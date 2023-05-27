@@ -1,5 +1,6 @@
 package com.chesstasks
 
+import com.chesstasks.di.configureDi
 import com.chesstasks.serialization.configureSerialization
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -11,5 +12,6 @@ fun main() {
 }
 
 fun Application.module() {
+    configureDi()
     configureSerialization()
 }
