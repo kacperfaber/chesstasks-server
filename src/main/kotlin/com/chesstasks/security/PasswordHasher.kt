@@ -14,3 +14,13 @@ class DevPasswordHasher : PasswordHasher{
         return rawPassword == passwordHash
     }
 }
+
+class ProdPasswordHasher : PasswordHasher {
+    override suspend fun hash(rawPassword: String): String {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun comparePasswords(rawPassword: String, passwordHash: String): Boolean {
+        TODO("Not yet implemented")
+    }
+}

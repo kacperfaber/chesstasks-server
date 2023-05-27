@@ -2,6 +2,7 @@ package com.chesstasks.di
 
 import com.chesstasks.Profiles
 import com.chesstasks.security.DevPasswordHasher
+import com.chesstasks.security.ProdPasswordHasher
 import io.ktor.server.application.*
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
@@ -18,7 +19,7 @@ fun devModule() = module {
 }
 
 fun prodModule() = module {
-    // TODO: ProdModule it's empty.
+    single {ProdPasswordHasher()}
 }
 
 fun Application.configureDi() {
