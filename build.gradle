@@ -2,17 +2,28 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.21'
     id 'io.ktor.plugin' version '2.3.0'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.21'
+    id "com.google.devtools.ksp" version "$ksp_version"
+    id 'application'
 }
 
 group "com.chesstasks"
 version "0.0.1"
 mainClassName = "com.chesstasks.ApplicationKt"
 
+tasks.compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
 def isDevelopment = project.ext.has("development")
 applicationDefaultJvmArgs = ["-Dio.ktor.development=$isDevelopment"]
 
 repositories {
     mavenCentral()
+}
+
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
 dependencies {
@@ -27,7 +38,12 @@ dependencies {
     implementation "io.ktor:ktor-server-websockets-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-netty-jvm:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
-    implementation "io.insert-koin:koin-ktor:$koin_version"
+
     testImplementation "io.ktor:ktor-server-tests-jvm:$ktor_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+
+    // Koin
+    implementation "io.insert-koin:koin-ktor:$koin_version"
+    implementation "io.insert-koin:koin-annotations:$koin_ksp_version"
+    ksp "io.insert-koin:koin-ksp-compiler:$koin_ksp_version"
 }
