@@ -26,6 +26,16 @@ sourceSets.main {
     java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
+test {
+    useJUnitPlatform()
+}
+
+tasks.register("devTest", Test) {
+    useJUnitPlatform {
+        systemProperty("profile", "dev")
+    }
+}
+
 dependencies {
     implementation "io.ktor:ktor-server-core-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-auth-jvm:$ktor_version"
@@ -40,7 +50,10 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:$logback_version"
 
     testImplementation "io.ktor:ktor-server-tests-jvm:$ktor_version"
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+
+    testImplementation "io.insert-koin:koin-test:$koin_version"
+    testImplementation "io.insert-koin:koin-test-junit5:$koin_version"
 
     // Koin
     implementation "io.insert-koin:koin-ktor:$koin_version"
