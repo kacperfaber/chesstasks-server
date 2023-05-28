@@ -6,12 +6,14 @@ import com.chesstasks.data.dto.Users
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.select
+import org.koin.core.annotation.Single
 
 interface UserDao {
     suspend fun getById(id: Int): UserDto?
     suspend fun getByLogin(login: String): UserDto?
 }
 
+@Single
 class UserDaoImpl : UserDao {
     private fun resultRowToUser(resultRow: ResultRow): UserDto {
         return UserDto(
