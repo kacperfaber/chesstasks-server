@@ -1,5 +1,6 @@
 package com.chesstasks.data
 
+import com.chesstasks.data.dto.Tokens
 import com.chesstasks.data.dto.Users
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
@@ -15,7 +16,7 @@ object DatabaseFactory {
         val db = Database.connect(jdbc, driverClassName, user = "sa", password = "sa")
 
         transaction(db) {
-            SchemaUtils.create(Users)
+            SchemaUtils.create(Users, Tokens)
             commit()
         }
     }

@@ -24,4 +24,8 @@ class TokenService(private val tokenReader: TokenReader, private val tokenWriter
         val tokenDto = insertToken(userId) ?: return null
         return Token(tokenDto.userId, tokenDto.secret)
     }
+
+    suspend fun revokeToken(token: Token): Boolean {
+        return tokenDao.deleteTokenByUserIdAndSecret(token.userId, token.secret)
+    }
 }
