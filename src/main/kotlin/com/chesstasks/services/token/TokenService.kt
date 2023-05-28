@@ -14,7 +14,7 @@ class TokenService(private val tokenReader: TokenReader, private val tokenWriter
         return tokenWriter.writeToken(token)
     }
 
-    suspend fun validateToken(token: Token): Int? = tokenDao.getTokenByUserIdAndSecret(token.userId, token.secret)?.id
+    suspend fun validateToken(token: Token): Int? = tokenDao.getTokenByUserIdAndSecret(token.userId, token.secret)?.userId
 
     private suspend fun insertToken(userId: Int): TokenDto? {
         return tokenDao.tryInsertToken(userId)
