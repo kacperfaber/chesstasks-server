@@ -9,7 +9,7 @@ import io.ktor.server.response.*
 fun Application.configureExceptionHandlers() {
     install(StatusPages) {
         exception<UnauthorizedException> {
-            call, exception -> call.respond(HttpStatusCode.Unauthorized, exception)
+            call, exception -> call.respond(HttpStatusCode.Unauthorized, ExceptionResponse(exception.message))
         }
     }
 }
