@@ -1,5 +1,7 @@
 package com.chesstasks.security
 
+import com.chesstasks.Profile
+import com.chesstasks.Profiles
 import com.chesstasks.di.setupModules
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
@@ -59,6 +61,8 @@ class DevPasswordHasherTest {
         @JvmStatic
         @BeforeAll
         fun before() {
+            Profiles.profileFallback = Profile.DEV
+
             startKoin {
                 setupModules()
             }

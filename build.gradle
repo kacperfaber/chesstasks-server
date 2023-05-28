@@ -30,12 +30,6 @@ test {
     useJUnitPlatform()
 }
 
-tasks.register("devTest", Test) {
-    useJUnitPlatform {
-        systemProperty("profile", "dev")
-    }
-}
-
 dependencies {
     implementation "io.ktor:ktor-server-core-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-auth-jvm:$ktor_version"

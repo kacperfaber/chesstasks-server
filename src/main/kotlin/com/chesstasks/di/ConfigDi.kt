@@ -37,7 +37,7 @@ fun gsonModule() = module {
 }
 
 fun KoinApplication.setupModules() {
-    val profileModule = if (Profiles.isDev()) devModule() else prodModule()
+    val profileModule = if (Profiles.isProd()) prodModule() else devModule()
     modules(GlobalModule().module, profileModule, gsonModule())
 }
 
