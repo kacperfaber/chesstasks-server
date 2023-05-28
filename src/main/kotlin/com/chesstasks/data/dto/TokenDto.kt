@@ -2,9 +2,10 @@ package com.chesstasks.data.dto
 
 import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
+import java.util.*
 
 object Tokens : BaseTable("tokens") {
-    val secret = text("secret")
+    val secret = text("secret").default(UUID.randomUUID().toString() + UUID.randomUUID().toString())
     val userId = integer("user_id").references(Users.id)
 }
 

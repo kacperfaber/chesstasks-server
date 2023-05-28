@@ -12,6 +12,7 @@ interface TokenDao {
     suspend fun getTokenByUserIdAndSecret(userId: Int, secret: String): TokenDto?
     suspend fun deleteTokenByUserIdAndSecret(userId: Int, secret: String): Boolean
     suspend fun tryInsertToken(userId: Int): TokenDto?
+    suspend fun deleteTokensByUserId(userId: Int): Int
 }
 
 @Single
@@ -37,4 +38,10 @@ class TokenDaoImpl : TokenDao {
         val insert = transaction { Tokens.insert { it[Tokens.userId] = userId } }
         return insert.resultedValues?.map(::resultRowToToken)?.singleOrNull()
     }
+
+    override suspend fun deleteTokensByUserId(userId: Int): Int {
+        return dbQuery { Tokens.deleteWhere { Tokens.userId eq userId } }
+    }
+
+
 }
