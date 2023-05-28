@@ -2,6 +2,7 @@ package com.chesstasks.security.auth
 
 import com.chesstasks.services.authentication.AuthenticationService
 import io.ktor.server.auth.*
+import io.ktor.server.routing.*
 import org.koin.core.annotation.Single
 import org.koin.java.KoinJavaComponent.get
 
@@ -25,5 +26,11 @@ class TokenAuthenticationProvider : AuthenticationProvider(Config(providerName))
     companion object {
         @JvmStatic
         val providerName = "token_auth_provider"
+    }
+}
+
+fun Route.tokenAuthentication(act: Route.() -> Unit) {
+    authenticate(TokenAuthenticationProvider.providerName) {
+        act(this)
     }
 }
