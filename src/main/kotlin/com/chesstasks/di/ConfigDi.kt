@@ -42,9 +42,7 @@ fun KoinApplication.setupModules() {
 }
 
 fun Application.configureDi() {
-    install(Koin) {}
-
-    startKoin {
+    install(Koin) {
         setupModules()
     }
 }
