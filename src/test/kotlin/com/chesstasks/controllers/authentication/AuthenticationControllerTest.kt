@@ -2,7 +2,9 @@ package com.chesstasks.controllers.authentication
 
 import com.chesstasks.data.dto.TokenDto
 import com.chesstasks.data.dto.Tokens
+import com.chesstasks.data.dto.UserDto
 import com.chesstasks.data.dto.Users
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -12,8 +14,10 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
-import testutils.BaseWebTest
+import testutils.*
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class AuthenticationControllerTest : BaseWebTest() {
     fun HttpRequestBuilder.setAuthBody(login: String, password: String) {
@@ -166,5 +170,56 @@ class AuthenticationControllerTest : BaseWebTest() {
 
         assertEquals(HttpStatusCode.OK, r.status)
         assertEquals(before+1,after)
+    }
+
+    @Test
+    fun `currentEndpoint returns 403 if no authentication`() = testSuspend {
+        defaultSetupDbForAuth()
+
+        app.client.get("/auth/current").status.isForbid()
+    }
+
+    @Test
+    fun `currentEndpoint returns OK if valid token authentication`() = testSuspend {
+        defaultSetupDbForAuth()
+
+        app.client.get("/auth/current") {
+            withToken(0)
+        }.status.isOk()
+    }
+
+    @Test
+    fun `currentEndpoint returns OK with not null data`() = testSuspend {
+        defaultSetupDbForAuth()
+
+        val user = app.client.get("/auth/current") {
+            withToken(0)
+        }.fromJson<UserDto>()
+
+        assertNotNull(user)
+    }
+
+    @Test
+    fun `currentEndpoint returns OK with expected data`() = testSuspend {
+        defaultSetupDbForAuth()
+
+        val user = app.client.get("/auth/current") {
+            withToken(0)
+        }.fromJson<UserDto>()
+
+        assertEquals(0, user.id)
+        assertEquals("kacper", user.username)
+        assertEquals("kacperf1234@gmail.com", user.emailAddress)
+    }
+
+    @Test
+    fun `currentEndpoint returns passwordHash null`() = testSuspend {
+        defaultSetupDbForAuth()
+
+        val r = app.client.get("/auth/current") {
+            withToken(0)
+        }
+
+        assertNull(r.jsonPath<String>("$.passwordHash"))
     }
 }

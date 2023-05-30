@@ -32,6 +32,7 @@ fun prodModule() = module {
     single { ProdTokenWriter() } binds arrayOf(TokenWriter::class)
 }
 
+// TODO: Replace with Jackson.
 fun gsonModule() = module {
     single { Gson() }
 }
