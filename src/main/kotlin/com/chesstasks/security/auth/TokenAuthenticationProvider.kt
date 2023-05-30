@@ -16,10 +16,12 @@ class TokenAuthenticationProvider : AuthenticationProvider(Config(providerName))
 
     private fun unauthorized(): Nothing = throw UnauthorizedException()
 
+    private fun forbid(): Nothing = throw ForbidException()
+
     override suspend fun onAuthenticate(context: AuthenticationContext) {
-        val token = getAuthorizationValue(context) ?: unauthorized()
+        val token = getAuthorizationValue(context) ?: forbid()
         val authenticationService: AuthenticationService = get(AuthenticationService::class.java)
-        val tokenAuthResult = authenticationService.tryAuthenticate(token) ?: unauthorized()
+        val tokenAuthResult = authenticationService.tryAuthenticate(token) ?: forbid()
         context.principal(TokenPrincipal(tokenAuthResult.token, tokenAuthResult.user))
     }
 
