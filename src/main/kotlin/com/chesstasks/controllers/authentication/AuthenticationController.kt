@@ -3,6 +3,8 @@ package com.chesstasks.controllers.authentication
 import com.chesstasks.security.auth.TokenPrincipal
 import com.chesstasks.security.auth.tokenAuthentication
 import com.chesstasks.services.authentication.AuthenticationService
+import com.chesstasks.services.token.TokenService
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
@@ -11,10 +13,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
+data class AuthPayload(val login: String, val password: String)
+
 fun Route.authenticationController() {
     val authenticationService by inject<AuthenticationService>()
-
-    data class AuthPayload(val login: String, val password: String)
+    val tokenService by inject<TokenService>()
 
     post("/auth") {
         val authPayload = call.receive<AuthPayload>()
@@ -26,6 +29,12 @@ fun Route.authenticationController() {
         get("/auth/current") {
             val user = call.principal<TokenPrincipal>()!!.user
             call.respond(user)
+        }
+
+        post("/auth/revoke") {
+            val token = call.principal<TokenPrincipal>()!!.token
+            val result = tokenService.revokeToken(token)
+            call.respond(if (result) HttpStatusCode.OK else HttpStatusCode.BadRequest)
         }
     }
 }
