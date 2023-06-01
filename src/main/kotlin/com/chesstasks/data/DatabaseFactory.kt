@@ -1,5 +1,6 @@
 package com.chesstasks.data
 
+import com.chesstasks.data.dto.Admins
 import com.chesstasks.data.dto.LichessPuzzles
 import com.chesstasks.data.dto.Tokens
 import com.chesstasks.data.dto.Users
@@ -11,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import javax.sql.DataSource
 
 object DatabaseFactory {
-    private val tables = listOf(Users, Tokens, LichessPuzzles).toTypedArray()
+    private val tables = listOf(Users, Tokens, LichessPuzzles, Admins).toTypedArray()
 
     fun init() {
         // TODO: No 'production' database.
