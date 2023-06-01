@@ -1,7 +1,7 @@
 package com.chesstasks.controllers.authentication
 
 import com.chesstasks.security.auth.TokenPrincipal
-import com.chesstasks.security.auth.tokenAuthentication
+import com.chesstasks.security.auth.user
 import com.chesstasks.services.authentication.AuthenticationService
 import com.chesstasks.services.token.TokenService
 import io.ktor.http.*
@@ -25,7 +25,7 @@ fun Route.authenticationController() {
         call.respond(authResult.token)
     }
 
-    tokenAuthentication {
+    user {
         get("/auth/current") {
             val user = call.principal<TokenPrincipal>()!!.user
             call.respond(user)

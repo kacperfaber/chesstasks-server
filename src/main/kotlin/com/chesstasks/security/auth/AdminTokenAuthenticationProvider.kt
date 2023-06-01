@@ -23,7 +23,7 @@ class AdminTokenAuthenticationProvider : AuthenticationProvider(Config(providerN
     }
 }
 
-fun Route.adminTokenAuthentication(act: Route.() -> Unit) {
+fun Route.admin(act: Route.() -> Unit) {
     authenticate(AdminTokenAuthenticationProvider.providerName) {
         act(this)
     }

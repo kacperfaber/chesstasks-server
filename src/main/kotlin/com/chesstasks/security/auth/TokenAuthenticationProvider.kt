@@ -31,7 +31,7 @@ class TokenAuthenticationProvider : AuthenticationProvider(Config(providerName))
     }
 }
 
-fun Route.tokenAuthentication(act: Route.() -> Unit) {
+fun Route.user(act: Route.() -> Unit) {
     authenticate(TokenAuthenticationProvider.providerName) {
         act(this)
     }
