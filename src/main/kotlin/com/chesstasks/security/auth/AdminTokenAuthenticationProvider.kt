@@ -3,8 +3,10 @@ package com.chesstasks.security.auth
 import com.chesstasks.services.authentication.AuthenticationService
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
+import org.koin.core.annotation.Single
 import org.koin.java.KoinJavaComponent
 
+@Single
 class AdminTokenAuthenticationProvider : AuthenticationProvider(Config(providerName)){
     class Config(name: String) : AuthenticationProvider.Config(name)
 
