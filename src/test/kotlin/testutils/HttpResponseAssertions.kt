@@ -24,6 +24,10 @@ fun HttpStatusCode.isUnauthorized() {
     assertEquals(HttpStatusCode.Unauthorized, this)
 }
 
+fun HttpStatusCode.isNoContent() {
+    assertEquals(HttpStatusCode.NoContent, this)
+}
+
 suspend fun <T> HttpResponse.jsonPath(path: String): T? {
     val config = Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS)
     val parsed = JsonPath.parse(bodyAsText(), config)
