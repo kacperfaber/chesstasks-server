@@ -1,5 +1,7 @@
 package testutils
 
+import com.chesstasks.Profile
+import com.chesstasks.Profiles
 import com.chesstasks.data.DatabaseFactory
 import com.chesstasks.data.dto.Tokens
 import com.chesstasks.module
@@ -31,6 +33,7 @@ open class BaseTest {
     fun setup() {
         app = TestApplication {
             application {
+                Profiles.profileFallback = Profile.TEST
                 module()
             }
         }
