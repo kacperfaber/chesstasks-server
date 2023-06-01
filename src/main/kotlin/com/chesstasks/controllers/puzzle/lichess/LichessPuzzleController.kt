@@ -1,5 +1,6 @@
 package com.chesstasks.controllers.puzzle.lichess
 
+import com.chesstasks.controllers.ofBoolean
 import com.chesstasks.controllers.ofNullable
 import com.chesstasks.exceptions.MissingQueryParameter
 import com.chesstasks.security.auth.admin
@@ -23,7 +24,13 @@ fun Route.lichessPuzzleController() {
 
     admin {
         put("/lichess-puzzle") {
-            val payload = call.receive<InsertLichessPuzzlePayload>()
+            val payload = call.receive<InsertLichessPuzzlePayload>() // TODO: Missing model validation.
+            call.ofNullable(lichessPuzzleService.createNew(payload.id, payload.fen, payload.moves, payload.ranking))
+        }
+
+        delete("/lichess-puzzle/{id}") {
+            val id = call.parameters["id"] ?: throw MissingQueryParameter("id")
+            call.ofBoolean(lichessPuzzleService.deleteById(id))
         }
     }
 }
