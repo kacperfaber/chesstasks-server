@@ -13,4 +13,8 @@ class AdminService(private val adminDao: AdminDao) {
     suspend fun getById(id: Int): AdminDto? {
         return adminDao.getById(id)
     }
+
+    suspend fun isUserAdmin(userId: Int): Boolean {
+        return adminDao.getByUserId(userId) != null
+    }
 }

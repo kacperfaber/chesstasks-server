@@ -2,6 +2,7 @@ package com.chesstasks.services.authentication
 
 import com.chesstasks.data.dto.UserDto
 import com.chesstasks.security.PasswordHasher
+import com.chesstasks.services.admin.AdminService
 import com.chesstasks.services.token.Token
 import com.chesstasks.services.token.TokenService
 import com.chesstasks.services.user.UserService
@@ -15,7 +16,8 @@ data class TokenAuthResult(val token: Token, val user: UserDto)
 class AuthenticationService(
     private val userService: UserService,
     private val passwordHasher: PasswordHasher,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val adminService: AdminService
 ) {
     suspend fun tryAuthenticate(login: String, password: String): AuthResult? {
         val user = userService.getByLogin(login) ?: return null
@@ -30,5 +32,10 @@ class AuthenticationService(
         val userId = tokenService.validateToken(token) ?: return null
         val user = userService.getById(userId) ?: return null
         return TokenAuthResult(token, user)
+    }
+
+    suspend fun tryAuthenticateAdmin(tokenString: String): TokenAuthResult? {
+        val tokenAuthResult = tryAuthenticate(tokenString) ?: return null
+        return if (adminService.isUserAdmin(tokenAuthResult.user.id)) tokenAuthResult else null
     }
 }
