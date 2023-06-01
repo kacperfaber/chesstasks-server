@@ -5,6 +5,7 @@ import com.chesstasks.data.dto.LichessPuzzles
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
 
 interface LichessPuzzleDao {
@@ -24,7 +25,9 @@ class LichessPuzzleDaoImpl : LichessPuzzleDao {
     }
 
     override suspend fun getById(id: String): LichessPuzzleDto? {
-        val resultRow = LichessPuzzles.select(LichessPuzzles.id eq id).singleOrNull() ?: return null
-        return resultRowToLichessPuzzleDto(resultRow)
+        return transaction {
+            val resultRow = LichessPuzzles.select(LichessPuzzles.id eq id).singleOrNull() ?: return@transaction null
+            return@transaction resultRowToLichessPuzzleDto(resultRow)
+        }
     }
 }

@@ -5,7 +5,7 @@ import com.chesstasks.data.dto.LichessPuzzleDto
 import org.koin.core.annotation.Single
 
 @Single
-class LichessPuzzleService(val lichessPuzzleDao: LichessPuzzleDao) {
+class LichessPuzzleService(private val lichessPuzzleDao: LichessPuzzleDao) {
     suspend fun getById(id: String): LichessPuzzleDto? {
         return lichessPuzzleDao.getById(id)
     }
