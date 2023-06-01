@@ -1,17 +1,17 @@
 package com.chesstasks.data
 
+import com.chesstasks.data.dto.LichessPuzzles
 import com.chesstasks.data.dto.Tokens
 import com.chesstasks.data.dto.Users
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import javax.sql.DataSource
 
 object DatabaseFactory {
-    private val tables = listOf(Users, Tokens).toTypedArray()
+    private val tables = listOf(Users, Tokens, LichessPuzzles).toTypedArray()
 
     fun init() {
         // TODO: No 'production' database.
