@@ -19,7 +19,6 @@ class LichessPuzzleControllerWebTest : BaseWebTest() {
                 it[id] = "a"
                 it[fen] = "8/8/8/8/8/8/8..."
                 it[moves] = "e2e4"
-                it[opening] = "Queen's Gambit"
                 it[ranking] = 1800
             }
         }

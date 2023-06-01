@@ -6,9 +6,7 @@ object LichessPuzzles : Table() {
     val id = varchar("id", 5)
     val fen = text("fen")
     val moves = varchar("moves", 255)
-    val opening = varchar("opening", 64).nullable()
-    // TODO: Use smaller data type to store 'opening'.
     val ranking = integer("ranking")
 }
 
-data class LichessPuzzleDto(val id: String, val fen: String, val moves: String, val ranking: Int, val opening: String?)
+data class LichessPuzzleDto(val id: String, val fen: String, val moves: String, val ranking: Int)

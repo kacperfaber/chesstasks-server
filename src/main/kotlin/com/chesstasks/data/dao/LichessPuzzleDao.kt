@@ -19,8 +19,8 @@ class LichessPuzzleDaoImpl : LichessPuzzleDao {
             resultRow[LichessPuzzles.id],
             resultRow[LichessPuzzles.fen],
             resultRow[LichessPuzzles.moves],
-            resultRow[LichessPuzzles.ranking],
-            resultRow[LichessPuzzles.opening]
+            resultRow[LichessPuzzles.ranking]
+            // TODO: Add opening field later
         )
     }
 
