@@ -9,6 +9,6 @@ suspend inline fun <reified T> ApplicationCall.ofNullable(value: T?) {
     respond(HttpStatusCode.OK, value ?: throw BadRequestException())
 }
 
-suspend fun ApplicationCall.ofBoolean(value: Boolean) {
-    respond(if (value) HttpStatusCode.OK else HttpStatusCode.BadRequest)
+suspend fun ApplicationCall.ofBoolean(value: Boolean, whenTrue: HttpStatusCode = HttpStatusCode.NoContent) {
+    respond(if (value) whenTrue else HttpStatusCode.BadRequest)
 }
