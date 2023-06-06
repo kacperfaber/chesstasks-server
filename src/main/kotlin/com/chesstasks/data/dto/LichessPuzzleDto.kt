@@ -7,6 +7,9 @@ object LichessPuzzles : Table() {
     val fen = text("fen")
     val moves = varchar("moves", 255)
     val ranking = integer("ranking")
+
+    override val primaryKey: PrimaryKey
+        get() = PrimaryKey(id)
 }
 
 data class LichessPuzzleDto(val id: String, val fen: String, val moves: String, val ranking: Int)
