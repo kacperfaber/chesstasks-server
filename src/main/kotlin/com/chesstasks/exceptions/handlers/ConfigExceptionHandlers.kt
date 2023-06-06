@@ -6,6 +6,7 @@ import com.chesstasks.security.auth.ForbidException
 import com.chesstasks.security.auth.UnauthorizedException
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 
@@ -25,6 +26,10 @@ fun Application.configureExceptionHandlers() {
 
         exception<MissingQueryParameter> {call, exception ->
             call.respond(HttpStatusCode.BadRequest, "Missing '${exception.queryParameterName}' query parameter.")
+        }
+
+        exception<RequestValidationException> {call, exception ->
+            call.respond(HttpStatusCode.BadRequest, "Request Validation: ${exception.reasons.joinToString(",") { "'$it'" }}")
         }
     }
 }

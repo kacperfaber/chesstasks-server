@@ -4,6 +4,7 @@ import com.chesstasks.controllers.configureControllers
 import com.chesstasks.data.configureDb
 import com.chesstasks.di.configureDi
 import com.chesstasks.exceptions.handlers.configureExceptionHandlers
+import com.chesstasks.requestvalidation.configureRequestValidation
 import com.chesstasks.security.auth.configureAuthentication
 import com.chesstasks.serialization.configureSerialization
 import io.ktor.server.application.*
@@ -21,5 +22,6 @@ fun Application.module() {
     configureDb()
     configureSerialization()
     configureAuthentication()
+    configureRequestValidation()
     configureControllers()
 }
