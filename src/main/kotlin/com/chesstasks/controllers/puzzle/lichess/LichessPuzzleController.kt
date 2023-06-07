@@ -24,9 +24,11 @@ fun Route.lichessPuzzleController() {
 
     admin {
         put("/lichess-puzzle") {
-            val payload = call.receive<InsertLichessPuzzlePayload>() // TODO: Missing model validation.
+            val payload = call.receive<InsertLichessPuzzlePayload>()
             call.ofNullable(lichessPuzzleService.createNew(payload.id, payload.fen, payload.moves, payload.ranking))
         }
+
+        // TODO: Missing GET - fetch list of lichess
 
         delete("/lichess-puzzle/{id}") {
             val id = call.parameters["id"] ?: throw MissingQueryParameter("id")
