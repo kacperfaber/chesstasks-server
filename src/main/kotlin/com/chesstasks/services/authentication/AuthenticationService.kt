@@ -12,6 +12,8 @@ data class AuthResult(val userId: Int, val username: String, val emailAddress: S
 
 data class TokenAuthResult(val token: Token, val user: UserDto)
 
+data class SessionAuthentication(val userId: Int, val username: String, val emailAddress: String, val isAdmin: Boolean)
+
 @Single
 class AuthenticationService(
     private val userService: UserService,
@@ -37,5 +39,11 @@ class AuthenticationService(
     suspend fun tryAuthenticateAdmin(tokenString: String): TokenAuthResult? {
         val tokenAuthResult = tryAuthenticate(tokenString) ?: return null
         return if (adminService.isUserAdmin(tokenAuthResult.user.id)) tokenAuthResult else null
+    }
+
+    suspend fun tryAuthenticateSession(login: String, password: String): SessionAuthentication? {
+        val user = userService.getByLogin(login) ?: return null
+        if (!passwordHasher.comparePasswords(password, user.passwordHash)) return null
+        return SessionAuthentication(user.id, user.username, user.emailAddress, adminService.isUserAdmin(user.id))
     }
 }
