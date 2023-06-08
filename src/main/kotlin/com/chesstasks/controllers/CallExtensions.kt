@@ -24,6 +24,10 @@ suspend fun ApplicationCall.view(name: String, ext: String = ".ftl", model: Any)
     respond(FreeMarkerContent("$name$ext", model))
 }
 
+suspend fun ApplicationCall.view(name: String, ext: String = ".ftl") {
+    respond(FreeMarkerContent("$name$ext", mapOf<Any,Any>()))
+}
+
 suspend inline fun ApplicationCall.view(name: String, ext: String = ".ftl", act: () -> Any) {
     respond(FreeMarkerContent("$name$ext", act()))
 }
