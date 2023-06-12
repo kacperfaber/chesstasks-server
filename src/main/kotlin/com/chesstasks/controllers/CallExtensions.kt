@@ -1,6 +1,7 @@
 package com.chesstasks.controllers
 
 import com.chesstasks.exceptions.BadRequestException
+import com.chesstasks.freemarker.ViewModel
 import com.chesstasks.security.auth.TokenPrincipal
 import com.chesstasks.security.auth.session.UserSession
 import io.ktor.http.*
@@ -20,8 +21,6 @@ suspend fun ApplicationCall.ofBoolean(value: Boolean, whenTrue: HttpStatusCode =
 fun ApplicationCall.requirePrincipalId(): Int {
     return principal<TokenPrincipal>()?.user?.id ?: throw Exception("No principal")
 }
-
-open class ViewModel(val user: UserSession?)
 
 suspend fun ApplicationCall.view(name: String, ext: String = ".ftl", model: ViewModel) {
     respond(FreeMarkerContent("$name$ext", model))
