@@ -2,6 +2,7 @@ package com.chesstasks.controllers
 
 import com.chesstasks.exceptions.BadRequestException
 import com.chesstasks.security.auth.TokenPrincipal
+import com.chesstasks.security.auth.session.UserSession
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -20,7 +21,9 @@ fun ApplicationCall.requirePrincipalId(): Int {
     return principal<TokenPrincipal>()?.user?.id ?: throw Exception("No principal")
 }
 
-suspend fun ApplicationCall.view(name: String, ext: String = ".ftl", model: Any) {
+open class ViewModel(val user: UserSession?)
+
+suspend fun ApplicationCall.view(name: String, ext: String = ".ftl", model: ViewModel) {
     respond(FreeMarkerContent("$name$ext", model))
 }
 
@@ -28,6 +31,6 @@ suspend fun ApplicationCall.view(name: String, ext: String = ".ftl") {
     respond(FreeMarkerContent("$name$ext", mapOf<Any,Any>()))
 }
 
-suspend inline fun ApplicationCall.view(name: String, ext: String = ".ftl", act: () -> Any) {
+suspend inline fun ApplicationCall.view(name: String, ext: String = ".ftl", act: () -> ViewModel) {
     respond(FreeMarkerContent("$name$ext", act()))
 }
