@@ -1,5 +1,6 @@
 package com.chesstasks.data.dao
 
+import com.chesstasks.data.DatabaseFactory.dbQuery
 import com.chesstasks.data.dto.UserPuzzleDto
 import com.chesstasks.data.dto.UserPuzzles
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -7,7 +8,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
 
 interface UserPuzzleDao {
@@ -22,7 +22,7 @@ interface UserPuzzleDao {
 @Single
 class UserPuzzleDaoImpl : UserPuzzleDao {
     override suspend fun getById(id: Int): UserPuzzleDto? {
-        return transaction {
+        return dbQuery {
             UserPuzzles
                 .select { UserPuzzles.id eq id }
                 .map(UserPuzzleDto::from)
@@ -31,7 +31,7 @@ class UserPuzzleDaoImpl : UserPuzzleDao {
     }
 
     override suspend fun getByIdAndOwnerId(id: Int, ownerId: Int): UserPuzzleDto? {
-        return transaction {
+        return dbQuery {
             UserPuzzles.select { (UserPuzzles.id eq id) and (UserPuzzles.ownerId eq ownerId) }
                 .map(UserPuzzleDto::from)
                 .singleOrNull()
@@ -39,13 +39,13 @@ class UserPuzzleDaoImpl : UserPuzzleDao {
     }
 
     override suspend fun getByOwnerId(ownerId: Int): List<UserPuzzleDto> {
-        return transaction {
+        return dbQuery {
             UserPuzzles.select { (UserPuzzles.ownerId eq ownerId) }.map(UserPuzzleDto::from)
         }
     }
 
     override suspend fun createNew(ownerId: Int, fen: String, moves: String, ranking: Int): UserPuzzleDto? {
-        return transaction {
+        return dbQuery {
             UserPuzzles.insert {
                 it[UserPuzzles.fen] = fen
                 it[UserPuzzles.moves] = moves
@@ -56,13 +56,13 @@ class UserPuzzleDaoImpl : UserPuzzleDao {
     }
 
     override suspend fun deleteByIdAndOwnerId(id: Int, ownerId: Int): Boolean {
-        return transaction {
+        return dbQuery {
             UserPuzzles.deleteWhere { (UserPuzzles.id eq id) and (UserPuzzles.ownerId eq ownerId) } > 0
         }
     }
 
     override suspend fun deleteById(id: Int): Boolean {
-        return transaction {
+        return dbQuery {
             UserPuzzles.deleteWhere { UserPuzzles.id eq id } > 0
         }
     }

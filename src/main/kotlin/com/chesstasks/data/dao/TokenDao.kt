@@ -5,7 +5,6 @@ import com.chesstasks.data.dto.TokenDto
 import com.chesstasks.data.dto.Tokens
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
 
 interface TokenDao {
@@ -35,7 +34,7 @@ class TokenDaoImpl : TokenDao {
     }
 
     override suspend fun tryInsertToken(userId: Int): TokenDto? {
-        val insert = transaction { Tokens.insert { it[Tokens.userId] = userId } }
+        val insert = dbQuery { Tokens.insert { it[Tokens.userId] = userId } }
         return insert.resultedValues?.map(::resultRowToToken)?.singleOrNull()
     }
 

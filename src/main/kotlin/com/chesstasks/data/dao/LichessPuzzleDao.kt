@@ -1,5 +1,6 @@
 package com.chesstasks.data.dao
 
+import com.chesstasks.data.DatabaseFactory.dbQuery
 import com.chesstasks.data.dto.LichessPuzzleDto
 import com.chesstasks.data.dto.LichessPuzzles
 import org.jetbrains.exposed.sql.ResultRow
@@ -7,7 +8,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
 
 interface LichessPuzzleDao {
@@ -29,14 +29,14 @@ class LichessPuzzleDaoImpl : LichessPuzzleDao {
     }
 
     override suspend fun getById(id: String): LichessPuzzleDto? {
-        return transaction {
-            val resultRow = LichessPuzzles.select(LichessPuzzles.id eq id).singleOrNull() ?: return@transaction null
-            return@transaction resultRowToLichessPuzzleDto(resultRow)
+        return dbQuery {
+            val resultRow = LichessPuzzles.select(LichessPuzzles.id eq id).singleOrNull() ?: return@dbQuery null
+            return@dbQuery resultRowToLichessPuzzleDto(resultRow)
         }
     }
 
     override suspend fun insert(id: String, fen: String, moves: String, ranking: Int): LichessPuzzleDto? {
-        return transaction {
+        return dbQuery {
             val insert = LichessPuzzles.insert {
                 it[LichessPuzzles.id] = id
                 it[LichessPuzzles.fen] = fen
@@ -44,12 +44,12 @@ class LichessPuzzleDaoImpl : LichessPuzzleDao {
                 it[LichessPuzzles.ranking] = ranking
             }
 
-            resultRowToLichessPuzzleDto(insert.resultedValues?.singleOrNull() ?: return@transaction null)
+            resultRowToLichessPuzzleDto(insert.resultedValues?.singleOrNull() ?: return@dbQuery null)
         }
     }
 
     override suspend fun deleteById(id: String): Boolean {
-        return transaction {
+        return dbQuery {
             LichessPuzzles.deleteWhere { LichessPuzzles.id eq id } > 0
         }
     }
