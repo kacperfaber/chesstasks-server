@@ -9,11 +9,15 @@ import org.koin.core.annotation.Single
 class PuzzleService(private val puzzleDao: PuzzleDao) {
     suspend fun getById(id: Int): PuzzleDto? = puzzleDao.getById(id)
 
-    suspend fun getAllByDatabase(database: PuzzleDatabase, limit: Int = 50, skip: Long = 0L): List<PuzzleDto> {
-        return puzzleDao.getAllByDatabase(database, limit, skip)
+    companion object {
+        const val DEFAULT_LIMIT = 50
     }
 
-    suspend fun getAllByOwner(ownerId: Int, limit: Int, skip: Long): List<PuzzleDto> {
-        return puzzleDao.getByOwnerId(ownerId, limit, skip)
+    suspend fun getAllByDatabase(database: PuzzleDatabase, skip: Long = 0L): List<PuzzleDto> {
+        return puzzleDao.getAllByDatabase(database, DEFAULT_LIMIT, skip)
+    }
+
+    suspend fun getAllByOwner(ownerId: Int, skip: Long): List<PuzzleDto> {
+        return puzzleDao.getByOwnerId(ownerId, DEFAULT_LIMIT, skip)
     }
 }
