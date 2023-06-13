@@ -2,10 +2,14 @@ package com.chesstasks.services.puzzle.history
 
 import com.chesstasks.data.dao.PuzzleHistoryItemDao
 import com.chesstasks.data.dto.PuzzleHistoryItemDto
+import com.chesstasks.services.user.preferences.UserPreferencesService
 import org.koin.core.annotation.Single
 
 @Single
-class PuzzleHistoryService(private val puzzleHistoryItemDao: PuzzleHistoryItemDao) {
+class PuzzleHistoryService(
+    private val puzzleHistoryItemDao: PuzzleHistoryItemDao,
+    private val userPreferencesService: UserPreferencesService
+) {
 
     suspend fun getById(id: Int): PuzzleHistoryItemDto? = puzzleHistoryItemDao.getById(id)
 
@@ -19,10 +23,9 @@ class PuzzleHistoryService(private val puzzleHistoryItemDao: PuzzleHistoryItemDa
     suspend fun getByUserId(
         userId: Int,
         authenticatedUserId: Int,
-        limit: Int = DEFAULT_LIMIT,
-        skip: Long = 0): List<PuzzleHistoryItemDto> {
-        // TODO: Add some preference settings. My puzzle should not be visible for stranger.
-
-        return puzzleHistoryItemDao.getByUserId(userId, authenticatedUserId, limit, skip)
+        skip: Long = 0
+    ): List<PuzzleHistoryItemDto>? {
+        val isAccess = userPreferencesService.checkAccessToSeePuzzleHistory(userId, authenticatedUserId)
+        return if (isAccess) puzzleHistoryItemDao.getByUserId(userId, authenticatedUserId, DEFAULT_LIMIT, skip) else null
     }
 }
