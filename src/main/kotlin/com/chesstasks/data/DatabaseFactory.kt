@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import javax.sql.DataSource
 
 object DatabaseFactory {
-    private val tables = listOf(Users, Tokens, Admins).toTypedArray()
+    private val tables = listOf(Users, Tokens, Admins, Puzzles).toTypedArray()
 
     fun init() {
         // TODO: No 'production' database.
