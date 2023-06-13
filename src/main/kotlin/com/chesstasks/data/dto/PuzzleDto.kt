@@ -2,6 +2,7 @@ package com.chesstasks.data.dto
 
 import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
 
 enum class PuzzleDatabase(val value: Int) {
@@ -22,24 +23,26 @@ object Puzzles : BaseTable("puzzles") {
 
 class PuzzleDto(
     id: Int,
+    @JsonIgnore val owner: UserDto?,
     val ownerId: Int?,
     val fen: String,
     val moves: String,
     val ranking: Int,
     val database: PuzzleDatabase,
-    val themeIds: List<Int>,
+    val themeIds: List<String>,
     createdAt: Long
 ) : BaseDto(id, createdAt) {
     companion object {
         fun from(row: ResultRow): PuzzleDto {
             return PuzzleDto(
                 row[Puzzles.id],
+                UserDto.tryFrom(row),
                 row[Puzzles.ownerId],
                 row[Puzzles.fen],
                 row[Puzzles.moves],
                 row[Puzzles.ranking],
                 row[Puzzles.database],
-                row[Puzzles.themeIds].split(",").map {it.toInt()},
+                row[Puzzles.themeIds].split(","), // TODO
                 row[Puzzles.createdAt]
             )
         }
