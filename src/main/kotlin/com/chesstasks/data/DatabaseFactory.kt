@@ -1,5 +1,6 @@
 package com.chesstasks.data
 
+import com.chesstasks.data.dao.UserPreferences
 import com.chesstasks.data.dto.*
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
@@ -9,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import javax.sql.DataSource
 
 object DatabaseFactory {
-    private val tables = listOf(Users, Tokens, Admins, Puzzles, PuzzleHistoryItems).toTypedArray()
+    private val tables = listOf(Users, Tokens, Admins, Puzzles, PuzzleHistoryItems, UserPreferences).toTypedArray()
 
     fun init() {
         // TODO: No 'production' database.
