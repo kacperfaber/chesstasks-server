@@ -20,4 +20,12 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
     suspend fun getAllByOwner(ownerId: Int, skip: Long): List<PuzzleDto> {
         return puzzleDao.getByOwnerId(ownerId, DEFAULT_LIMIT, skip)
     }
+
+    suspend fun deletePuzzle(id: Int, authenticatedUserId: Int): Boolean {
+        return puzzleDao.deleteByIdAndAuthenticatedUserId(id, authenticatedUserId)
+    }
+
+    suspend fun deletePuzzle(id: Int): Boolean {
+        return puzzleDao.deleteById(id)
+    }
 }

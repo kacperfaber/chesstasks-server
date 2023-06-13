@@ -1,8 +1,11 @@
 package com.chesstasks.controllers.puzzle
 
+import com.chesstasks.controllers.ofBoolean
 import com.chesstasks.controllers.ofNullable
+import com.chesstasks.controllers.requirePrincipalId
 import com.chesstasks.data.dto.PuzzleDatabase
 import com.chesstasks.exceptions.MissingQueryParameter
+import com.chesstasks.security.auth.admin
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.puzzle.PuzzleService
 import io.ktor.server.application.*
@@ -32,6 +35,20 @@ fun Route.puzzleController() {
             val skip = call.parameters["skip"]?.toLongOrNull() ?: 0
             val userId = call.parameters["userId"]?.toIntOrNull() ?: throw MissingQueryParameter("userId")
             call.ofNullable(puzzleService.getAllByOwner(userId, skip))
+        }
+
+        delete("/puzzle/{id}") {
+            val userId = call.requirePrincipalId()
+            val id = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
+
+            call.ofBoolean(puzzleService.deletePuzzle(id, userId))
+        }
+    }
+
+    admin {
+        delete("/puzzle/as-admin/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
+            call.ofBoolean(puzzleService.deletePuzzle(id))
         }
     }
 }

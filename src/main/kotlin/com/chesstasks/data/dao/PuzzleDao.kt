@@ -6,6 +6,9 @@ import com.chesstasks.data.dto.PuzzleDto
 import com.chesstasks.data.dto.PuzzleDto.Companion.from
 import com.chesstasks.data.dto.Puzzles
 import com.chesstasks.data.dto.Users
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.koin.core.annotation.Single
@@ -33,6 +36,18 @@ class PuzzleDao {
     suspend fun getAllByDatabase(database: PuzzleDatabase, limit: Int, skip: Long): List<PuzzleDto> {
         return dbQuery {
             (Puzzles innerJoin Users).select { Puzzles.database eq database }.limit(limit, skip).map(::from)
+        }
+    }
+
+    suspend fun deleteByIdAndAuthenticatedUserId(id: Int, authenticatedUserId: Int): Boolean {
+        return dbQuery {
+            (Puzzles).deleteWhere { (Puzzles.id eq id) and (Puzzles.ownerId eq authenticatedUserId) } > 0
+        }
+    }
+
+    suspend fun deleteById(id: Int): Boolean {
+        return dbQuery {
+            Puzzles.deleteWhere { Puzzles.id eq id } > 0
         }
     }
 }

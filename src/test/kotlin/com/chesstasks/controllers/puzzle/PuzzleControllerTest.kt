@@ -1,16 +1,18 @@
 package com.chesstasks.controllers.puzzle
 
-import com.chesstasks.data.dto.Admins
-import com.chesstasks.data.dto.PuzzleDatabase
-import com.chesstasks.data.dto.Puzzles
-import com.chesstasks.data.dto.Users
+import com.chesstasks.data.dto.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.test.dispatcher.*
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import testutils.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class PuzzleControllerTest : BaseWebTest() {
     private fun setupUser() {
@@ -186,7 +188,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
         val r = app.client.get("/puzzle/all/by-database/lichess") { withToken(0) }
-        idRange(r, 0..49, skip=0)
+        idRange(r, 0..49, skip = 0)
     }
 
     @Test
@@ -194,7 +196,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
         val r = app.client.get("/puzzle/all/by-database/lichess?skip=100") { withToken(0) }
-        idRange(r, 100..149, skip=-100)
+        idRange(r, 100..149, skip = -100)
     }
 
     @Test
@@ -235,7 +237,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.USER)
         val r = app.client.get("/puzzle/all/by-database/user") { withToken(0) }
-        idRange(r, 0..49, skip=0)
+        idRange(r, 0..49, skip = 0)
     }
 
     @Test
@@ -243,6 +245,200 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.USER)
         val r = app.client.get("/puzzle/all/by-database/user?skip=100") { withToken(0) }
-        idRange(r, 100..149, skip=-100)
+        idRange(r, 100..149, skip = -100)
+    }
+
+    @Test
+    fun `deleteByIdEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        app.client.delete("/puzzle/0").status.isForbid()
+    }
+
+    private fun setupUser2() {
+        transaction {
+            Users.insert {
+                it[id] = 1
+                it[emailAddress] = "test@gmail.com"
+                it[username] = "kacper2"
+                it[passwordHash] = "HelloWorld123"
+            }
+        }
+    }
+
+    @Test
+    fun `deleteByIdEndpoint returns BAD_REQUEST if authenticated as not owner of the resource`() = testSuspend {
+        setupUser()
+        setupUser2()
+        setupPuzzle()
+        app.client.delete("/puzzle/0") { withToken(1) }.status.isBadRequest()
+    }
+
+    @Test
+    fun `deleteByIdEndpoint returns BAD_REQUEST if authenticated but resource does not exist`() = testSuspend {
+        setupUser()
+        app.client.delete("/puzzle/0") { withToken(0) }.status.isBadRequest()
+    }
+
+    private fun countPuzzles(): Long {
+        return transaction {
+            Puzzles.selectAll().count()
+        }
+    }
+
+    @Test
+    fun `deleteByIdEndpoint returns NO_CONTENT if authenticated and resource does not exist`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        app.client.delete("/puzzle/0") { withToken(0) }.status.isNoContent()
+    }
+
+    @Test
+    fun `deleteByIdEndpoint makes Puzzles table smaller by 1 and returns No_CONTENT`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        val before = countPuzzles()
+        app.client.delete("/puzzle/0") { withToken(0) }.status.isNoContent()
+        val now = countPuzzles()
+        assertEquals(before - 1, now)
+    }
+
+    @Test
+    fun `deleteByIdEndpoint does not affect Puzzle table size when returns BAD_REQUEST`() = testSuspend {
+        setupUser()
+        val before = countPuzzles()
+        app.client.delete("/puzzle/0") { withToken(0) }.status.isBadRequest()
+        val now = countPuzzles()
+        assertEquals(before, now)
+    }
+
+    @Test
+    fun `deleteByIdEndpoint does not affect Puzzle table size when returns FORBIDDEN`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        val before = countPuzzles()
+        app.client.delete("/puzzle/0").status.isForbid()
+        val now = countPuzzles()
+        assertEquals(before, now)
+    }
+
+    private fun getPuzzle(id: Int): PuzzleDto? {
+        return transaction {
+            Puzzles.select { Puzzles.id eq id }.map(PuzzleDto::from).singleOrNull()
+        }
+    }
+
+    @Test
+    fun `deleteByIdEndpoint deletes item we expect and returns NO_CONTENT`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        assertNotNull(getPuzzle(0))
+        app.client.delete("/puzzle/0") { withToken(0) }.status.isNoContent()
+        assertNull(getPuzzle(0))
+    }
+
+    @Test
+    fun `deleteByIdEndpoint doesnt deletes item we expect and returns FORBIDDEN`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        assertNotNull(getPuzzle(0))
+        app.client.delete("/puzzle/0").status.isForbid()
+        assertNotNull(getPuzzle(0))
+    }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        app.client.delete("/puzzle/as-admin/0").status.isForbid()
+    }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint returns FORBIDDEN if authenticated just as user`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isForbid()
+    }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint returns BAD_REQUEST if authenticated as admin but resource does not exist`() =
+        testSuspend {
+            setupUser()
+            setupAdmin()
+            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isBadRequest()
+        }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint returns NO_CONTENT if authenticated as admin and resource does exist`() =
+        testSuspend {
+            setupUser()
+            setupPuzzle()
+            setupAdmin()
+            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
+        }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint returns NO_CONTENT if authenticated as admin and deletes resource we expect`() =
+        testSuspend {
+            setupUser()
+            setupPuzzle()
+            setupAdmin()
+
+            assertNotNull(getPuzzle(0))
+
+            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
+
+            assertNull(getPuzzle(0))
+        }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint returns NO_CONTENT if authenticated as admin and makes Puzzle table smaller by 1`() =
+        testSuspend {
+            setupUser()
+            setupPuzzle()
+            setupAdmin()
+
+            val before = countPuzzles()
+
+            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
+
+            assertEquals(before - 1, countPuzzles())
+        }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint does not affect Puzzle table size when returns FORBIDDEN`() = testSuspend {
+        setupUser()
+        setupPuzzle()
+        setupAdmin()
+
+        val before = countPuzzles()
+
+        app.client.delete("/puzzle/as-admin/0").status.isForbid()
+
+        assertEquals(before, countPuzzles())
+    }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint does not affect Puzzle table size when returns FORBIDDEN - when it's just user`() =
+        testSuspend {
+            setupUser()
+            setupPuzzle()
+
+            val before = countPuzzles()
+
+            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isForbid()
+
+            assertEquals(before, countPuzzles())
+        }
+
+    @Test
+    fun `deleteAsAdminByIdEndpoint does not affect Puzzle table size when returns BAD_REQUEST`() = testSuspend {
+        setupUser()
+        setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
+        setupAdmin()
+
+        val bef = countPuzzles()
+        app.client.delete("/puzzle/as-admin/-500") { withToken(0) }.status.isBadRequest()
+        assertEquals(bef, countPuzzles())
     }
 }
