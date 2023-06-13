@@ -2,6 +2,7 @@ package com.chesstasks.data.dto
 
 import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
 
 object PuzzleHistoryItems : BaseTable("puzzle_history_items") {
@@ -18,9 +19,9 @@ class PuzzleHistoryItemDto(
     id: Int,
     val moves: String?,
     val puzzleId: Int,
-    val puzzle: PuzzleDto,
+    @JsonIgnore val puzzle: PuzzleDto,
     val userId: Int,
-    val user: UserDto,
+    @JsonIgnore val user: UserDto,
     createdAt: Long
 ) : BaseDto(id, createdAt) {
     companion object {
