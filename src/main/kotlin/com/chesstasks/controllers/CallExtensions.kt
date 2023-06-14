@@ -33,3 +33,7 @@ suspend fun ApplicationCall.view(name: String, ext: String = ".ftl") {
 suspend inline fun ApplicationCall.view(name: String, ext: String = ".ftl", act: () -> ViewModel) {
     respond(FreeMarkerContent("$name$ext", act()))
 }
+
+fun ApplicationCall.getSkip(def: Long = 0): Long {
+    return parameters["skip"]?.toLongOrNull() ?: def
+}

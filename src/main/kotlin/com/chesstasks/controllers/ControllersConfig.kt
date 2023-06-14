@@ -1,6 +1,7 @@
 package com.chesstasks.controllers
 
 import com.chesstasks.controllers.authentication.authenticationController
+import com.chesstasks.controllers.friend.friendController
 import com.chesstasks.controllers.puzzle.history.puzzleHistoryController
 import com.chesstasks.controllers.puzzle.puzzleController
 import com.chesstasks.controllers.ui.configUI
@@ -12,6 +13,7 @@ fun Application.configureControllers() {
         authenticationController()
         puzzleController()
         puzzleHistoryController()
+        friendController()
 
         // TODO: Embrace this 3 lines above in one 'configUI'
 
