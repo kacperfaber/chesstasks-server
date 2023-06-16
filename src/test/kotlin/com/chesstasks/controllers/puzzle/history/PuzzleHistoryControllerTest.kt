@@ -45,7 +45,6 @@ class PuzzleHistoryControllerTest : BaseWebTest() {
                 it[moves] = "e2e4"
                 it[ranking] = 1500
                 it[database] = PuzzleDatabase.USER
-                it[themeIds] = "AAAA,BBBB"
             }
 
             PuzzleHistoryItems.insert {
@@ -67,7 +66,6 @@ class PuzzleHistoryControllerTest : BaseWebTest() {
                 it[moves] = "e2e4"
                 it[ranking] = 1500
                 it[database] = PuzzleDatabase.USER
-                it[themeIds] = "AAAA,BBBB"
             }
 
             repeat(r) { iter ->
@@ -275,7 +273,6 @@ class PuzzleHistoryControllerTest : BaseWebTest() {
                 it[moves] = "e2e4"
                 it[ranking] = 1500
                 it[database] = PuzzleDatabase.USER
-                it[themeIds] = "AAAA,BBBB"
             }
 
             PuzzleHistoryItems.insert {

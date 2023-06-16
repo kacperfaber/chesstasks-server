@@ -35,7 +35,6 @@ class PuzzleControllerTest : BaseWebTest() {
                 it[moves] = "e2e4"
                 it[ranking] = 1500
                 it[database] = PuzzleDatabase.USER
-                it[themeIds] = "AAAA,BBBB"
             }
         }
     }
@@ -149,7 +148,6 @@ class PuzzleControllerTest : BaseWebTest() {
                     it[id] = iter
                     it[ranking] = 1500
                     it[Puzzles.database] = database
-                    it[themeIds] = "AAAA,BBBB"
                 }
             }
         }

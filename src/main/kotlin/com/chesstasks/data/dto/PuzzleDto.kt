@@ -4,6 +4,7 @@ import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.select
 
 enum class PuzzleDatabase(val value: Int) {
     LICHESS(0),
@@ -18,7 +19,6 @@ object Puzzles : BaseTable("puzzles") {
     val moves = varchar("moves", 256)
     val ranking = integer("ranking")
     val database = enumeration<PuzzleDatabase>("database")
-    val themeIds = varchar("theme_ids", 256)
 }
 
 class PuzzleDto(
@@ -29,20 +29,30 @@ class PuzzleDto(
     val moves: String,
     val ranking: Int,
     val database: PuzzleDatabase,
-    val themeIds: List<String>,
+    val themes: List<String>,
     createdAt: Long
 ) : BaseDto(id, createdAt) {
     companion object {
         fun from(row: ResultRow): PuzzleDto {
+            val id = row[Puzzles.id]
+
+            val themeIds = PuzzleThemes
+                .select { PuzzleThemes.puzzleId eq id }
+                .map { it[PuzzleThemes.themeId] }
+
+            val themes = Themes.select {
+                Themes.id inList themeIds
+            }.map { it[Themes.name] }
+
             return PuzzleDto(
-                row[Puzzles.id],
+                id,
                 UserDto.tryFrom(row),
                 row[Puzzles.ownerId],
                 row[Puzzles.fen],
                 row[Puzzles.moves],
                 row[Puzzles.ranking],
                 row[Puzzles.database],
-                row[Puzzles.themeIds].split(","), // TODO
+                themes,
                 row[Puzzles.createdAt]
             )
         }
