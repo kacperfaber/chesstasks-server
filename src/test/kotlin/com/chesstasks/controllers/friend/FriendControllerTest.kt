@@ -5,18 +5,14 @@ import com.chesstasks.data.dto.FriendRequests
 import com.chesstasks.data.dto.Friends
 import com.chesstasks.data.dto.Users
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.test.dispatcher.*
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import testutils.*
 import java.util.*
-import kotlin.random.Random
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class FriendControllerTest : BaseWebTest() {
     private fun setupUsers() {
@@ -212,7 +208,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupRequests()
 
-        app.client.get("/friend/requests/received"){withToken(0)}.status.isOk()
+        app.client.get("/friend/requests/received") { withToken(0) }.status.isOk()
     }
 
     private fun setupAdmin() {
@@ -230,7 +226,7 @@ class FriendControllerTest : BaseWebTest() {
         setupAdmin()
         setupRequests()
 
-        app.client.get("/friend/requests/received"){withToken(0)}.status.isOk()
+        app.client.get("/friend/requests/received") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -265,7 +261,7 @@ class FriendControllerTest : BaseWebTest() {
     fun `getAllFriendEndpoint returns OK when authenticated as user`() = testSuspend {
         setupUsers()
         setupFriend()
-        app.client.get("/friend/all"){withToken(0)}.status.isOk()
+        app.client.get("/friend/all") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -273,7 +269,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupAdmin()
         setupFriend()
-        app.client.get("/friend/all"){withToken(0)}.status.isOk()
+        app.client.get("/friend/all") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -288,15 +284,15 @@ class FriendControllerTest : BaseWebTest() {
 
     private fun setupRandomFriends(r: Int, add: Int = 5, secUserId: Int = 0) {
         transaction {
-            repeat(r) {i ->
+            repeat(r) { i ->
                 Users.insert {
                     it[id] = i + add
                     it[username] = UUID.randomUUID().toString().take(4)
                     it[emailAddress] = UUID.randomUUID().toString().take(4)
                     it[passwordHash] = "HelloWorld123"
                 }
-                
-                Friends.insert { 
+
+                Friends.insert {
                     it[id] = i + add
                     it[userId] = i + add
                     it[secondUserId] = secUserId
@@ -331,9 +327,9 @@ class FriendControllerTest : BaseWebTest() {
         setupRandomFriends(1000, 10)
         val resp = app.client.get("/friend/all?skip=500") { withToken(0) }
         resp.status.isOk()
-        resp.jsonPath("$[0].id", 10+500)
+        resp.jsonPath("$[0].id", 10 + 500)
         resp.jsonPath("$[0].secondUserId", 0)
-        resp.jsonPath("$[0].userId", 10+500)
+        resp.jsonPath("$[0].userId", 10 + 500)
     }
 
     @Test
@@ -345,5 +341,194 @@ class FriendControllerTest : BaseWebTest() {
         resp.jsonPath("$[0].id", 10)
         resp.jsonPath("$[0].secondUserId", 0)
         resp.jsonPath("$[0].userId", 10)
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns FORBIDDEN when no auth`() = testSuspend {
+        setupUsers()
+        app.client.put("/friend/requests").status.isForbid()
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns OK when valid data passed and authenticated`() = testSuspend {
+        setupUsers()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }.status.isOk()
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns BAD_REQUEST authenticated but target user does not exist`() = testSuspend {
+        setupUsers()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 199)
+        }.status.isBadRequest()
+    }
+
+    private fun getRequestByUsers(userId: Int, secondUserId: Int): ResultRow? {
+        return transaction {
+            FriendRequests.select { (FriendRequests.targetId eq secondUserId) and (FriendRequests.senderId eq userId) }
+                .singleOrNull()
+        }
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint makes FriendRequest row when returns OK`() = testSuspend {
+        setupUsers()
+
+        assertNull(getRequestByUsers(0, 1))
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }.status.isOk()
+
+        assertNotNull(getRequestByUsers(0, 1))
+    }
+
+    private fun countRequests(): Long = transaction {
+        FriendRequests.selectAll().count()
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint doesnt make FriendRequest row when returns BAD_REQUEST`() = testSuspend {
+        setupUsers()
+
+        assertNull(getRequestByUsers(0, 199))
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 199)
+        }.status.isBadRequest()
+
+        assertNull(getRequestByUsers(0, 199))
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint makes FriendRequests table bigger by 1 when returns OK`() = testSuspend {
+        setupUsers()
+
+        val bef = countRequests()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }.status.isOk()
+
+        assertEquals(bef + 1, countRequests())
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint doesnt make FriendRequests table bigger by 1 when returns OK`() = testSuspend {
+        setupUsers()
+
+        val bef = countRequests()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 199)
+        }.status.isBadRequest()
+
+        assertEquals(bef, countRequests())
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns BAD_REQUEST when they're already friends`() = testSuspend {
+        setupUsers()
+        setupFriend()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }.status.isBadRequest()
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint doesnt make row in FriendRequests when they're already friends`() = testSuspend {
+        setupUsers()
+        setupFriend()
+
+        val bef = countRequests()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }.status.isBadRequest()
+
+        assertEquals(bef, countRequests())
+    }
+
+    private fun setupFriendRequests() {
+        transaction {
+            FriendRequests.insert {
+                it[id] = 0
+                it[senderId] = 0
+                it[targetId] = 1
+            }
+        }
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns BAD_REQUEST when FriendRequest already created`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+
+        val bef = countRequests()
+
+        app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }.status.isBadRequest()
+
+        assertEquals(bef, countRequests())
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns BAD_REQUEST when FriendRequest already created - scenario TARGET_ID sent`() =
+        testSuspend {
+            setupUsers()
+
+            transaction {
+                FriendRequests.insert {
+                    it[id] = 0
+                    it[senderId] = 1
+                    it[targetId] = 0
+                }
+            }
+
+            val bef = countRequests()
+
+            app.client.put("/friend/requests") {
+                withToken(0)
+                jsonBody("userId" to 1)
+            }.status.isBadRequest()
+
+            assertEquals(bef, countRequests())
+        }
+
+    @Test
+    fun `putFriendRequestEndpoint returns UNSUPPORTED_MEDIA_TYPE when no body`() = testSuspend {
+        setupUsers()
+
+        assertEquals(HttpStatusCode.UnsupportedMediaType, app.client.put("/friend/requests") { withToken(0) }.status)
+    }
+
+    @Test
+    fun `putFriendRequestEndpoint returns OK and expected data`() = testSuspend {
+        setupUsers()
+
+        val r = app.client.put("/friend/requests") {
+            withToken(0)
+            jsonBody("userId" to 1)
+        }
+        r.status.isOk()
+        val expectedIdFromDb = getRequestByUsers(0, 1)?.get(FriendRequests.id)
+        r.jsonPath("$.id", expectedIdFromDb)
+        r.jsonPath("$.senderId", 0)
+        r.jsonPath("$.targetId", 1)
     }
 }

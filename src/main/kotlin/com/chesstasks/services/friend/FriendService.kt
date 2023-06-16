@@ -9,13 +9,16 @@ import org.koin.core.annotation.Single
 @Single
 class FriendService(private val friendRequestDao: FriendRequestDao, private val friendDao: FriendDao) {
     suspend fun sendRequest(userId: Int, targetId: Int): FriendRequestDto? {
-        // Require that can't create two requests between the same people
-        if (friendRequestDao.countRequestsBetweenUsers(userId, targetId) > 0) return null
+        try {
+            // Require that can't create two requests between the same people
+            if (friendRequestDao.countRequestsBetweenUsers(userId, targetId) > 0) return null
 
-        // Are they already friends?
-        if (friendDao.areTheyFriends(userId, targetId)) return null
+            // Are they already friends?
+            if (friendDao.areTheyFriends(userId, targetId)) return null
 
-        return friendRequestDao.insertValues(userId, targetId)
+            return friendRequestDao.insertValues(userId, targetId)
+        }
+        catch (e: Exception) {return null}
     }
 
     companion object {

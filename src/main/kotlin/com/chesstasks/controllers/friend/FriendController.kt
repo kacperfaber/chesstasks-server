@@ -8,6 +8,7 @@ import com.chesstasks.exceptions.MissingQueryParameter
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.friend.FriendService
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.java.KoinJavaComponent.inject
 
@@ -36,6 +37,12 @@ fun Route.friendController() {
             val userId = call.requirePrincipalId()
             val id = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
             call.ofBoolean(friendService.deleteFriend(id, userId))
+        }
+
+        put("/friend/requests") {
+            val currentId = call.requirePrincipalId()
+            val targetUserId = call.receive<PutFriendRequestPayload>().userId
+            call.ofNullable(friendService.sendRequest(currentId, targetUserId))
         }
     }
 }
