@@ -1,5 +1,7 @@
 package com.chesstasks.controllers.friend
 
+import com.chesstasks.data.dto.Admins
+import com.chesstasks.data.dto.FriendRequests
 import com.chesstasks.data.dto.Friends
 import com.chesstasks.data.dto.Users
 import io.ktor.client.request.*
@@ -9,10 +11,9 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
-import testutils.BaseWebTest
-import testutils.isBadRequest
-import testutils.isForbid
-import testutils.isNoContent
+import testutils.*
+import java.util.*
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -49,6 +50,12 @@ class FriendControllerTest : BaseWebTest() {
                 it[id] = 0
                 it[userId] = 0
                 it[secondUserId] = 1
+            }
+
+            Friends.insert {
+                it[id] = 1
+                it[userId] = 2
+                it[secondUserId] = 0
             }
         }
     }
@@ -175,4 +182,168 @@ class FriendControllerTest : BaseWebTest() {
 
             assertEquals(bef, countFriends())
         }
+
+    private fun setupRequests() {
+        transaction {
+            FriendRequests.insert {
+                it[FriendRequests.id] = 0
+                it[senderId] = 0
+                it[targetId] = 1
+            }
+
+            FriendRequests.insert {
+                it[FriendRequests.id] = 1
+                it[senderId] = 2
+                it[targetId] = 0
+            }
+        }
+    }
+
+    @Test
+    fun `getReceivedRequestsEndpoint returns FORBIDDEN if no auth`() = testSuspend {
+        setupUsers()
+        setupRequests()
+
+        app.client.get("/friend/requests/received").status.isForbid()
+    }
+
+    @Test
+    fun `getReceivedRequestsEndpoint returns OK when authenticated as user`() = testSuspend {
+        setupUsers()
+        setupRequests()
+
+        app.client.get("/friend/requests/received"){withToken(0)}.status.isOk()
+    }
+
+    private fun setupAdmin() {
+        transaction {
+            Admins.insert {
+                it[id] = 0
+                it[userId] = 0
+            }
+        }
+    }
+
+    @Test
+    fun `getReceivedRequestsEndpoint returns OK when authenticated as admin`() = testSuspend {
+        setupUsers()
+        setupAdmin()
+        setupRequests()
+
+        app.client.get("/friend/requests/received"){withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getReceivedRequestsEndpoint returns OK expected items count`() = testSuspend {
+        setupUsers()
+        setupRequests()
+
+        val response = app.client.get("/friend/requests/received") { withToken(1) }
+        response.status.isOk()
+        response.jsonPath("$.length()", 1)
+    }
+
+    @Test
+    fun `getReceivedRequestsEndpoint returns expected data`() = testSuspend {
+        setupUsers()
+        setupRequests()
+
+        val response = app.client.get("/friend/requests/received") { withToken(0) }
+        response.status.isOk()
+        response.jsonPath("$[0].id", 1)
+        response.jsonPath("$[0].senderId", 2)
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns FORBIDDEN if no auth`() = testSuspend {
+        setupUsers()
+        setupFriend()
+        app.client.get("/friend/all").status.isForbid()
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK when authenticated as user`() = testSuspend {
+        setupUsers()
+        setupFriend()
+        app.client.get("/friend/all"){withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK when authenticated as admin`() = testSuspend {
+        setupUsers()
+        setupAdmin()
+        setupFriend()
+        app.client.get("/friend/all"){withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK and expected items length`() = testSuspend {
+        setupUsers()
+        setupAdmin()
+        setupFriend()
+        val resp = app.client.get("/friend/all") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$.length()", 2)
+    }
+
+    private fun setupRandomFriends(r: Int, add: Int = 5, secUserId: Int = 0) {
+        transaction {
+            repeat(r) {i ->
+                Users.insert {
+                    it[id] = i + add
+                    it[username] = UUID.randomUUID().toString().take(4)
+                    it[emailAddress] = UUID.randomUUID().toString().take(4)
+                    it[passwordHash] = "HelloWorld123"
+                }
+                
+                Friends.insert { 
+                    it[id] = i + add
+                    it[userId] = i + add
+                    it[secondUserId] = secUserId
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK and 50 items when there's too much`() = testSuspend {
+        setupUsers()
+        setupRandomFriends(777, 10)
+        val resp = app.client.get("/friend/all") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$.length()", 50)
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK and expected data`() = testSuspend {
+        setupUsers()
+        setupRandomFriends(1, 10)
+        val resp = app.client.get("/friend/all") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$[0].id", 10)
+        resp.jsonPath("$[0].secondUserId", 0)
+        resp.jsonPath("$[0].userId", 10)
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK and expected items USING SKIP`() = testSuspend {
+        setupUsers()
+        setupRandomFriends(1000, 10)
+        val resp = app.client.get("/friend/all?skip=500") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$[0].id", 10+500)
+        resp.jsonPath("$[0].secondUserId", 0)
+        resp.jsonPath("$[0].userId", 10+500)
+    }
+
+    @Test
+    fun `getAllFriendEndpoint returns OK and expected items when skip not set`() = testSuspend {
+        setupUsers()
+        setupRandomFriends(1000, 10)
+        val resp = app.client.get("/friend/all") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$[0].id", 10)
+        resp.jsonPath("$[0].secondUserId", 0)
+        resp.jsonPath("$[0].userId", 10)
+    }
 }

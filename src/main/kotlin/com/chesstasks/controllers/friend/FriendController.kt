@@ -20,6 +20,8 @@ fun Route.friendController() {
             call.ofNullable(friendService.getFriends(userId, call.getSkip()))
         }
 
+        // TODO: Test endpoint /friend/requests/sent
+
         get("/friend/requests/sent") {
             val userId = call.requirePrincipalId()
             call.ofNullable(friendService.getSentRequests(userId, call.getSkip()))
@@ -29,8 +31,6 @@ fun Route.friendController() {
             val userId = call.requirePrincipalId()
             call.ofNullable(friendService.getReceivedRequests(userId, call.getSkip()))
         }
-
-        // TODO: Test these 3 endpoints above
 
         delete("/friend/by-id/{id}") {
             val userId = call.requirePrincipalId()
