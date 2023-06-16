@@ -439,4 +439,97 @@ class PuzzleControllerTest : BaseWebTest() {
         app.client.delete("/puzzle/as-admin/-500") { withToken(0) }.status.isBadRequest()
         assertEquals(bef, countPuzzles())
     }
+
+    private fun setupMateTheme() = transaction {
+        Themes.insert {
+            it[id] = 0
+            it[name] = "mate"
+        }
+    }
+
+    private fun setupMatePuzzles() {
+        transaction {
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 0
+            }
+        }
+    }
+
+    @Test
+    fun `getAllByTheme returns FORBIDDEN if no auth`() = testSuspend {
+        app.client.get("/puzzle/by-theme/mate").status.isForbid()
+    }
+
+    @Test
+    fun `getAllByTheme returns OK auth`() = testSuspend {
+        setupUser()
+        setupMateTheme()
+        setupPuzzle()
+        setupMatePuzzles()
+        app.client.get("/puzzle/by-theme/mate"){withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getAllByTheme returns OK and expected items length`() = testSuspend {
+        setupUser()
+        setupMateTheme()
+        setupPuzzle()
+        setupMatePuzzles()
+        val r = app.client.get("/puzzle/by-theme/mate"){withToken(0)}
+        r.status.isOk()
+        r.jsonPath("$.length()", 1)
+    }
+
+    private fun setupRandomMatePuzzle(iteration: Int, add: Int = 0, database: PuzzleDatabase = PuzzleDatabase.LICHESS) {
+        transaction {
+            repeat(iteration) { iter ->
+                Puzzles.insert {
+                    it[fen] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                    it[moves] = "e2e4"
+                    it[ownerId] = 0
+                    it[id] = iter + add
+                    it[ranking] = 1500
+                    it[Puzzles.database] = database
+                }
+
+                PuzzleThemes.insert {
+                    it[themeId] = 0
+                    it[puzzleId] = iter + add
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `getAllByTheme returns OK and maximum 50 items length`() = testSuspend {
+        setupUser()
+        setupMateTheme()
+        setupRandomMatePuzzle(500)
+        val r = app.client.get("/puzzle/by-theme/mate"){withToken(0)}
+        r.status.isOk()
+        r.jsonPath("$.length()", 50)
+    }
+
+    @Test
+    fun `getAllByTheme returns OK and maximum 50 items length USING SKIP`() = testSuspend {
+        setupUser()
+        setupMateTheme()
+        setupRandomMatePuzzle(500, 0)
+        val r = app.client.get("/puzzle/by-theme/mate?skip=100"){withToken(0)}
+        r.status.isOk()
+        r.jsonPath("$[0].id", 100)
+        r.jsonPath("$[49].id", 149)
+    }
+
+    @Test
+    fun `getAllByTheme returns OK and expected first and last item ID`() = testSuspend {
+        setupUser()
+        setupMateTheme()
+        setupRandomMatePuzzle(500, 0)
+        val r = app.client.get("/puzzle/by-theme/mate"){withToken(0)}
+        r.status.isOk()
+        r.jsonPath("$[0].id", 0)
+        r.jsonPath("$[49].id", 49)
+    }
 }

@@ -28,4 +28,7 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
     suspend fun deletePuzzle(id: Int): Boolean {
         return puzzleDao.deleteById(id)
     }
+
+    suspend fun getAllByThemeName(themeName: String, skip: Long): List<PuzzleDto> =
+        puzzleDao.getAllByThemeName(themeName, DEFAULT_LIMIT, skip)
 }

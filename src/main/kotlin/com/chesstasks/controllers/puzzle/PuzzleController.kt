@@ -1,5 +1,6 @@
 package com.chesstasks.controllers.puzzle
 
+import com.chesstasks.controllers.getSkip
 import com.chesstasks.controllers.ofBoolean
 import com.chesstasks.controllers.ofNullable
 import com.chesstasks.controllers.requirePrincipalId
@@ -42,6 +43,11 @@ fun Route.puzzleController() {
             val id = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
 
             call.ofBoolean(puzzleService.deletePuzzle(id, userId))
+        }
+
+        get("/puzzle/by-theme/{themeName}") {
+            val themeName = call.parameters["themeName"] ?: throw MissingQueryParameter("themeName")
+            call.ofNullable(puzzleService.getAllByThemeName(themeName, call.getSkip()))
         }
     }
 
