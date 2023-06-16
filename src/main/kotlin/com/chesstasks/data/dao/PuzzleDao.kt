@@ -11,7 +11,7 @@ import org.koin.core.annotation.Single
 class PuzzleDao {
     suspend fun getAll(limit: Int, skip: Long): List<PuzzleDto> = dbQuery {
         Puzzles
-            .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.id eq Users.id })
+            .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
             .selectAll()
@@ -22,7 +22,7 @@ class PuzzleDao {
 
     suspend fun getByOwnerId(ownerId: Int, limit: Int = 50, skip: Long = 50): List<PuzzleDto> = dbQuery {
         Puzzles
-            .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.id eq Users.id })
+            .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
             .select { Puzzles.ownerId eq ownerId }
@@ -42,7 +42,7 @@ class PuzzleDao {
 
     suspend fun getAllByDatabase(database: PuzzleDatabase, limit: Int, skip: Long): List<PuzzleDto> = dbQuery {
         Puzzles
-            .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.id eq Users.id })
+            .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
             .select { Puzzles.database eq database }
