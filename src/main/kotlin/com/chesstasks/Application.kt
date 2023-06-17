@@ -8,6 +8,7 @@ import com.chesstasks.freemarker.configFreeMarker
 import com.chesstasks.requestvalidation.configureRequestValidation
 import com.chesstasks.security.auth.configureAuthentication
 import com.chesstasks.serialization.configureSerialization
+import com.chesstasks.websocket.configWebSocket
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -28,4 +29,5 @@ fun Application.module() {
     configureRequestValidation()
     configFreeMarker()
     configureControllers()
+    configWebSocket()
 }
