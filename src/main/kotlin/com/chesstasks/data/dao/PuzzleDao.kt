@@ -5,6 +5,7 @@ import com.chesstasks.data.dto.*
 import com.chesstasks.data.dto.PuzzleDto.Companion.from
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inSubQuery
 import org.koin.core.annotation.Single
 
 @Single
@@ -14,11 +15,11 @@ class PuzzleDao {
             .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
-            .join(Openings, JoinType.LEFT, additionalConstraint = {Puzzles.openingId eq Openings.id})
+            .join(Openings, JoinType.LEFT, additionalConstraint = { Puzzles.openingId eq Openings.id })
     }
 
     suspend fun getAll(limit: Int, skip: Long): List<PuzzleDto> = dbQuery {
-            Puzzles.prepareJoin()
+        Puzzles.prepareJoin()
             .selectAll()
             .limit(limit, skip)
             .map(::from)
@@ -72,8 +73,21 @@ class PuzzleDao {
 
     suspend fun getAllByOpeningEco(openingEco: String, limit: Int, skip: Long): List<PuzzleDto> = dbQuery {
         Puzzles.prepareJoin()
-            .select { Openings.eco eq openingEco}
+            .select { Openings.eco eq openingEco }
             .limit(limit, skip)
+            .map(PuzzleDto::from)
+    }
+
+    suspend fun getAllUnresolved(userId: Int) = dbQuery {
+        (Puzzles).prepareJoin()
+            .join(PuzzleHistoryItems, JoinType.LEFT, additionalConstraint = {PuzzleHistoryItems.puzzleId eq Puzzles.id})
+            .select {
+                PuzzleHistoryItems.id notInSubQuery
+                        PuzzleHistoryItems
+                            .select { (PuzzleHistoryItems.puzzleId eq Puzzles.id) }
+                            .having { PuzzleHistoryItems.id.count() eq 0 }
+            }
+            .limit(50, 0)
             .map(PuzzleDto::from)
     }
 }
