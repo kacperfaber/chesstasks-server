@@ -24,10 +24,16 @@ import kotlin.test.assertEquals
 
 // TODO: Should I create custom test runner with annotations?
 
+@Target(AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Inject
+
 open class BaseTest {
     open lateinit var app: TestApplication
 
     protected inline fun <reified T> getInstance(): T = get().get(T::class)
+
+    protected fun getInstance(cl: Class<*>): Any = get().get(cl.kotlin)
 
     @BeforeEach
     fun setup() {
@@ -38,6 +44,10 @@ open class BaseTest {
             }
         }
         app.start()
+
+        this.javaClass.fields
+            .filter { it.isAnnotationPresent(Inject::class.java) }
+            .map { field -> field.set(this, getInstance(field.type)) }
     }
 
     @AfterEach
