@@ -20,7 +20,8 @@ object DatabaseFactory {
         Friends,
         FriendRequests,
         PuzzleThemes,
-        Themes
+        Themes,
+        Openings
     ).toTypedArray()
 
     fun init() {
