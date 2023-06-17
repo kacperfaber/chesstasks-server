@@ -467,7 +467,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupMateTheme()
         setupPuzzle()
         setupMatePuzzles()
-        app.client.get("/puzzle/by-theme/mate"){withToken(0)}.status.isOk()
+        app.client.get("/puzzle/by-theme/mate") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -476,7 +476,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupMateTheme()
         setupPuzzle()
         setupMatePuzzles()
-        val r = app.client.get("/puzzle/by-theme/mate"){withToken(0)}
+        val r = app.client.get("/puzzle/by-theme/mate") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 1)
     }
@@ -506,7 +506,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupMateTheme()
         setupRandomMatePuzzle(500)
-        val r = app.client.get("/puzzle/by-theme/mate"){withToken(0)}
+        val r = app.client.get("/puzzle/by-theme/mate") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 50)
     }
@@ -516,7 +516,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupMateTheme()
         setupRandomMatePuzzle(500, 0)
-        val r = app.client.get("/puzzle/by-theme/mate?skip=100"){withToken(0)}
+        val r = app.client.get("/puzzle/by-theme/mate?skip=100") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$[0].id", 100)
         r.jsonPath("$[49].id", 149)
@@ -527,9 +527,54 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupMateTheme()
         setupRandomMatePuzzle(500, 0)
-        val r = app.client.get("/puzzle/by-theme/mate"){withToken(0)}
+        val r = app.client.get("/puzzle/by-theme/mate") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$[0].id", 0)
         r.jsonPath("$[49].id", 49)
+    }
+
+    private fun setupTwoThemes() = transaction {
+        Themes.insert {
+            it[name] = "short"
+            it[id] = 0
+        }
+
+        Themes.insert {
+            it[name] = "mate"
+            it[id] = 1
+        }
+    }
+
+    private fun setupRandomPuzzlesWithTwoThemes(iteration: Int, add: Int) = transaction {
+        repeat(iteration) {iter ->
+            val id = iter + add
+
+            Puzzles.insert {
+                it[Puzzles.id] = id
+                it[fen] = "8/8/8/8"
+                it[moves] = "e2e4"
+                it[ranking] = 1500
+                it[database] = PuzzleDatabase.USER
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = id
+                it[themeId] = 0
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = id
+                it[themeId] = 1
+            }
+        }
+    }
+
+    @Test
+    fun `getAllByThemeEndpoint returns OK and expected length if there's two themes on single puzzle`() = testSuspend {
+        setupTwoThemes()
+        setupRandomPuzzlesWithTwoThemes(37, 0)
+        setupUser()
+
+        app.client.get("/puzzle/by-theme/mate"){withToken(0)}.jsonPath("$.length()", 37)
     }
 }
