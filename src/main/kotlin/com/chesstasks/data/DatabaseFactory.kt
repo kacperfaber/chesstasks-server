@@ -15,7 +15,6 @@ object DatabaseFactory {
         Tokens,
         Admins,
         Puzzles,
-        PuzzleHistoryItems,
         UserPreferences,
         Friends,
         FriendRequests,
