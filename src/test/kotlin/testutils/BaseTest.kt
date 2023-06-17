@@ -22,8 +22,6 @@ import org.koin.core.context.GlobalContext.get
 import java.util.*
 import kotlin.test.assertEquals
 
-// TODO: Should I create custom test runner with annotations?
-
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Inject
