@@ -31,4 +31,12 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
 
     suspend fun getAllByThemeName(themeName: String, skip: Long): List<PuzzleDto> =
         puzzleDao.getAllByThemeName(themeName, DEFAULT_LIMIT, skip)
+
+    suspend fun getAllByOpeningEco(openingEco: String, skip: Long): List<PuzzleDto> {
+        return puzzleDao.getAllByOpeningEco(openingEco, DEFAULT_LIMIT, skip)
+    }
+
+    suspend fun getAllByOpeningId(openingId: Int, skip: Long): List<PuzzleDto> {
+        return puzzleDao.getAllByOpeningId(openingId, DEFAULT_LIMIT, skip)
+    }
 }

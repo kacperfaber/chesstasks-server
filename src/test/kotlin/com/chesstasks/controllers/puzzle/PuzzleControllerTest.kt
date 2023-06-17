@@ -546,7 +546,7 @@ class PuzzleControllerTest : BaseWebTest() {
     }
 
     private fun setupRandomPuzzlesWithTwoThemes(iteration: Int, add: Int) = transaction {
-        repeat(iteration) {iter ->
+        repeat(iteration) { iter ->
             val id = iter + add
 
             Puzzles.insert {
@@ -575,6 +575,191 @@ class PuzzleControllerTest : BaseWebTest() {
         setupRandomPuzzlesWithTwoThemes(37, 0)
         setupUser()
 
-        app.client.get("/puzzle/by-theme/mate"){withToken(0)}.jsonPath("$.length()", 37)
+        app.client.get("/puzzle/by-theme/mate") { withToken(0) }.jsonPath("$.length()", 37)
+    }
+
+    @Test
+    fun `getAllByOpeningId returns FORBIDDEN if no auth`() = testSuspend {
+        app.client.get("/puzzle/by-opening/id/0").status.isForbid()
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK if auth`() = testSuspend {
+        setupUser()
+        app.client.get("/puzzle/by-opening/id/0") { withToken(0) }.status.isOk()
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK if authenticated as admin`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        app.client.get("/puzzle/by-opening/id/0") { withToken(0) }.status.isOk()
+    }
+
+    private fun setupOpening() = transaction {
+        Openings.insert {
+            it[id] = 0
+            it[eco] = "A00"
+            it[moves] = "e4"
+            it[name] = "Alekhine Defense"
+        }
+    }
+
+    private fun setupRandomPuzzleWithOpening(iter: Int, add: Int = 0, openingId: Int = 0) = transaction {
+        repeat(iter) { i ->
+            val id = i + add
+
+            Puzzles.insert {
+                it[Puzzles.id] = id
+                it[fen] = "8/8/8/8"
+                it[moves] = "e2e4"
+                it[ranking] = 1500
+                it[database] = PuzzleDatabase.USER
+                it[Puzzles.openingId] = openingId
+            }
+        }
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK and expected items length`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(25)
+
+        val r = app.client.get("/puzzle/by-opening/id/0") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$.length()", 25)
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK and maximum 50 items length`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(100)
+
+        val r = app.client.get("/puzzle/by-opening/id/0") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$.length()", 50)
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK and 0 items length if no Puzzle with this opening`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(100)
+
+        val r = app.client.get("/puzzle/by-opening/id/-1") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$.length()", 0)
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK and expected items`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(100)
+
+        val r = app.client.get("/puzzle/by-opening/id/0") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$[0].id", 0)
+        r.jsonPath("$[1].id", 1)
+        r.jsonPath("$[49].id", 49)
+    }
+
+    @Test
+    fun `getAllByOpeningId returns OK and expected items using SKIP`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(100)
+
+        val skip = 50
+
+        val r = app.client.get("/puzzle/by-opening/id/0?skip=$skip") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$[0].id", 0 + skip)
+        r.jsonPath("$[1].id", 1 + skip)
+        r.jsonPath("$[49].id", 49 + skip)
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns FORBIDDEN if no auth`() = testSuspend {
+        app.client.get("/puzzle/by-opening/eco/A00").status.isForbid()
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK if authenticated`() = testSuspend {
+        setupUser()
+        app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }.status.isOk()
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK if authenticated as admin`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }.status.isOk()
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK and expected items length`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupOpening()
+        setupRandomPuzzleWithOpening(25, 0, 0)
+        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$.length()", 25)
+    }
+
+    private fun setupSecondOpening() = transaction {
+        Openings.insert {
+            it[id] = 1
+            it[name] = "Fischers Defense"
+            it[moves] = "d4"
+            it[eco] = "B00"
+        }
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK and 0 items length if no puzzle with this opening`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupSecondOpening()
+        setupRandomPuzzleWithOpening(50, 0, 1)
+        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$.length()", 0)
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK and maximum 50 items if expected`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(250, 0, 0)
+        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$.length()", 50)
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK and expected items`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(250, 0, 0)
+        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$[0].id", 0)
+        resp.jsonPath("$[49].id", 49)
+    }
+
+    @Test
+    fun `getAllOpeningByEco returns OK and expected items USING SKIP`() = testSuspend {
+        setupUser()
+        setupOpening()
+        setupRandomPuzzleWithOpening(250, 0, 0)
+        val skip = 50
+        val resp = app.client.get("/puzzle/by-opening/eco/A00?skip=$skip") { withToken(0) }
+        resp.status.isOk()
+        resp.jsonPath("$[0].id", 0+skip)
+        resp.jsonPath("$[49].id", 49+skip)
     }
 }

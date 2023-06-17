@@ -49,6 +49,16 @@ fun Route.puzzleController() {
             val themeName = call.parameters["themeName"] ?: throw MissingQueryParameter("themeName")
             call.ofNullable(puzzleService.getAllByThemeName(themeName, call.getSkip()))
         }
+
+        get("/puzzle/by-opening/eco/{openingEco}") {
+            val eco = call.parameters["openingEco"] ?: throw MissingQueryParameter("openingEco")
+            call.ofNullable(puzzleService.getAllByOpeningEco(eco, call.getSkip()))
+        }
+
+        get("/puzzle/by-opening/id/{openingId}") {
+            val openingId = call.parameters["openingId"]?.toIntOrNull() ?: throw MissingQueryParameter("openingEco")
+            call.ofNullable(puzzleService.getAllByOpeningId(openingId, call.getSkip()))
+        }
     }
 
     admin {
