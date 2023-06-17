@@ -14,6 +14,7 @@ class PuzzleDao {
             .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
+            .join(Openings, JoinType.LEFT, additionalConstraint = {Puzzles.openingId eq Openings.id})
             .selectAll()
             .limit(limit, skip)
             .map(::from)
@@ -25,6 +26,7 @@ class PuzzleDao {
             .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
+            .join(Openings, JoinType.LEFT, additionalConstraint = {Puzzles.openingId eq Openings.id})
             .select { Puzzles.ownerId eq ownerId }
             .limit(limit, skip)
             .map(::from)
@@ -35,6 +37,7 @@ class PuzzleDao {
             .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
+            .join(Openings, JoinType.LEFT, additionalConstraint = {Puzzles.openingId eq Openings.id})
             .select { Puzzles.id eq id }
             .map(::from)
             .firstOrNull()
@@ -45,6 +48,7 @@ class PuzzleDao {
             .join(Users, JoinType.LEFT, additionalConstraint = { Puzzles.ownerId eq Users.id })
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.puzzleId eq Puzzles.id })
             .join(Themes, JoinType.LEFT, additionalConstraint = { PuzzleThemes.themeId eq Themes.id })
+            .join(Openings, JoinType.LEFT, additionalConstraint = {Puzzles.openingId eq Openings.id})
             .select { Puzzles.database eq database }
             .limit(limit, skip).map(::from)
     }
@@ -61,6 +65,7 @@ class PuzzleDao {
         Puzzles.join(Users, JoinType.LEFT, additionalConstraint = {Puzzles.ownerId eq Users.id})
             .join(PuzzleThemes, JoinType.LEFT, additionalConstraint = {PuzzleThemes.puzzleId eq Puzzles.id})
             .join(Themes, JoinType.LEFT, additionalConstraint = {Themes.id eq PuzzleThemes.themeId})
+            .join(Openings, JoinType.LEFT, additionalConstraint = {Puzzles.openingId eq Openings.id})
             .select { Themes.name eq themeName }
             .limit(limit, skip)
             .map(PuzzleDto::from)

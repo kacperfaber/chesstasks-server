@@ -19,6 +19,7 @@ object Puzzles : BaseTable("puzzles") {
     val moves = varchar("moves", 256)
     val ranking = integer("ranking")
     val database = enumeration<PuzzleDatabase>("database")
+    val openingId = integer("opening_id").references(Openings.id).nullable()
 }
 
 class PuzzleDto(
@@ -30,6 +31,8 @@ class PuzzleDto(
     val ranking: Int,
     val database: PuzzleDatabase,
     val themes: List<String>,
+    val opening: OpeningDto?,
+    val openingId: Int?,
     createdAt: Long
 ) : BaseDto(id, createdAt) {
     companion object {
@@ -53,6 +56,8 @@ class PuzzleDto(
                 row[Puzzles.ranking],
                 row[Puzzles.database],
                 themes,
+                if (row[Puzzles.openingId] != null) OpeningDto.from(row) else null,
+                row[Puzzles.openingId],
                 row[Puzzles.createdAt]
             )
         }
