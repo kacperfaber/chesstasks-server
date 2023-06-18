@@ -1,16 +1,16 @@
 package com.chesstasks.websocket
 
 import com.google.gson.Gson
-import org.koin.java.KoinJavaComponent
+import com.google.gson.annotations.SerializedName
 
-class Command(val name: String, val data: String?) {
-    val gson by KoinJavaComponent.inject<Gson>(Gson::class.java)
+class Command(@SerializedName("n") val name: String, @SerializedName("d") val data: Any?) {
+    val g = Gson() // TODO: Using Koin doesn't work
 
     inline fun <reified T> receive(): T {
-        return gson.fromJson(data, T::class.java)
+        return g.fromJson(g.toJson(data), T::class.java)
     }
 
     fun <T> receive(cl: Class<T>): T {
-        return gson.fromJson(data, cl)
+        return g.fromJson(g.toJson(data), cl)
     }
 }
