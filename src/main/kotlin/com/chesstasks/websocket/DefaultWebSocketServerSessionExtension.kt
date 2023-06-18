@@ -7,7 +7,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 private val gson by inject<Gson> (Gson::class.java) // TODO: Should it be like that?
 
-suspend fun DefaultWebSocketServerSession.send(name: String, data: Any) {
+suspend fun DefaultWebSocketServerSession.send(name: String, data: Any?) {
     val r = gson.toJson(mapOf("n" to name, "d" to data))
     send(Frame.Text(r))
 }
