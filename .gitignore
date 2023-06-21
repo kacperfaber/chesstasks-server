@@ -40,6 +40,10 @@ out/
 *.un~
 *.*~
 
-### fontello source ###
+### fontello source and session ###
 /src/main/resources/public/fonts/icons/css/
 /src/main/resources/public/fonts/icons/font/
+.fontello-session
+
+### node_modules ###
+node_modules/

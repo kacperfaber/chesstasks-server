@@ -6,9 +6,9 @@ import io.ktor.server.routing.*
 import java.io.File
 
 fun Route.configUI() {
-    staticFiles("/public", File("src/main/resources/public")) {
-        default("/css/style.css")
-    }
+    staticFiles("/public", File("node_modules")) {}
+
+    staticFiles("/public", File("src/main/resources/public")) {}
 
     loginController()
 }
