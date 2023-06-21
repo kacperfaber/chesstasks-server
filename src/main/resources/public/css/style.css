@@ -1,3 +1,13 @@
+
+body, html {
+    margin: 0;
+    padding: 0;
+    background: rgb(5, 5, 10);
+    width: 100%;
+    height: 100%;
+    color: white;
+}
+
 #app_navbar {
     width: 100%;
     height: 6vh;
@@ -13,4 +23,59 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#app_sidenav {
+    height: 100%;
+    width: 20vh;
+
+    border-right: 1px solid rgba(90, 90, 90, 1);
+
+    background: rgb(5, 5, 10);
+}
+
+@media (max-width: 600px) {
+    #app_sidenav {
+        position: fixed;
+        left: -20vh;
+        top: 0;
+
+        transition: left 0.2s ease-in-out;
+    }
+
+    #app_sidenav.active {
+        left: 0;
+    }
+
+    #app_navbar__menu_button {
+        display: block;
+    }
+}
+
+@media (min-width: 600px) {
+    #app_sidenav {
+        float: left;
+    }
+
+    #app_container {
+        float: left;
+    }
+
+    #app_navbar__menu_button {
+        display: none;
+    }
+}
+
+.app {
+    padding-top: 6vh;
+    height: 100%;
+    width: 100%;
+}
+
+.icon {
+    color: white;
+}
+
+.clear-both {
+    clear: both;
 }
