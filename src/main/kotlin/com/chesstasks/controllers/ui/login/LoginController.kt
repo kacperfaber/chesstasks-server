@@ -11,14 +11,15 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import org.koin.java.KoinJavaComponent.inject
 
-data class LoginModel(val login: String)
+data class LoginModel(val login: String, val isError: Boolean)
 
 fun Route.loginController() {
     val authenticationService by inject<AuthenticationService>(AuthenticationService::class.java)
 
     get("/ui/login") {
         val login = call.parameters["login"] ?: ""
-        call.respond(FreeMarkerContent("login/login.ftl", LoginModel(login)))
+        val isError = call.parameters["error"]?.toBoolean() ?: false
+        call.respond(FreeMarkerContent("login/login.ftl", LoginModel(login, isError)))
     }
 
     post("/ui/login/submit") {

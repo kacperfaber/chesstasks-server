@@ -40,6 +40,12 @@
                         <input type="password" id="password" name="password">
                     </div>
 
+                    <#if error>
+                        <div class="form-group error">
+                            <span>Something went wrong...</span>
+                        </div>
+                    </#if>
+
                     <div class="form-group">
                         <input class="form-submit" type="submit" value="SIGN IN">
                     </div>

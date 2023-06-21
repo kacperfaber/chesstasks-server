@@ -82,3 +82,8 @@ input[type=text].input:focus {
 .form-group > input[type=submit].form-submit:hover {
     background: #0e8d46;
 }
+
+.error {
+    color: red;
+    font-size: 1.3em;
+}
