@@ -40,4 +40,6 @@ out/
 *.un~
 *.*~
 
-### ###
+### fontello source ###
+/src/main/resources/public/fonts/icons/css/
+/src/main/resources/public/fonts/icons/font/
