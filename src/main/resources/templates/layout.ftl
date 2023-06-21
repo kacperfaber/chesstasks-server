@@ -19,13 +19,11 @@
 
     <body>
 
-    <@navbar.navbar></@navbar.navbar>
-
-    <div class="app">
-        <@sidenav.sidenav></@sidenav.sidenav>
-
-        <div id="app_container">
-            <#nested>
+    <div id="app">
+        <div id="app_navbar">
+            <button id="app_navbar__menu_button">
+                <span class="icon icon-menu"></span>
+            </button>
         </div>
     </div>
 
