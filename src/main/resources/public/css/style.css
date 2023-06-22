@@ -58,7 +58,7 @@ body, html {
     }
 
     #app_sidenav {
-        border-right: 1px solid rgb(80,80,80);
+        border-right: 1px solid rgb(80, 80, 80);
     }
 }
 
@@ -89,7 +89,7 @@ body, html {
     }
 }
 
-@media(max-width: 1000px) {
+@media (max-width: 1000px) {
     #app_sidenav.active {
         left: 0;
     }
@@ -126,4 +126,47 @@ body, html {
         margin-top: calc(var(--navbar-height) * 1.25);
         margin-left: calc(var(--sidenav-width) * 1.25);
     }
+}
+
+#app_sidenav__current_user {
+    height: var(--navbar-height);
+    width: 100%;
+
+    border-bottom: 1px solid rgb(90, 90, 90);
+}
+
+#app_sidenav__links {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidenav-link {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    background: transparent;
+
+    padding-left: 5px;
+
+    font-size: 1.2em;
+
+    width: 100%;
+    height: 5vh;
+
+    border: none;
+    outline: none;
+
+    color: rgb(190, 190, 190);
+
+    text-decoration: none;
+    text-underline: none;
+}
+
+.sidenav-link:hover {
+    color: rgb(190, 190, 190);
+    background: #303137;
 }

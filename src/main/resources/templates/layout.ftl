@@ -25,6 +25,17 @@
         </div>
 
         <div id="app_sidenav">
+            <div id="app_sidenav__current_user">
+                <!-- TODO: Add something here -->
+            </div>
+
+            <div id="app_sidenav__links">
+                <a href="/ui/home" data-href="/ui/home" class="sidenav-link">
+                    <span class="icon icon-home"></span>
+                    <span>HOME</span>
+                </a>
+            </div>
+
             <div id="app_sidenav__blur"></div>
         </div>
 
