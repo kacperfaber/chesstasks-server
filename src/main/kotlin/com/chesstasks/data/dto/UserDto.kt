@@ -35,3 +35,11 @@ class UserDto(
         }
     }
 }
+
+class SimpleUserDto(val id: Int, val createdAt: Long, val username: String) {
+    companion object {
+        fun from(r: ResultRow): SimpleUserDto {
+            return SimpleUserDto(r[Users.id], r[Users.createdAt], r[Users.username])
+        }
+    }
+}
