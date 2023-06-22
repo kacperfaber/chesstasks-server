@@ -1,3 +1,19 @@
+:root {
+    --navbar-height: 7vh;
+}
+
+@media (min-width: 1000px) {
+    :root {
+        --sidenav-width: 14vw;
+    }
+}
+
+@media (max-width: 1000px) {
+    :root {
+        --sidenav-width: 50vh;
+    }
+}
+
 body, html {
     background: #181920;
 
@@ -9,7 +25,6 @@ body, html {
 
 #app_navbar {
     position: fixed;
-    left: 0;
     top: 0;
 
     width: 100%;
@@ -17,15 +32,96 @@ body, html {
 
     background: #181920;
 
-    border-bottom: 1px solid rgb(50, 50, 50);
-
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+#app_sidenav {
+    transition: left 0.2s ease-in;
+
+    position: fixed;
+    left: calc(var(--sidenav-width) * -1);
+    top: 0;
+    height: 100%;
+
+    width: var(--sidenav-width);
+
+    background: #181920;
+}
+
+@media (min-width: 1000px) {
+    #app_navbar {
+        left: var(--sidenav-width);
+    }
+
+    #app_sidenav {
+        border-right: 1px solid rgb(80,80,80);
+    }
+}
+
+@media (max-width: 1000px) {
+    #app_navbar {
+        left: 0;
+    }
+
+    #app_sidenav {
+        -webkit-box-shadow: 8px 0 30px 0 rgba(22, 23, 29, 1);
+        -moz-box-shadow: 8px 0 30px 0 rgba(22, 23, 29, 1);
+        box-shadow: 8px 0 30px 0 rgba(22, 23, 29, 1);
+    }
+}
+
+#app_navbar__menu_button {
+    font-size: 1.5em;
+    color: rgb(180, 180, 180);
+}
+
 @media (min-width: 1000px) {
     #app_navbar__menu_button {
         display: none;
+    }
+
+    #app_sidenav {
+        left: 0;
+    }
+}
+
+@media(max-width: 1000px) {
+    #app_sidenav.active {
+        left: 0;
+    }
+
+    #app_sidenav > #app_sidenav__blur {
+        opacity: 0;
+        background: black;
+        pointer-events: none;
+
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+
+        transition: opacity 0.2s ease-in-out, left 0.2s ease-in-out;;
+    }
+
+    #app_sidenav.active > #app_sidenav__blur {
+        opacity: 30%;
+        left: var(--sidenav-width);
+        pointer-events: all;
+    }
+}
+
+@media (max-width: 1000px) {
+    #app_content {
+        margin-top: calc(var(--navbar-height) * 1.25);
+    }
+}
+
+@media (min-width: 1000px) {
+    #app_content {
+        margin-top: calc(var(--navbar-height) * 1.25);
+        margin-left: calc(var(--sidenav-width) * 1.25);
     }
 }

@@ -1,5 +1,3 @@
-<#import "navbar.ftl" as navbar>
-<#import "sidenav.ftl" as sidenav>
 <#macro layout>
 
     <!DOCTYPE html>
@@ -21,9 +19,17 @@
 
     <div id="app">
         <div id="app_navbar">
-            <button id="app_navbar__menu_button">
+            <button class="btn" id="app_navbar__menu_button">
                 <span class="icon icon-menu"></span>
             </button>
+        </div>
+
+        <div id="app_sidenav">
+            <div id="app_sidenav__blur"></div>
+        </div>
+
+        <div id="app_content">
+            <#nested>
         </div>
     </div>
 
