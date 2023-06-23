@@ -40,4 +40,11 @@ out/
 *.un~
 *.*~
 
-### ###
+### NODE ###
+node_modules/
+
+### fontello ###
+src/main/resources/public/fonts/icons/css
+src/main/resources/public/fonts/icons/font
+.fontello-session
+*/.fontello-session
