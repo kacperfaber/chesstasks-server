@@ -4,6 +4,9 @@ import com.chesstasks.Profiles
 import com.chesstasks.security.DevPasswordHasher
 import com.chesstasks.security.PasswordHasher
 import com.chesstasks.security.ProdPasswordHasher
+import com.chesstasks.services.email.verification.DevVerificationEmailSender
+import com.chesstasks.services.email.verification.ProdVerificationEmailSender
+import com.chesstasks.services.email.verification.VerificationEmailSender
 import com.chesstasks.services.token.*
 import com.google.gson.Gson
 import io.ktor.server.application.*
@@ -24,12 +27,14 @@ fun devModule() = module {
     single { DevPasswordHasher() } binds arrayOf(PasswordHasher::class)
     single { DevTokenReader(get()) } binds arrayOf(TokenReader::class)
     single { DevTokenWriter(get()) } binds arrayOf(TokenWriter::class)
+    single { DevVerificationEmailSender() } binds arrayOf(VerificationEmailSender::class)
 }
 
 fun prodModule() = module {
     single { ProdPasswordHasher() } binds arrayOf(PasswordHasher::class)
     single { ProdTokenReader() } binds arrayOf(TokenReader::class)
     single { ProdTokenWriter() } binds arrayOf(TokenWriter::class)
+    single { ProdVerificationEmailSender() } binds arrayOf(VerificationEmailSender::class)
 }
 
 // TODO: Replace with Jackson.

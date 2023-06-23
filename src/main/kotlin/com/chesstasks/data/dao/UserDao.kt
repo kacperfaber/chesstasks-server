@@ -11,6 +11,8 @@ interface UserDao {
     suspend fun getById(id: Int): UserDto?
     suspend fun getByLogin(login: String): UserDto?
     suspend fun getNewUsers(limit: Int, skip: Long): List<SimpleUserDto>
+    suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto?
+    suspend fun isValuesUnique(username: String, emailAddress: String): Boolean
 }
 
 @Single
@@ -33,6 +35,18 @@ class UserDaoImpl : UserDao {
         Users.select { (Users.emailAddress like login) or (Users.username eq login) }
             .map(::resultRowToUser)
             .singleOrNull()
+    }
+
+    override suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto? = dbQuery {
+        Users.insert {
+            it[Users.username] = username
+            it[Users.emailAddress] = emailAddress
+            it[Users.passwordHash] = passwordHash
+        }.resultedValues?.map(UserDto::tryFrom)?.firstOrNull()
+    }
+
+    override suspend fun isValuesUnique(username: String, emailAddress: String): Boolean = dbQuery {
+        Users.select { (Users.emailAddress like emailAddress) and (Users.username like username) }.count() == 0L
     }
 
     override suspend fun getNewUsers(limit: Int, skip: Long): List<SimpleUserDto> = dbQuery {
