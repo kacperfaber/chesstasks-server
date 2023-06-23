@@ -90,4 +90,13 @@ class PuzzleDao {
             .limit(50, 0)
             .map(PuzzleDto::from)
     }
+
+    suspend fun getRandomByRankingRange(min: Int, max: Int, limit: Int, skip: Long) = dbQuery {
+        Puzzles
+            .prepareJoin()
+            .select { (Puzzles.ranking lessEq max) and (Puzzles.ranking greaterEq min) }
+            .limit(limit, skip)
+            .orderBy(com.chesstasks.data.expressions.Random)
+            .map(PuzzleDto::from)
+    }
 }

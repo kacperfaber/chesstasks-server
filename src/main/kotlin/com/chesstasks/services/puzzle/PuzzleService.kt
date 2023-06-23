@@ -39,4 +39,8 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
     suspend fun getAllByOpeningId(openingId: Int, skip: Long): List<PuzzleDto> {
         return puzzleDao.getAllByOpeningId(openingId, DEFAULT_LIMIT, skip)
     }
+
+    suspend fun getRandomByRankingRange(min: Int, max: Int): List<PuzzleDto> {
+        return puzzleDao.getRandomByRankingRange(min, max, DEFAULT_LIMIT, 0L)
+    }
 }
