@@ -1,9 +1,9 @@
 package com.chesstasks.websocket
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 
-class Command(@SerializedName("n") val name: String, @SerializedName("d") val data: Any?) {
+class Command(@JsonProperty("n") val name: String, @JsonProperty("d") val data: Any?) {
     val g = Gson() // TODO: Using Koin doesn't work
 
     inline fun <reified T> receive(): T {
