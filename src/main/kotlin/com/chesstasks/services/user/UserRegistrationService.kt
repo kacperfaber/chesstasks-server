@@ -2,13 +2,15 @@ package com.chesstasks.services.user
 
 import com.chesstasks.security.PasswordHasher
 import com.chesstasks.services.email.verification.EmailVerificationCodeService
+import com.chesstasks.services.email.verification.VerificationEmailSender
 import org.koin.core.annotation.Single
 
 @Single
 class UserRegistrationService(
     private val userService: UserService,
     private val passwordHasher: PasswordHasher,
-    private val emailVerificationCodeService: EmailVerificationCodeService
+    private val emailVerificationCodeService: EmailVerificationCodeService,
+    private val verificationEmailSender: VerificationEmailSender
 ) {
 
     enum class RegistrationResult(val i: String) {
@@ -28,7 +30,7 @@ class UserRegistrationService(
         val emailVerificationCode = emailVerificationCodeService.insertValues(emailAddress, username, passwordHash)
             ?: return RegistrationResult.Fail
 
-        // TODO: Try sent code...
+        verificationEmailSender.sendVerificationEmail(emailAddress, emailVerificationCode.code)
 
         return RegistrationResult.CodeSent
     }
