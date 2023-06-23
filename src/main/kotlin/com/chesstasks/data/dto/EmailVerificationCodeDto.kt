@@ -2,11 +2,14 @@ package com.chesstasks.data.dto
 
 import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
+import com.chesstasks.randomString
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
 
 object EmailVerificationCodes : BaseTable("email_verification_codes") {
-    val code = varchar("code", 6).uniqueIndex()
+    val code = varchar("code", 6).uniqueIndex().clientDefault {
+        randomString(6)
+    }
 
     val passwordHash = varchar("password_hash", 32)
     val username = varchar("username", 32).uniqueIndex()

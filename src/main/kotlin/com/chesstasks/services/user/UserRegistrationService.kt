@@ -16,6 +16,11 @@ class UserRegistrationService(
         Fail("fail")
     }
 
+    enum class VerificationResult(val i: String) {
+        Fail("fail"),
+        Ok("ok")
+    }
+
     suspend fun tryRegister(username: String, emailAddress: String, password: String): RegistrationResult {
         // TODO: Validate username and emailAddress unique with Users.
 
@@ -26,6 +31,13 @@ class UserRegistrationService(
         // TODO: Try sent code...
 
         return RegistrationResult.CodeSent
+    }
+
+    suspend fun tryVerify(emailAddress: String, code: String): VerificationResult {
+        val emailVerificationCode = emailVerificationCodeService.getByEmailAndCode(emailAddress, code) ?: return VerificationResult.Fail
+        userService.tryCreateUser(emailVerificationCode.username, emailVerificationCode.emailAddress, emailVerificationCode.passwordHash) ?: return VerificationResult.Fail
+        emailVerificationCodeService.deleteById(emailVerificationCode.id)
+        return VerificationResult.Ok
     }
 
 }
