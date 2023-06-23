@@ -7,8 +7,8 @@ import org.jetbrains.exposed.sql.ResultRow
 
 object Users : BaseTable("`user`") {
     val passwordHash = varchar("password_hash", 32)
-    val username = varchar("username", 32)
-    val emailAddress = varchar("email_address", 32)
+    val username = varchar("username", 32).uniqueIndex()
+    val emailAddress = varchar("email_address", 32).uniqueIndex()
 }
 
 class UserDto(

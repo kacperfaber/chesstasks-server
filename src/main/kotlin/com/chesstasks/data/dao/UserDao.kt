@@ -46,7 +46,7 @@ class UserDaoImpl : UserDao {
     }
 
     override suspend fun isValuesUnique(username: String, emailAddress: String): Boolean = dbQuery {
-        Users.select { (Users.emailAddress like emailAddress) and (Users.username like username) }.count() == 0L
+        Users.select { (Users.emailAddress like emailAddress) or (Users.username like username) }.count() == 0L
     }
 
     override suspend fun getNewUsers(limit: Int, skip: Long): List<SimpleUserDto> = dbQuery {
