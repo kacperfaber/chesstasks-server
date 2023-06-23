@@ -32,7 +32,7 @@
                 <form action="/ui/login/submit" method="POST" class="form">
                     <div class="form-group">
                         <label for="login">Enter your login:</label>
-                        <input type="text" id="login" name="login">
+                        <input type="text" id="login" name="login" value="${login}">
                     </div>
 
                     <div class="form-group">
