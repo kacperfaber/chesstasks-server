@@ -4,6 +4,7 @@ import com.chesstasks.data.dto.Admins
 import com.chesstasks.data.dto.FriendRequests
 import com.chesstasks.data.dto.Friends
 import com.chesstasks.data.dto.Users
+import com.chesstasks.randomString
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.test.dispatcher.*
@@ -287,8 +288,8 @@ class FriendControllerTest : BaseWebTest() {
             repeat(r) { i ->
                 Users.insert {
                     it[id] = i + add
-                    it[username] = UUID.randomUUID().toString().take(4)
-                    it[emailAddress] = UUID.randomUUID().toString().take(4)
+                    it[username] = randomString(12)
+                    it[emailAddress] = randomString(12)
                     it[passwordHash] = "HelloWorld123"
                 }
 
