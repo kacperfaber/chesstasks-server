@@ -22,7 +22,7 @@ class UserRegistrationService(
     }
 
     suspend fun tryRegister(username: String, emailAddress: String, password: String): RegistrationResult {
-        // TODO: Validate username and emailAddress unique with Users.
+        if (!userService.isValuesUnique(username, emailAddress)) return RegistrationResult.Fail
 
         val passwordHash = passwordHasher.hash(password)
         val emailVerificationCode = emailVerificationCodeService.insertValues(emailAddress, username, passwordHash)

@@ -10,4 +10,5 @@ class UserService(private val userDao: UserDao) {
     suspend fun getByLogin(login: String): UserDto? = userDao.getByLogin(login)
 
     suspend fun tryCreateUser(username: String, emailAddress: String, passwordHash: String): UserDto? = userDao.insertValues(username, emailAddress, passwordHash)
+    suspend fun isValuesUnique(username: String, emailAddress: String): Boolean = userDao.isValuesUnique(username, emailAddress)
 }

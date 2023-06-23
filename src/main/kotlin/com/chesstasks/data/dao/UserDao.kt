@@ -3,16 +3,14 @@ package com.chesstasks.data.dao
 import com.chesstasks.data.DatabaseFactory.dbQuery
 import com.chesstasks.data.dto.UserDto
 import com.chesstasks.data.dto.Users
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.koin.core.annotation.Single
 
 interface UserDao {
     suspend fun getById(id: Int): UserDto?
     suspend fun getByLogin(login: String): UserDto?
     suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto?
+    suspend fun isValuesUnique(username: String, emailAddress: String): Boolean
 }
 
 @Single
@@ -43,5 +41,9 @@ class UserDaoImpl : UserDao {
             it[Users.emailAddress] = emailAddress
             it[Users.passwordHash] = passwordHash
         }.resultedValues?.map(UserDto::tryFrom)?.firstOrNull()
+    }
+
+    override suspend fun isValuesUnique(username: String, emailAddress: String): Boolean = dbQuery {
+        Users.select { (Users.emailAddress like emailAddress) and (Users.username like username) }.count() == 0L
     }
 }
