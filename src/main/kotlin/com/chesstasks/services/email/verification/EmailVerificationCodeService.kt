@@ -11,4 +11,7 @@ class EmailVerificationCodeService(private val emailVerificationCodeDao: EmailVe
 
     suspend fun deleteById(id: Int): Boolean =
         emailVerificationCodeDao.deleteById(id)
+
+    suspend fun insertValues(emailAddress: String, username: String, passwordHash: String): EmailVerificationCodeDto?=
+        emailVerificationCodeDao.insertValues(emailAddress, username, passwordHash)
 }
