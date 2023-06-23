@@ -1,11 +1,14 @@
 package com.chesstasks.controllers.ui
 
+import com.chesstasks.controllers.ui.login.loginController
+import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
+import java.io.File
 
 fun Route.configUI() {
-    // TODO: Add controllers for both (admin and user)
+    staticFiles("/public", File("node_modules")) {}
 
-    // TODO: Add admin controllers here.
+    staticFiles("/public", File("src/main/resources/public")) {}
 
-    // TODO: Add user controllers here.
+    loginController()
 }

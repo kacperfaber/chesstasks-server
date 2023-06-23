@@ -1,0 +1,89 @@
+body {
+    background: #181920;
+    font-family: 'Lato', sans-serif;
+    color: rgb(200, 200, 200);
+}
+
+body, html {
+    width: 100vw;
+    padding-top: 100px;
+}
+
+input[type=text].input:focus {
+    outline: none;
+}
+
+#app_login__header {
+    line-height: 0.8em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#app_login__header > h1{
+    color: white;
+}
+
+#app_login__header > p{
+    color: rgb(160, 160, 160);
+}
+
+.form-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.form-group > input{
+    height: 40px;
+    width: 75%;
+
+    max-width: 350px;
+
+    background: #2c2d34;
+
+    border: 0;
+    border-radius: 10px;
+
+    padding: 5px;
+    color: white;
+    font-size: 0.8em;
+
+    margin-bottom: 15px;
+}
+
+.form-group > input:focus {
+    outline: none;
+}
+
+#app_login__form {
+    padding-top: 100px;
+}
+
+.form-group > input[type=submit].form-submit {
+    height: 40px;
+    width: 75%;
+
+    max-width: 350px;
+
+    background: #189759;
+
+    color: white;
+
+    border-radius: 10px;
+    border: 0;
+    outline: none;
+
+    transition: background-color 0.2s ease-in-out;
+}
+
+.form-group > input[type=submit].form-submit:hover {
+    background: #0e8d46;
+}
+
+.error {
+    color: red;
+    font-size: 1.3em;
+}

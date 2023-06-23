@@ -1,9 +1,9 @@
 package com.chesstasks
 
-enum class Profile(val value: Int) {
-    PROD(0),
-    DEV(1),
-    TEST(2)
+enum class Profile(val value: String) {
+    PROD("prod"),
+    DEV("dev"),
+    TEST("test")
 }
 
 object Profiles {

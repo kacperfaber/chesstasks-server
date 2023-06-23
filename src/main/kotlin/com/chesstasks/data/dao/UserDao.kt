@@ -1,16 +1,16 @@
 package com.chesstasks.data.dao
 
 import com.chesstasks.data.DatabaseFactory.dbQuery
+import com.chesstasks.data.dto.SimpleUserDto
 import com.chesstasks.data.dto.UserDto
 import com.chesstasks.data.dto.Users
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.koin.core.annotation.Single
 
 interface UserDao {
     suspend fun getById(id: Int): UserDto?
     suspend fun getByLogin(login: String): UserDto?
+    suspend fun getNewUsers(limit: Int, skip: Long): List<SimpleUserDto>
 }
 
 @Single
@@ -33,5 +33,14 @@ class UserDaoImpl : UserDao {
         Users.select { (Users.emailAddress like login) or (Users.username eq login) }
             .map(::resultRowToUser)
             .singleOrNull()
+    }
+
+    override suspend fun getNewUsers(limit: Int, skip: Long): List<SimpleUserDto> = dbQuery {
+        Users
+            .slice(Users.id, Users.createdAt, Users.username)
+            .selectAll()
+            .limit(limit, skip)
+            .orderBy(Users.createdAt, SortOrder.DESC)
+            .map(SimpleUserDto::from)
     }
 }
