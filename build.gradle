@@ -52,6 +52,7 @@ dependencies {
     implementation "io.ktor:ktor-server-sessions:$ktor_version"
     implementation "io.ktor:ktor-server-auth:$ktor_version"
     implementation 'io.ktor:ktor-server-sessions-jvm:2.3.0'
+    implementation "org.apache.commons:commons-email:1.5"
 
 
     testImplementation 'com.jayway.jsonpath:json-path:2.8.0'
