@@ -2,6 +2,9 @@ package com.chesstasks.game.puzzle
 
 class PuzzleState(val puzzleId: Int, val fen: String, val computerMoves: List<BaseMove>, val userMoves: List<Move>) {
     var index = 1
+
+    val firstMove: String
+        get() = computerMoves[0].move
 }
 
 open class BaseMove(val move: String)
