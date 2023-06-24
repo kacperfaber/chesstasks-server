@@ -3,6 +3,7 @@ package com.chesstasks.websocket
 
 import com.chesstasks.security.auth.user
 import com.chesstasks.websocket.handlers.configHandlers
+import com.chesstasks.websocket.handlers.training.trainingHandler
 import com.chesstasks.websocket.handlers.user.userHandler
 import com.chesstasks.websocket.worker.setupEndpointWorker
 import io.ktor.server.application.*
@@ -22,6 +23,7 @@ fun Application.configWebSocket() {
 
     configHandlers {
         userHandler()
+        trainingHandler()
     }
 
     routing {
