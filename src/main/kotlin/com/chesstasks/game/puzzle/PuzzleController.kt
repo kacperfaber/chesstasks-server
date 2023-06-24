@@ -24,4 +24,10 @@ class PuzzleController {
         return PuzzleState(puzzleId, fen, computerMoves, userMoves)
     }
 
+    fun makeMove(puzzleState: PuzzleState, move: String): MoveSolveState {
+        val success = move == puzzleState.userMove.move
+        val moveSolveState = if (success) MoveSolveState.Ok else MoveSolveState.Wrong
+        puzzleState.submit(moveSolveState)
+        return moveSolveState
+    }
 }
