@@ -16,3 +16,8 @@ suspend fun DefaultWebSocketServerSession.sendCommand(name: String) {
     val r = gson.toJson(mapOf("n" to name))
     send(Frame.Text(r))
 }
+
+suspend fun DefaultWebSocketServerSession.sendCommand(name: String, data: Any) {
+    val r = gson.toJson(mapOf("n" to name, "d" to data))
+    send(Frame.Text(r))
+}
