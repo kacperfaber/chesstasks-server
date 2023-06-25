@@ -23,7 +23,7 @@ class UserWebSocketTokenAuthenticationProvider : AuthenticationProvider(Config(p
         try {
             val token = context.call.request.headers["Authorization"] ?: protocolError()
             val authenticationService: AuthenticationService = KoinJavaComponent.get(AuthenticationService::class.java)
-            val tokenAuthResult = authenticationService.tryAuthenticateAdmin(token) ?: protocolError()
+            val tokenAuthResult = authenticationService.tryAuthenticate(token) ?: protocolError()
             context.principal(TokenPrincipal(tokenAuthResult.token, tokenAuthResult.user))
         }
 
