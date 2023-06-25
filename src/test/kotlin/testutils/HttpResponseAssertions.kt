@@ -28,6 +28,12 @@ fun HttpStatusCode.isNoContent() {
     assertEquals(HttpStatusCode.NoContent, this)
 }
 
+fun <T> String.jsonPath(path: String): T? {
+    val config = Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS)
+    val parsed = JsonPath.parse(this, config)
+    return parsed.read<T?>(path)
+}
+
 suspend fun <T> HttpResponse.jsonPath(path: String): T? {
     val config = Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS)
     val parsed = JsonPath.parse(bodyAsText(), config)

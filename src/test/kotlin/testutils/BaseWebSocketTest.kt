@@ -39,6 +39,22 @@ open class BaseWebSocketTest : BaseWebTest() {
             }
         }
 
+        @OptIn(DelicateCoroutinesApi::class)
+        suspend fun <T> getValue(name: String, jsonPath: String): T {
+            return suspendCoroutine {
+                GlobalScope.launch {
+                    for (frame in session.incoming) {
+                        if (frame !is Frame.Text) continue
+                        val text = frame.readText()
+                        if (objectMapper.readValue<Command>(text).name != name) continue
+                        val commandData = text.jsonPath<T>(jsonPath)!!
+                        it.resume(commandData)
+                    }
+                    this.cancel()
+                }
+            }
+        }
+
         suspend fun isProtocolError() {
             val closeReason = session.closeReason.await()
             assertEquals(CloseReason.Codes.PROTOCOL_ERROR, closeReason?.knownReason)
