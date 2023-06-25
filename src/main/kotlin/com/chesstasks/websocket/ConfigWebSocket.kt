@@ -4,6 +4,7 @@ package com.chesstasks.websocket
 import com.chesstasks.security.auth.TokenPrincipal
 import com.chesstasks.security.auth.webSocketUser
 import com.chesstasks.websocket.handlers.configHandlers
+import com.chesstasks.websocket.handlers.exceptionHandlers
 import com.chesstasks.websocket.handlers.training.trainingHandler
 import com.chesstasks.websocket.handlers.user.userHandler
 import com.chesstasks.websocket.worker.setupEndpointWorker
@@ -26,6 +27,7 @@ fun Application.configWebSocket() {
     }
 
     configHandlers {
+        exceptionHandlers()
         userHandler()
         trainingHandler()
     }
