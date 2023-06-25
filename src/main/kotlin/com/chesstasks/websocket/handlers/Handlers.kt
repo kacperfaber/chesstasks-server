@@ -3,6 +3,7 @@ package com.chesstasks.websocket.handlers
 import com.chesstasks.security.auth.TokenPrincipal
 import com.chesstasks.services.admin.AdminService
 import com.chesstasks.websocket.Command
+import com.chesstasks.websocket.exceptions.CommandForbiddenException
 import io.ktor.server.auth.*
 import io.ktor.server.websocket.*
 import org.koin.java.KoinJavaComponent.inject
@@ -60,7 +61,7 @@ object Handlers {
 
     object UserSecurityConfig : SecurityConfig() {
         override suspend fun validate(sess: DefaultWebSocketServerSession) {
-            sess.call.principal<TokenPrincipal>()?.user?.id ?: throw Exception("This websocket command is forbidden")
+            sess.call.principal<TokenPrincipal>()?.user?.id ?: throw CommandForbiddenException()
         }
     }
 
@@ -68,8 +69,8 @@ object Handlers {
         private val adminService by inject<AdminService>(AdminService::class.java)
 
         override suspend fun validate(sess: DefaultWebSocketServerSession) {
-            val userId =  sess.call.principal<TokenPrincipal>()?.user?.id ?: throw Exception("This websocket command is forbidden")
-            if (!adminService.isUserAdmin(userId)) throw Exception("This websocket command is forbidden")
+            val userId =  sess.call.principal<TokenPrincipal>()?.user?.id ?: throw CommandForbiddenException()
+            if (!adminService.isUserAdmin(userId)) throw CommandForbiddenException()
         }
     }
 }
