@@ -11,10 +11,12 @@ import org.koin.ktor.ext.get
 fun Application.configureAuthentication() {
     val tokenAuthenticationProvider: TokenAuthenticationProvider = get()
     val adminTokenAuthenticationProvider: AdminTokenAuthenticationProvider = get()
+    val userWebSocketTokenAuthenticationProvider: UserWebSocketTokenAuthenticationProvider = get()
 
     install(Authentication) {
         this.register(tokenAuthenticationProvider)
         this.register(adminTokenAuthenticationProvider)
+        this.register(userWebSocketTokenAuthenticationProvider)
         configSessionSecurity()
     }
 
