@@ -13,7 +13,14 @@ suspend fun DefaultWebSocketServerSession.setupEndpointWorker() {
         val message = String(frame.readBytes())
         val command = objectMapper.readValue(message, Command::class.java)
         val handler = Handlers.handlers.getOrDefault(command.name, null) ?: continue // TODO()
-        handler.validate(this)
-        handler.onReceived(this, command)
+
+        try {
+            handler.validate(this)
+            handler.onReceived(this, command)
+        }
+
+        catch (e: Exception) {
+            Handlers.tryHandleException(this, e)
+        }
     }
 }

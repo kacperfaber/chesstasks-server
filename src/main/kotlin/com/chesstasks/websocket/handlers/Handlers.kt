@@ -22,12 +22,27 @@ class LambdaHandler(val func: suspend DefaultWebSocketServerSession.(Command) ->
     }
 }
 
+class ExceptionHandler(val func: suspend DefaultWebSocketServerSession.(Exception) -> Unit)
+
 object Handlers {
     val handlers = mutableMapOf<String, Handler>()
+    val exceptionHandlers = mutableMapOf<Class<*>, ExceptionHandler>()
+
+    suspend fun tryHandleException(session: DefaultWebSocketServerSession, e: Exception) {
+        val key = exceptionHandlers.keys.firstOrNull {
+            it.isAssignableFrom(e.javaClass)
+        }
+
+        (exceptionHandlers.getOrDefault(key, null) ?: throw e).func(session, e)
+    }
 
     object Config {
         fun handle(s: String, func: suspend DefaultWebSocketServerSession.(Command) -> Unit) {
             handlers[s] = LambdaHandler(func) {}
+        }
+
+        inline fun <reified T : Exception> exception(noinline act: suspend DefaultWebSocketServerSession.(e: Exception) -> Unit) {
+            exceptionHandlers[T::class.java] = ExceptionHandler(act)
         }
     }
 
@@ -36,6 +51,10 @@ object Handlers {
 
         fun handle(s: String, func: suspend DefaultWebSocketServerSession.(Command) -> Unit) {
             handlers[s] = LambdaHandler(func, ::validate)
+        }
+
+        inline fun <reified T : Exception> exception(noinline act: suspend DefaultWebSocketServerSession.(e: Exception) -> Unit) {
+            exceptionHandlers[T::class.java] = ExceptionHandler(act)
         }
     }
 
