@@ -19,6 +19,7 @@ fun Application.configWebSocket() {
         timeout = Duration.ofSeconds(15)
         maxFrameSize = Long.MAX_VALUE
         masking = false
+        // TODO: this.contentConverter - Configure contentConverter
     }
 
     configHandlers {
