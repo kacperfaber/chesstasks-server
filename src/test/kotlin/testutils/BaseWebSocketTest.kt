@@ -9,13 +9,16 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.time.withTimeoutOrNull
 import org.junit.jupiter.api.Assertions.assertEquals
+import java.time.Duration
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 private val objectMapper = ObjectMapper()
+
+class TimeoutException : Exception()
 
 open class BaseWebSocketTest : BaseWebTest() {
     data class WebSocketConnection(val session: DefaultWebSocketSession, val call: HttpClientCall) {
@@ -36,7 +39,7 @@ open class BaseWebSocketTest : BaseWebTest() {
             }
         }
 
-        suspend fun isProtocolError(){
+        suspend fun isProtocolError() {
             val closeReason = session.closeReason.await()
             assertEquals(CloseReason.Codes.PROTOCOL_ERROR, closeReason?.knownReason)
         }
@@ -47,6 +50,7 @@ open class BaseWebSocketTest : BaseWebTest() {
     }
 
     protected suspend fun webSocket(
+        timeout: Long = 5_000,
         httpRequestBuilder: HttpRequestBuilder.() -> Unit,
         act: suspend WebSocketConnection.() -> Unit
     ) {
@@ -56,16 +60,29 @@ open class BaseWebSocketTest : BaseWebTest() {
 
         client.webSocket(httpRequestBuilder) {
             val webSocketConnection = WebSocketConnection(this, call)
-            act(webSocketConnection)
+
+            val res = withTimeoutOrNull(Duration.ofMillis(timeout)) {
+                act(webSocketConnection)
+                true
+            }
+
+            res ?: throw TimeoutException()
         }
     }
 
-    protected suspend fun playEndpoint(userId: Int? = null, act: suspend WebSocketConnection.() -> Unit) {
+    protected suspend fun playEndpoint(
+        userId: Int? = null,
+        timeout: Long = 5_000,
+        act: suspend WebSocketConnection.() -> Unit
+    ) {
         val httpRequestBuilder: HttpRequestBuilder.() -> Unit = {
             userId?.let { withToken(userId) };
             url.set(path = "/play")
         }
 
-        webSocket(httpRequestBuilder, act)
+        webSocket(timeout, httpRequestBuilder) {
+            act()
+        }
     }
 }
+
