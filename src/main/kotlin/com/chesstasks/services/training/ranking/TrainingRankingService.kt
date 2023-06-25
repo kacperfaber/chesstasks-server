@@ -6,9 +6,14 @@ import org.koin.core.annotation.Single
 
 @Single
 class TrainingRankingService(private val trainingRankingDao: TrainingRankingDao) {
-    suspend fun getRankingByUserId(userId: Int): Int? = trainingRankingDao.getRankingByUserId(userId)
+    companion object {
+        // TODO: Use properties.json or admin database.
+        const val DEFAULT_RANKING = 1500
+    }
 
-    suspend fun getByUserId(userId: Int): TrainingRankingDto? = trainingRankingDao.getByUserId(userId)
+    suspend fun getByUserId(userId: Int): TrainingRankingDto {
+        return trainingRankingDao.getByUserId(userId) ?: trainingRankingDao.insertValues(userId, DEFAULT_RANKING)!!
+    }
 
     suspend fun insertValues(userId: Int, ranking: Int): TrainingRankingDto? =
         trainingRankingDao.insertValues(userId, ranking)

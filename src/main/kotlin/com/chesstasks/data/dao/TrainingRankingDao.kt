@@ -10,10 +10,6 @@ import org.koin.core.annotation.Single
 
 @Single
 class TrainingRankingDao {
-    suspend fun getRankingByUserId(userId: Int): Int? = dbQuery {
-        TrainingRankings.select { TrainingRankings.userId eq userId }.firstOrNull()?.get(TrainingRankings.ranking)
-    }
-
     suspend fun getByUserId(userId: Int): TrainingRankingDto? = dbQuery {
         TrainingRankings.select {TrainingRankings.userId eq userId}?.map(TrainingRankingDto::from)?.firstOrNull()
     }
