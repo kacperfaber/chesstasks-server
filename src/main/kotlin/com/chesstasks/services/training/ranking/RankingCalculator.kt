@@ -4,7 +4,7 @@ import org.koin.core.annotation.Single
 
 @Single
 class RankingCalculator {
-    fun getNewRanking(ranking: Int, puzzleRanking: Int) {
+    fun getNewRanking(ranking: Int, puzzleRanking: Int, success: Boolean): Int {
         TODO()
     }
 }
