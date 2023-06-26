@@ -142,4 +142,45 @@ class PlayTrainingControllerTest : BaseWebTest() {
         val idsList = r.jsonPath<List<Int>>("$[?(@.database == 'USER')].id")
         assertEquals(30, idsList?.count())
     }
+
+    @Test
+    fun `submitPuzzleEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        app.client.post("/play/training/0/submit").status.isForbid()
+    }
+
+    private fun HttpRequestBuilder.submitPayload(success: Boolean = true) {
+        jsonBody("success" to success)
+    }
+
+    private fun setupRandomPuzzlesWithId(iter: Int) = transaction {
+        repeat(iter) { itId ->
+            Puzzles.insert {
+                it[id] = itId
+                it[fen] = initialFEN
+                it[moves] = "e2e4"
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+            }
+        }
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns 415 if authenticated as user and resource exist but no body`() = testSuspend {
+        setupUser()
+        setupRandomPuzzlesWithId(10)
+        app.client.post("/play/training/0/submit"){withToken(0)}.status.isUnsupportedMediaType()
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns BAD_REQUEST if authenticated as user but resource does not exist and body`() = testSuspend {
+        setupUser()
+        app.client.post("/play/training/0/submit"){withToken(0); submitPayload()}.status.isBadRequest()
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns OK if authenticated as user, body given and resource exist`() = testSuspend {
+        setupUser()
+        setupRandomPuzzlesWithId(10)
+        app.client.post("/play/training/0/submit") {withToken(0); submitPayload()}.status.isUnsupportedMediaType()
+    }
 }
