@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 
+// TODO: Puzzles.moves should be list of string.
+
 enum class PuzzleDatabase(val value: Int) {
     LICHESS(0),
     USER(1)

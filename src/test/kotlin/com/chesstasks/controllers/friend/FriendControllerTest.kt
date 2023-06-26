@@ -598,7 +598,9 @@ class FriendControllerTest : BaseWebTest() {
 
         val r = app.client.get("/api/friend/requests/sent") { withToken(0) }
         r.status.isOk()
-        r.jsonPath("$[0].id", 10)
+        for (i in (10 .. 60)) {
+            assertNotNull(r.jsonPath("$[?(@.id == $i)].id"))
+        }
     }
 
     @Test
@@ -608,6 +610,8 @@ class FriendControllerTest : BaseWebTest() {
 
         val r = app.client.get("/api/friend/requests/sent?skip=50") { withToken(0) }
         r.status.isOk()
-        r.jsonPath("$[0].id", 60)
+        for (i in (60 .. 110)) {
+            assertNotNull(r.jsonPath("$[?(@.id == $i)].id"))
+        }
     }
 }

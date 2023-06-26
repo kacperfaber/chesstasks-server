@@ -1,0 +1,510 @@
+openapi: "3.0.3"
+info:
+  title: "ChessTasks.com API"
+  description: "ChessTasks.com - API documentation."
+  version: "0.0.1"
+servers:
+- url: "https://chesstasks.com/api"
+paths:
+  /api/auth:
+    post:
+      operationId: /api/auth
+      tags:
+        - auth
+      description: "Generate access token for yourself"
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/AuthPayload"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: string
+                description: Generated token.
+        "400":
+          description: Bad Request - Bad credentials
+  /api/auth/current:
+    get:
+      operationId: /api/auth/current
+      tags:
+        - auth
+      description: "Get current user."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request - no current user
+  /api/auth/revoke:
+    post:
+      operationId: /api/auth/revoke
+      tags:
+        - auth
+      description: "Revoke access token."
+      responses:
+        "200":
+          description: OK
+        "403":
+          description: Forbidden - You're not authenticated.
+  /api/friend/all:
+    get:
+      operationId: /api/friend/all
+      tags:
+        - friends
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Friend"
+        "403":
+          description: Forbidden - You're not authenticated
+  /api/friend/by-id/{id}:
+    delete:
+      operationId: /api/friend/by-id/{id}
+      tags:
+        - friends
+      description: "Delete a friend by id"
+      parameters:
+      - name: "id"
+        description: Friend.id [not user id]
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "201":
+          description: Deleted successfully.
+        "403":
+          description: Forbidden - You're not authenticated
+        "400":
+          description: "Bad Request - Friend not found"
+  /api/friend/requests:
+    put:
+      operationId: /api/friend/requests
+      tags:
+        - friends
+      description: "Send a friend request to user"
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/PutFriendRequestPayload"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendRequest"
+  /api/friend/requests/received:
+    get:
+      operationId: /friend/requests/received
+      tags:
+        - friends
+      description: List friend request you received
+      parameters:
+        - name: skip
+          in: query
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendRequest"
+        "403":
+          description: Forbidden - You're not authenticated
+  /api/friend/requests/sent:
+    get:
+      operationId: /friend/requests/sent
+      tags:
+        - friends
+      description: List friend request you sent
+      parameters:
+        - name: skip
+          in: query
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendRequest"
+        "403":
+          description: Forbidden - You're not authenticated
+
+  /api/play/training/{puzzleId}/submit:
+    post:
+      operationId: /play/training/{puzzleId}/submit
+      tags:
+        - play
+      description: "Submit puzzle"
+      parameters:
+      - name: "puzzleId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/SubmitPuzzlePayload"
+        required: true
+      responses:
+        "403":
+          description: Forbidden - You're not authenticated
+        "400":
+          description: "Bad Request"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/SubmitPuzzleResponse"
+  /api/play/training/puzzles:
+    get:
+      operationId: /play/training/puzzles
+      tags:
+        - play
+      description: Get Puzzles by criteria
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/GetPuzzlePayload"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+        "403":
+          description: Forbidden - You're not authenticated
+  /api/puzzle/{id}:
+    delete:
+      operationId: /puzzle/{id} DEL
+      tags:
+        - puzzle
+      description: ""
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "400":
+          description: "Bad Request - Puzzle not found"
+        "204":
+          description: "OK"
+    get:
+      operationId: /puzzle/{id}
+      tags:
+        - puzzle
+      description: Get puzzle by id
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "400":
+          description: "Bad Request - Puzzle not found"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Puzzle"
+  /api/puzzle/all/by-database/lichess:
+    get:
+      operationId: /puzzle/all/by-database/lichess
+      tags:
+        - puzzle
+      description: Get list of puzzle in Lichess database.
+      parameters:
+      - name: "skip"
+        in: "query"
+        required: false
+        schema:
+          type: "number"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+        "403":
+          description: Forbidden - You're not authenticated.
+  /api/puzzle/all/by-database/user:
+    get:
+      operationId: /puzzle/all/by-database/user
+      tags:
+        - puzzle
+      description: Get list of puzzle in User database.
+      parameters:
+        - name: "skip"
+          in: "query"
+          required: false
+          schema:
+            type: "number"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+        "403":
+          description: Forbidden - You're not authenticated.
+  /api/puzzle/by-opening/eco/{openingEco}:
+    get:
+      operationId: /puzzle/by-opening/eco/{openingEco}
+      tags:
+        - puzzle
+      description: ""
+      parameters:
+      - name: "openingEco"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+  /api/puzzle/by-opening/id/{openingId}:
+    get:
+      operationId: /puzzle/by-opening/id/{openingId}
+      tags:
+        - puzzle
+      description: ""
+      parameters:
+      - name: "openingId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "400":
+          description: "Bad Request"
+        "403":
+          description: Forbidden - You're not authenticated.
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+  /api/puzzle/by-theme/{themeName}:
+    get:
+      operationId: /puzzle/by-theme/{themeName}
+      tags:
+        - puzzle
+      description: ""
+      parameters:
+      - name: "themeName"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+  /api/puzzle/by-user/{userId}:
+    get:
+      operationId: /puzzle/by-user/{userId}
+      tags:
+        - puzzle
+      description: ""
+      parameters:
+      - name: "skip"
+        in: "query"
+        required: false
+        schema:
+          type: "number"
+      - name: "userId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "403":
+          description: Forbidden - You're not authenticated
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+components:
+  schemas:
+    AuthPayload:
+      type: "object"
+      properties:
+        login:
+          type: "string"
+        password:
+          type: "string"
+    ExceptionResponse:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+    User:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        emailAddress:
+          type: "string"
+        id:
+          type: "integer"
+          format: "int32"
+        createdAt:
+          type: "integer"
+          format: "int64"
+    PutFriendRequestPayload:
+      type: "object"
+      properties:
+        userId:
+          type: "integer"
+          format: "int32"
+    SubmitPuzzlePayload:
+      type: "object"
+      properties:
+        success:
+          type: "boolean"
+    PuzzleDatabase:
+      type: string
+      enum:
+        - LICHESS
+        - USER
+    GetPuzzlePayload:
+      type: "object"
+      properties:
+        rankingOffset:
+          type: integer
+          nullable: true
+        themeId:
+          type: integer
+          nullable: true
+        database:
+          $ref: "#/components/schemas/PuzzleDatabase"
+    Object:
+      type: "object"
+      properties: {}
+    Friend:
+      type: "object"
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+          description: "First user id"
+        secondUserId:
+          type: integer
+          description: "Second user id"
+        createdAt:
+          type: integer
+          description: Request accepted at
+    FriendRequest:
+      type: "object"
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: integer
+          description: Sent at
+        senderId:
+          type: integer
+          description: Id of user who sent the request.
+        targetId:
+          type: integer
+          description: Id of user who received the request.
+    SubmitPuzzleResponse:
+      type: object
+      properties:
+        ranking:
+          type: integer
+          description: New ranking
+        rankingDifference:
+          type: integer
+          description: Value your ranking has been changed.
+    Puzzle:
+      type: object
+      properties:
+        id:
+          type: integer
+        fen:
+          type: string
+        moves:
+          type: array
+          items:
+            type: string
+        database:
+          $ref: "#/components/schemas/PuzzleDatabase"
+        themes:
+          type: array
+          items:
+            type: string
+        ranking:
+          type: integer
+        ownerId:
+          type: integer
+          nullable: true
+        openingId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: integer
