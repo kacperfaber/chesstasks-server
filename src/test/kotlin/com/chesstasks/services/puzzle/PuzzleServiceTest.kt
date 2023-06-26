@@ -33,14 +33,14 @@ class PuzzleServiceTest : BaseTest() {
     @Test
     fun `getListBySearchCriteria returns expected list size when DEFAULT_LIMIT used`() = testSuspend {
         setupRandomPuzzles(500, 1500)
-        val searchCriteria = PuzzleService.SearchCriteria(1500, null, null)
+        val searchCriteria = PuzzleService.SearchCriteria(1500, null, null, null)
         assertEquals(50, puzzleService.getListBySearchCriteria(searchCriteria, skip = 0L).size)
     }
 
     @Test
     fun `getListBySearchCriteria returns expected list size when limit is bigger than database size`() = testSuspend {
         setupRandomPuzzles(500, 1500)
-        val searchCriteria = PuzzleService.SearchCriteria(1500, null, null)
+        val searchCriteria = PuzzleService.SearchCriteria(1500, null, null, null)
         assertEquals(500, puzzleService.getListBySearchCriteria(searchCriteria, limit = 1000, skip = 0L).size)
     }
 
@@ -48,7 +48,7 @@ class PuzzleServiceTest : BaseTest() {
     fun `getListBySearchCriteria returns only items matching to criteria`() = testSuspend{
         setupRandomPuzzles(10, 1500)
         setupRandomPuzzles(10, 500)
-        val searchCriteria = PuzzleService.SearchCriteria(1500, null, null)
+        val searchCriteria = PuzzleService.SearchCriteria(1500, null, null, null)
         val res = puzzleService.getListBySearchCriteria(searchCriteria, limit = 1000, skip = 0L)
         assertEquals(10, res.size)
         assertTrue { res.all { it.ranking == 1500 } }

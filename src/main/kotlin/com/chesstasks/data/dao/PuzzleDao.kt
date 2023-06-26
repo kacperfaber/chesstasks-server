@@ -3,6 +3,7 @@ package com.chesstasks.data.dao
 import com.chesstasks.data.DatabaseFactory.dbQuery
 import com.chesstasks.data.dto.*
 import com.chesstasks.data.dto.PuzzleDto.Companion.from
+import com.chesstasks.data.expressions.Random
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inSubQuery
@@ -108,6 +109,17 @@ class PuzzleDao {
             .prepareJoin()
             .select {where.reduce {acc, op -> acc.and(op)}}
             .limit(limit, skip)
+            .map(PuzzleDto::from)
+    }
+
+    suspend fun getRandomList(where: List<Op<Boolean>>, limit: Int, skip: Long): List<PuzzleDto> = dbQuery{
+        if (where.isEmpty()) throw RuntimeException("PuzzleDao.getList: 'where' parameter can't be an empty list.")
+
+        Puzzles
+            .prepareJoin()
+            .select {where.reduce {acc, op -> acc.and(op)}}
+            .limit(limit, skip)
+            .orderBy(Random)
             .map(PuzzleDto::from)
     }
 }

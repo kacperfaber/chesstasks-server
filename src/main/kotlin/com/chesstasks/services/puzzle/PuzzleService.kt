@@ -51,17 +51,21 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
         return puzzleDao.getRandomByRankingRange(min, max, DEFAULT_LIMIT, 0L)
     }
 
-    class SearchCriteria(val ranking: Int, private val rankingOffset: Int?, private val themeId: Int?) {
+    class SearchCriteria(val ranking: Int, private val rankingOffset: Int?, private val themeId: Int?, private val database: PuzzleDatabase?) {
         fun getWheres(): List<Op<Boolean>> {
             return listOfNotNull(
                 if (themeId != null) PuzzleThemes.puzzleId eq themeId else null,
-                if (rankingOffset == null) (Puzzles.ranking greaterEq ranking - 100) and (Puzzles.ranking lessEq ranking + 100) else null,
-                if (rankingOffset != null) (Puzzles.ranking greaterEq (ranking + rankingOffset) - 100) and (Puzzles.ranking lessEq (ranking + rankingOffset) + 100) else null,
+                (Puzzles.ranking greaterEq (ranking + (rankingOffset ?: 0)) - 100) and (Puzzles.ranking lessEq (ranking + (rankingOffset ?: 0)) + 100),
+                if (database != null) Puzzles.database eq database else null
             )
         }
     }
 
     suspend fun getListBySearchCriteria(searchCriteria: SearchCriteria, limit: Int = DEFAULT_LIMIT, skip: Long): List<PuzzleDto> {
         return puzzleDao.getList(searchCriteria.getWheres(), limit, skip)
+    }
+
+    suspend fun getRandomListBySearchCriteria(searchCriteria: SearchCriteria, limit: Int = DEFAULT_LIMIT, skip: Long): List<PuzzleDto> {
+        return puzzleDao.getRandomList(searchCriteria.getWheres(), limit, skip)
     }
 }
