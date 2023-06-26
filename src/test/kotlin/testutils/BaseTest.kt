@@ -56,9 +56,22 @@ open class BaseTest {
 }
 
 open class BaseWebTest : BaseTest() {
-    protected fun HttpRequestBuilder.jsonBody(vararg pairs: Pair<Any, Any>) {
+    protected fun HttpRequestBuilder.jsonBody(vararg pairs: Pair<Any, Any?>) {
         contentType(ContentType.Application.Json)
         setBody(Gson().toJson(mapOf(*pairs)))
+    }
+
+    protected fun createToken(userId: Int, secret: String) = transaction {
+        Tokens.insert {
+            it[id] = 0
+            it[Tokens.userId] = userId
+            it[createdAt] = System.currentTimeMillis()
+            it[Tokens.secret] = secret
+        }
+    }
+
+    protected fun HttpRequestBuilder.useToken(userId: Int, secret: String) {
+        header("Authorization", Gson().toJson(Token(userId, secret)))
     }
 
     protected fun HttpRequestBuilder.withToken(userId: Int, useSecret: String? = null) {
