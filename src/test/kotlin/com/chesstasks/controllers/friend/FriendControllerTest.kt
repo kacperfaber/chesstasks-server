@@ -532,4 +532,82 @@ class FriendControllerTest : BaseWebTest() {
         r.jsonPath("$.senderId", 0)
         r.jsonPath("$.targetId", 1)
     }
+
+    @Test
+    fun `getSentRequestsEndpoint returns FORBIDDEN if no auth`() = testSuspend {
+        setupUsers()
+        app.client.get("/api/friend/requests/sent").status.isForbid()
+    }
+
+    @Test
+    fun `getSentRequestsEndpoint returns OK if authenticated as admin`() = testSuspend {
+        setupUsers()
+        setupAdmin()
+        app.client.get("/api/friend/requests/sent"){withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getSentRequestsEndpoint returns OK if authenticated as user`() = testSuspend {
+        setupUsers()
+        app.client.get("/api/friend/requests/sent"){withToken(0)}.status.isOk()
+    }
+
+    private fun setupRandomRequests(iter: Int, offset: Int, senderUserId: Int) = transaction {
+        repeat(iter) {iteration ->
+            val id = iteration + offset
+
+            Users.insert {
+                it[Users.id] = id
+                it[emailAddress] = UUID.randomUUID().toString().take(24)
+                it[username] = UUID.randomUUID().toString().take(24)
+                it[passwordHash] = "HelloWorld123"
+            }
+
+            FriendRequests.insert {
+                it[FriendRequests.id] = id
+                it[senderId] = senderUserId
+                it[targetId] = id
+            }
+        }
+    }
+
+    @Test
+    fun `getSentRequestsEndpoint returns expected items length max=50 and OK`() = testSuspend {
+        setupUsers()
+        setupRandomRequests(100, 10, 0)
+
+        val r = app.client.get("/api/friend/requests/sent") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$.length()", 50)
+    }
+
+    @Test
+    fun `getSentRequestsEndpoint returns expected items length and OK`() = testSuspend {
+        setupUsers()
+        setupRandomRequests(25, 10, 0)
+
+        val r = app.client.get("/api/friend/requests/sent") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$.length()", 25)
+    }
+
+    @Test
+    fun `getSentRequestsEndpoint returns OK and expected first item`() = testSuspend {
+        setupUsers()
+        setupRandomRequests(500, 10, 0)
+
+        val r = app.client.get("/api/friend/requests/sent") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$[0].id", 10)
+    }
+
+    @Test
+    fun `getSentRequestsEndpoint returns OK and expected first item using skip`() = testSuspend {
+        setupUsers()
+        setupRandomRequests(500, 10, 0)
+
+        val r = app.client.get("/api/friend/requests/sent?skip=50") { withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$[0].id", 60)
+    }
 }
