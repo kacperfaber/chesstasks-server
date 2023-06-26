@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inSubQuery
 import org.koin.core.annotation.Single
+import java.lang.RuntimeException
 
 @Single
 class PuzzleDao {
@@ -97,6 +98,16 @@ class PuzzleDao {
             .select { (Puzzles.ranking lessEq max) and (Puzzles.ranking greaterEq min) }
             .limit(limit, skip)
             .orderBy(com.chesstasks.data.expressions.Random)
+            .map(PuzzleDto::from)
+    }
+
+    suspend fun getList(where: List<Op<Boolean>>, limit: Int, skip: Long): List<PuzzleDto> = dbQuery{
+        if (where.isEmpty()) throw RuntimeException("PuzzleDao.getList: 'where' parameter can't be an empty list.")
+
+        Puzzles
+            .prepareJoin()
+            .select {where.reduce {acc, op -> acc.and(op)}}
+            .limit(limit, skip)
             .map(PuzzleDto::from)
     }
 }

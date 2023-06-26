@@ -3,6 +3,13 @@ package com.chesstasks.services.puzzle
 import com.chesstasks.data.dao.PuzzleDao
 import com.chesstasks.data.dto.PuzzleDatabase
 import com.chesstasks.data.dto.PuzzleDto
+import com.chesstasks.data.dto.PuzzleThemes
+import com.chesstasks.data.dto.Puzzles
+import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
+import org.jetbrains.exposed.sql.and
 import org.koin.core.annotation.Single
 
 @Single
@@ -42,5 +49,19 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
 
     suspend fun getRandomByRankingRange(min: Int, max: Int): List<PuzzleDto> {
         return puzzleDao.getRandomByRankingRange(min, max, DEFAULT_LIMIT, 0L)
+    }
+
+    class SearchCriteria(val ranking: Int, private val rankingOffset: Int?, private val themeId: Int?) {
+        fun getWheres(): List<Op<Boolean>> {
+            return listOfNotNull(
+                if (themeId != null) PuzzleThemes.puzzleId eq themeId else null,
+                if (rankingOffset == null) (Puzzles.ranking greaterEq ranking - 100) and (Puzzles.ranking lessEq ranking + 100) else null,
+                if (rankingOffset != null) (Puzzles.ranking greaterEq (ranking + rankingOffset) - 100) and (Puzzles.ranking lessEq (ranking + rankingOffset) + 100) else null,
+            )
+        }
+    }
+
+    suspend fun getListBySearchCriteria(searchCriteria: SearchCriteria, limit: Int = DEFAULT_LIMIT, skip: Long): List<PuzzleDto> {
+        return puzzleDao.getList(searchCriteria.getWheres(), limit, skip)
     }
 }

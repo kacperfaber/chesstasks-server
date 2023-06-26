@@ -2,11 +2,14 @@ package com.chesstasks.data.dao
 
 import com.chesstasks.data.dto.*
 import io.ktor.test.dispatcher.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import testutils.BaseTest
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -175,5 +178,37 @@ class PuzzleDaoTest : BaseTest() {
         setupPuzzleWithOwner(PuzzleDatabase.USER)
         val res = puzzleDao.getById(0)
         assertEquals(PuzzleDatabase.USER, res?.database)
+    }
+
+    companion object {
+        const val initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    }
+
+    private fun setupRandomList(iter: Int, ranking: Int) = transaction {
+        repeat(iter) {
+            Puzzles.insert {
+                it[fen] = initialFEN
+                it[moves] = "e2e4 e7e5 d2d4 d7d5"
+                it[database] = PuzzleDatabase.LICHESS
+                it[Puzzles.ranking] = ranking
+            }
+        }
+    }
+
+    @Test
+    fun `getList returns expected length`() = testSuspend {
+        val puzzleDao = getInstance<PuzzleDao>()
+        setupRandomList(500, 1500)
+        val expectedLen = Random.nextInt(0, 400)
+        assertEquals(expectedLen, puzzleDao.getList(listOf(Puzzles.ranking greaterEq 0), expectedLen, 0).size)
+    }
+
+    @Test
+    fun `getList returns expected length when used with wheres parameter`() = testSuspend {
+        val puzzleDao = getInstance<PuzzleDao>()
+        val expectedLen = Random.nextInt(0, 400)
+        setupRandomList(expectedLen, 1000)
+        setupRandomList(100, 1500)
+        assertEquals(expectedLen, puzzleDao.getList(listOf(Puzzles.ranking eq 1000), expectedLen, 0).size)
     }
 }
