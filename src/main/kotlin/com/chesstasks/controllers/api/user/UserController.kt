@@ -1,4 +1,4 @@
-package com.chesstasks.controllers.user
+package com.chesstasks.controllers.api.user
 
 import com.chesstasks.controllers.ofNullable
 import com.chesstasks.controllers.requirePrincipalId

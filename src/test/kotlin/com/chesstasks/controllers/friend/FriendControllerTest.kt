@@ -59,20 +59,20 @@ class FriendControllerTest : BaseWebTest() {
 
     @Test
     fun `deleteFriendByIdEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
-        app.client.delete("/friend/by-id/0").status.isForbid()
+        app.client.delete("/api/friend/by-id/0").status.isForbid()
     }
 
     @Test
     fun `deleteFriendByIdEndpoint returns BAD_REQUEST authenticated but resource does not exist`() = testSuspend {
         setupUsers()
-        app.client.delete("/friend/by-id/0") { withToken(0) }.status.isBadRequest()
+        app.client.delete("/api/friend/by-id/0") { withToken(0) }.status.isBadRequest()
     }
 
     @Test
     fun `deleteFriendByIdEndpoint returns NO_CONTENT when authenticated and resource exist`() = testSuspend {
         setupUsers()
         setupFriend()
-        app.client.delete("/friend/by-id/0") { withToken(0) }.status.isNoContent()
+        app.client.delete("/api/friend/by-id/0") { withToken(0) }.status.isNoContent()
     }
 
     @Test
@@ -80,7 +80,7 @@ class FriendControllerTest : BaseWebTest() {
         testSuspend {
             setupUsers()
             setupFriend()
-            app.client.delete("/friend/by-id/0") { withToken(0) }.status.isNoContent()
+            app.client.delete("/api/friend/by-id/0") { withToken(0) }.status.isNoContent()
         }
 
     @Test
@@ -88,7 +88,7 @@ class FriendControllerTest : BaseWebTest() {
         testSuspend {
             setupUsers()
             setupFriend()
-            app.client.delete("/friend/by-id/0") { withToken(1) }.status.isNoContent()
+            app.client.delete("/api/friend/by-id/0") { withToken(1) }.status.isNoContent()
         }
 
     @Test
@@ -96,7 +96,7 @@ class FriendControllerTest : BaseWebTest() {
         testSuspend {
             setupUsers()
             setupFriend()
-            app.client.delete("/friend/by-id/0") { withToken(2) }.status.isBadRequest()
+            app.client.delete("/api/friend/by-id/0") { withToken(2) }.status.isBadRequest()
         }
 
     private fun hasFriendship(id: Int): Boolean = transaction {
@@ -110,7 +110,7 @@ class FriendControllerTest : BaseWebTest() {
             setupFriend()
             assertTrue { hasFriendship(0) }
 
-            app.client.delete("/friend/by-id/0") { withToken(1) }.status.isNoContent()
+            app.client.delete("/api/friend/by-id/0") { withToken(1) }.status.isNoContent()
 
             assertFalse { hasFriendship(0) }
         }
@@ -122,7 +122,7 @@ class FriendControllerTest : BaseWebTest() {
             setupFriend()
             assertTrue { hasFriendship(0) }
 
-            app.client.delete("/friend/by-id/0") { withToken(0) }.status.isNoContent()
+            app.client.delete("/api/friend/by-id/0") { withToken(0) }.status.isNoContent()
 
             assertFalse { hasFriendship(0) }
         }
@@ -134,7 +134,7 @@ class FriendControllerTest : BaseWebTest() {
             setupFriend()
             assertTrue { hasFriendship(0) }
 
-            app.client.delete("/friend/by-id/0") { withToken(2) }.status.isBadRequest()
+            app.client.delete("/api/friend/by-id/0") { withToken(2) }.status.isBadRequest()
 
             assertTrue { hasFriendship(0) }
         }
@@ -150,7 +150,7 @@ class FriendControllerTest : BaseWebTest() {
             setupFriend()
             val bef = countFriends()
 
-            app.client.delete("/friend/by-id/0") { withToken(1) }.status.isNoContent()
+            app.client.delete("/api/friend/by-id/0") { withToken(1) }.status.isNoContent()
 
             val now = countFriends()
             assertEquals(bef - 1, now)
@@ -163,7 +163,7 @@ class FriendControllerTest : BaseWebTest() {
             setupFriend()
             val bef = countFriends()
 
-            app.client.delete("/friend/by-id/0") { withToken(0) }.status.isNoContent()
+            app.client.delete("/api/friend/by-id/0") { withToken(0) }.status.isNoContent()
 
             assertEquals(bef - 1, countFriends())
         }
@@ -175,7 +175,7 @@ class FriendControllerTest : BaseWebTest() {
             setupFriend()
             val bef = countFriends()
 
-            app.client.delete("/friend/by-id/0") { withToken(2) }.status.isBadRequest()
+            app.client.delete("/api/friend/by-id/0") { withToken(2) }.status.isBadRequest()
 
             assertEquals(bef, countFriends())
         }
@@ -201,7 +201,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupRequests()
 
-        app.client.get("/friend/requests/received").status.isForbid()
+        app.client.get("/api/friend/requests/received").status.isForbid()
     }
 
     @Test
@@ -209,7 +209,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupRequests()
 
-        app.client.get("/friend/requests/received") { withToken(0) }.status.isOk()
+        app.client.get("/api/friend/requests/received") { withToken(0) }.status.isOk()
     }
 
     private fun setupAdmin() {
@@ -227,7 +227,7 @@ class FriendControllerTest : BaseWebTest() {
         setupAdmin()
         setupRequests()
 
-        app.client.get("/friend/requests/received") { withToken(0) }.status.isOk()
+        app.client.get("/api/friend/requests/received") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -235,7 +235,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupRequests()
 
-        val response = app.client.get("/friend/requests/received") { withToken(1) }
+        val response = app.client.get("/api/friend/requests/received") { withToken(1) }
         response.status.isOk()
         response.jsonPath("$.length()", 1)
     }
@@ -245,7 +245,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupRequests()
 
-        val response = app.client.get("/friend/requests/received") { withToken(0) }
+        val response = app.client.get("/api/friend/requests/received") { withToken(0) }
         response.status.isOk()
         response.jsonPath("$[0].id", 1)
         response.jsonPath("$[0].senderId", 2)
@@ -255,14 +255,14 @@ class FriendControllerTest : BaseWebTest() {
     fun `getAllFriendEndpoint returns FORBIDDEN if no auth`() = testSuspend {
         setupUsers()
         setupFriend()
-        app.client.get("/friend/all").status.isForbid()
+        app.client.get("/api/friend/all").status.isForbid()
     }
 
     @Test
     fun `getAllFriendEndpoint returns OK when authenticated as user`() = testSuspend {
         setupUsers()
         setupFriend()
-        app.client.get("/friend/all") { withToken(0) }.status.isOk()
+        app.client.get("/api/friend/all") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -270,7 +270,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupAdmin()
         setupFriend()
-        app.client.get("/friend/all") { withToken(0) }.status.isOk()
+        app.client.get("/api/friend/all") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -278,7 +278,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupAdmin()
         setupFriend()
-        val resp = app.client.get("/friend/all") { withToken(0) }
+        val resp = app.client.get("/api/friend/all") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$.length()", 2)
     }
@@ -306,7 +306,7 @@ class FriendControllerTest : BaseWebTest() {
     fun `getAllFriendEndpoint returns OK and 50 items when there's too much`() = testSuspend {
         setupUsers()
         setupRandomFriends(777, 10)
-        val resp = app.client.get("/friend/all") { withToken(0) }
+        val resp = app.client.get("/api/friend/all") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$.length()", 50)
     }
@@ -315,7 +315,7 @@ class FriendControllerTest : BaseWebTest() {
     fun `getAllFriendEndpoint returns OK and expected data`() = testSuspend {
         setupUsers()
         setupRandomFriends(1, 10)
-        val resp = app.client.get("/friend/all") { withToken(0) }
+        val resp = app.client.get("/api/friend/all") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$[0].id", 10)
         resp.jsonPath("$[0].secondUserId", 0)
@@ -326,7 +326,7 @@ class FriendControllerTest : BaseWebTest() {
     fun `getAllFriendEndpoint returns OK and expected items USING SKIP`() = testSuspend {
         setupUsers()
         setupRandomFriends(1000, 10)
-        val resp = app.client.get("/friend/all?skip=500") { withToken(0) }
+        val resp = app.client.get("/api/friend/all?skip=500") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$[0].id", 10 + 500)
         resp.jsonPath("$[0].secondUserId", 0)
@@ -337,7 +337,7 @@ class FriendControllerTest : BaseWebTest() {
     fun `getAllFriendEndpoint returns OK and expected items when skip not set`() = testSuspend {
         setupUsers()
         setupRandomFriends(1000, 10)
-        val resp = app.client.get("/friend/all") { withToken(0) }
+        val resp = app.client.get("/api/friend/all") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$[0].id", 10)
         resp.jsonPath("$[0].secondUserId", 0)
@@ -347,14 +347,14 @@ class FriendControllerTest : BaseWebTest() {
     @Test
     fun `putFriendRequestEndpoint returns FORBIDDEN when no auth`() = testSuspend {
         setupUsers()
-        app.client.put("/friend/requests").status.isForbid()
+        app.client.put("/api/friend/requests").status.isForbid()
     }
 
     @Test
     fun `putFriendRequestEndpoint returns OK when valid data passed and authenticated`() = testSuspend {
         setupUsers()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }.status.isOk()
@@ -364,7 +364,7 @@ class FriendControllerTest : BaseWebTest() {
     fun `putFriendRequestEndpoint returns BAD_REQUEST authenticated but target user does not exist`() = testSuspend {
         setupUsers()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 199)
         }.status.isBadRequest()
@@ -383,7 +383,7 @@ class FriendControllerTest : BaseWebTest() {
 
         assertNull(getRequestByUsers(0, 1))
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }.status.isOk()
@@ -401,7 +401,7 @@ class FriendControllerTest : BaseWebTest() {
 
         assertNull(getRequestByUsers(0, 199))
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 199)
         }.status.isBadRequest()
@@ -415,7 +415,7 @@ class FriendControllerTest : BaseWebTest() {
 
         val bef = countRequests()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }.status.isOk()
@@ -429,7 +429,7 @@ class FriendControllerTest : BaseWebTest() {
 
         val bef = countRequests()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 199)
         }.status.isBadRequest()
@@ -442,7 +442,7 @@ class FriendControllerTest : BaseWebTest() {
         setupUsers()
         setupFriend()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }.status.isBadRequest()
@@ -455,7 +455,7 @@ class FriendControllerTest : BaseWebTest() {
 
         val bef = countRequests()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }.status.isBadRequest()
@@ -480,7 +480,7 @@ class FriendControllerTest : BaseWebTest() {
 
         val bef = countRequests()
 
-        app.client.put("/friend/requests") {
+        app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }.status.isBadRequest()
@@ -503,7 +503,7 @@ class FriendControllerTest : BaseWebTest() {
 
             val bef = countRequests()
 
-            app.client.put("/friend/requests") {
+            app.client.put("/api/friend/requests") {
                 withToken(0)
                 jsonBody("userId" to 1)
             }.status.isBadRequest()
@@ -515,14 +515,14 @@ class FriendControllerTest : BaseWebTest() {
     fun `putFriendRequestEndpoint returns UNSUPPORTED_MEDIA_TYPE when no body`() = testSuspend {
         setupUsers()
 
-        assertEquals(HttpStatusCode.UnsupportedMediaType, app.client.put("/friend/requests") { withToken(0) }.status)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, app.client.put("/api/friend/requests") { withToken(0) }.status)
     }
 
     @Test
     fun `putFriendRequestEndpoint returns OK and expected data`() = testSuspend {
         setupUsers()
 
-        val r = app.client.put("/friend/requests") {
+        val r = app.client.put("/api/friend/requests") {
             withToken(0)
             jsonBody("userId" to 1)
         }

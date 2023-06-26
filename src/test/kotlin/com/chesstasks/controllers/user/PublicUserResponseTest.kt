@@ -1,5 +1,6 @@
 package com.chesstasks.controllers.user
 
+import com.chesstasks.controllers.api.user.PublicUserResponse
 import com.chesstasks.data.dto.UserDto
 import io.ktor.test.dispatcher.*
 import org.junit.jupiter.api.Test

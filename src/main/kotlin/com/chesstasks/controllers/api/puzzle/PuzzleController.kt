@@ -1,4 +1,4 @@
-package com.chesstasks.controllers.puzzle
+package com.chesstasks.controllers.api.puzzle
 
 import com.chesstasks.controllers.getSkip
 import com.chesstasks.controllers.ofBoolean

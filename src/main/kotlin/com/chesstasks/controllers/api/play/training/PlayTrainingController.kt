@@ -1,4 +1,4 @@
-package com.chesstasks.controllers.play.training
+package com.chesstasks.controllers.api.play.training
 
 import com.chesstasks.controllers.getSkip
 import com.chesstasks.controllers.ofNullable

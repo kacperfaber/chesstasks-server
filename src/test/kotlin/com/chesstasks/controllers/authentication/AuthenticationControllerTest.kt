@@ -39,7 +39,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns OK if valid credentials`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacper", "HelloWorld123")
         }
 
@@ -50,7 +50,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns OK if valid username and password`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacper", "HelloWorld123")
         }
 
@@ -61,7 +61,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns OK if valid email and password`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacper", "HelloWorld123")
         }
 
@@ -72,7 +72,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns BAD_REQUEST if valid username and bad password`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacper", "BadPassword")
         }
 
@@ -83,7 +83,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns BAD_REQUEST if valid email and bad password`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacperf1234@gmail.com", "BadPassword")
         }
 
@@ -94,7 +94,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns BAD_REQUEST if invalid email and bad password`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("badEmail@gmail.com", "BadPassword")
         }
 
@@ -105,7 +105,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns BAD_REQUEST if invalid username and bad password`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("badUsername@gmail.com", "BadPassword")
         }
 
@@ -116,7 +116,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `authEndpoint returns UNSUPPORTED_MEDIA_TYPE if invalid contentType set to XML`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("badUsername@gmail.com", "BadPassword")
             contentType(ContentType.Application.Xml)
         }
@@ -138,7 +138,7 @@ class AuthenticationControllerTest : BaseWebTest() {
 
         val before = countTokens()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacper", "HelloWorld123")
         }
 
@@ -162,7 +162,7 @@ class AuthenticationControllerTest : BaseWebTest() {
 
         val before = getTokensByUserId(0).count()
 
-        val r = app.client.post("/auth") {
+        val r = app.client.post("/api/auth") {
             setAuthBody("kacper", "HelloWorld123")
         }
 
@@ -176,14 +176,14 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `currentEndpoint returns 403 if no authentication`() = testSuspend {
         defaultSetupDbForAuth()
 
-        app.client.get("/auth/current").status.isForbid()
+        app.client.get("/api/auth/current").status.isForbid()
     }
 
     @Test
     fun `currentEndpoint returns OK if valid token authentication`() = testSuspend {
         defaultSetupDbForAuth()
 
-        app.client.get("/auth/current") {
+        app.client.get("/api/auth/current") {
             withToken(0)
         }.status.isOk()
     }
@@ -192,7 +192,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `currentEndpoint returns OK with not null data`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val user = app.client.get("/auth/current") {
+        val user = app.client.get("/api/auth/current") {
             withToken(0)
         }.fromJson<UserDto>()
 
@@ -203,7 +203,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `currentEndpoint returns OK with expected data`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val user = app.client.get("/auth/current") {
+        val user = app.client.get("/api/auth/current") {
             withToken(0)
         }.fromJson<UserDto>()
 
@@ -216,7 +216,7 @@ class AuthenticationControllerTest : BaseWebTest() {
     fun `currentEndpoint returns passwordHash null`() = testSuspend {
         defaultSetupDbForAuth()
 
-        val r = app.client.get("/auth/current") {
+        val r = app.client.get("/api/auth/current") {
             withToken(0)
         }
 

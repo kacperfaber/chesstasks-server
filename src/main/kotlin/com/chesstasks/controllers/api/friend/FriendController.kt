@@ -1,4 +1,4 @@
-package com.chesstasks.controllers.friend
+package com.chesstasks.controllers.api.friend
 
 import com.chesstasks.controllers.getSkip
 import com.chesstasks.controllers.ofBoolean

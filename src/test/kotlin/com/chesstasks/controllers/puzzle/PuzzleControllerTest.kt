@@ -44,14 +44,14 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        app.client.get("/puzzle/0").status.isForbid()
+        app.client.get("/api/puzzle/0").status.isForbid()
     }
 
     @Test
     fun `getByIdEndpoint returns BAD_REQUEST if authenticated but resource does not exist`() = testSuspend {
         setupUser()
 
-        app.client.get("/puzzle/0") { withToken(0) }.status.isBadRequest()
+        app.client.get("/api/puzzle/0") { withToken(0) }.status.isBadRequest()
     }
 
     @Test
@@ -59,7 +59,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        app.client.get("/puzzle/0") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/0") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -67,7 +67,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        val r = app.client.get("/puzzle/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/0") { withToken(0) }
 
         r.status.isOk()
         r.jsonPath("$.id", 0)
@@ -78,7 +78,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        val r = app.client.get("/puzzle/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/0") { withToken(0) }
 
         r.status.isOk()
         r.jsonPath("$.ownerId", 0)
@@ -89,7 +89,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        val r = app.client.get("/puzzle/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/0") { withToken(0) }
 
         r.status.isOk()
         r.jsonPath("$.fen", "8/8/8/8")
@@ -100,7 +100,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        val r = app.client.get("/puzzle/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/0") { withToken(0) }
 
         r.status.isOk()
         r.jsonPath("$.moves", "e2e4")
@@ -111,7 +111,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
 
-        val r = app.client.get("/puzzle/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/0") { withToken(0) }
 
         r.status.isOk()
         r.jsonPath("$.ranking", 1500)
@@ -120,13 +120,13 @@ class PuzzleControllerTest : BaseWebTest() {
     @Test
     fun `byLichessDbEndpoint returns FORBIDDEN if not authenticated`() = testSuspend {
         setupUser()
-        app.client.get("/puzzle/all/by-database/lichess").status.isForbid()
+        app.client.get("/api/puzzle/all/by-database/lichess").status.isForbid()
     }
 
     @Test
     fun `byLichessDbEndpoint returns OK if authenticated as user`() = testSuspend {
         setupUser()
-        app.client.get("/puzzle/all/by-database/lichess") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/all/by-database/lichess") { withToken(0) }.status.isOk()
     }
 
     private fun setupAdmin() {
@@ -158,21 +158,21 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `byLichessDbEndpoint returns OK if authenticated as admin`() = testSuspend {
         setupUser()
         setupAdmin()
-        app.client.get("/puzzle/all/by-database/lichess") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/all/by-database/lichess") { withToken(0) }.status.isOk()
     }
 
     @Test
     fun `byLichessDbEndpoint returns expected length (limit 50)`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
-        app.client.get("/puzzle/all/by-database/lichess") { withToken(0) }.jsonPath("$.length()", 50)
+        app.client.get("/api/puzzle/all/by-database/lichess") { withToken(0) }.jsonPath("$.length()", 50)
     }
 
     @Test
     fun `byLichessDbEndpoint returns expected length with skip (limit 50)`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
-        app.client.get("/puzzle/all/by-database/lichess?skip=100") { withToken(0) }.jsonPath("$.length()", 50)
+        app.client.get("/api/puzzle/all/by-database/lichess?skip=100") { withToken(0) }.jsonPath("$.length()", 50)
     }
 
     private suspend fun idRange(r: HttpResponse, ids: IntRange, skip: Int) {
@@ -185,7 +185,7 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `byLichessDbEndpoint returns items that we expect`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
-        val r = app.client.get("/puzzle/all/by-database/lichess") { withToken(0) }
+        val r = app.client.get("/api/puzzle/all/by-database/lichess") { withToken(0) }
         idRange(r, 0..49, skip = 0)
     }
 
@@ -193,48 +193,48 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `byLichessDbEndpoint returns items that we expect with SKIP`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.LICHESS)
-        val r = app.client.get("/puzzle/all/by-database/lichess?skip=100") { withToken(0) }
+        val r = app.client.get("/api/puzzle/all/by-database/lichess?skip=100") { withToken(0) }
         idRange(r, 100..149, skip = -100)
     }
 
     @Test
     fun `byUserDbEndpoint returns FORBIDDEN if not authenticated`() = testSuspend {
         setupUser()
-        app.client.get("/puzzle/all/by-database/user").status.isForbid()
+        app.client.get("/api/puzzle/all/by-database/user").status.isForbid()
     }
 
     @Test
     fun `byUserDbEndpoint returns OK if authenticated as user`() = testSuspend {
         setupUser()
-        app.client.get("/puzzle/all/by-database/user") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/all/by-database/user") { withToken(0) }.status.isOk()
     }
 
     @Test
     fun `byUserDbEndpoint returns OK if authenticated as admin`() = testSuspend {
         setupUser()
         setupAdmin()
-        app.client.get("/puzzle/all/by-database/user") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/all/by-database/user") { withToken(0) }.status.isOk()
     }
 
     @Test
     fun `byUserDbEndpoint returns expected length (limit 50)`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.USER)
-        app.client.get("/puzzle/all/by-database/user") { withToken(0) }.jsonPath("$.length()", 50)
+        app.client.get("/api/puzzle/all/by-database/user") { withToken(0) }.jsonPath("$.length()", 50)
     }
 
     @Test
     fun `byUserDbEndpoint returns expected length with skip (limit 50)`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.USER)
-        app.client.get("/puzzle/all/by-database/user?skip=100") { withToken(0) }.jsonPath("$.length()", 50)
+        app.client.get("/api/puzzle/all/by-database/user?skip=100") { withToken(0) }.jsonPath("$.length()", 50)
     }
 
     @Test
     fun `byUserDbEndpoint returns items that we expect`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.USER)
-        val r = app.client.get("/puzzle/all/by-database/user") { withToken(0) }
+        val r = app.client.get("/api/puzzle/all/by-database/user") { withToken(0) }
         idRange(r, 0..49, skip = 0)
     }
 
@@ -242,7 +242,7 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `byUserDbEndpoint returns items that we expect with SKIP`() = testSuspend {
         setupUser()
         setupRandomPuzzle(500, PuzzleDatabase.USER)
-        val r = app.client.get("/puzzle/all/by-database/user?skip=100") { withToken(0) }
+        val r = app.client.get("/api/puzzle/all/by-database/user?skip=100") { withToken(0) }
         idRange(r, 100..149, skip = -100)
     }
 
@@ -250,7 +250,7 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `deleteByIdEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
         setupUser()
         setupPuzzle()
-        app.client.delete("/puzzle/0").status.isForbid()
+        app.client.delete("/api/puzzle/0").status.isForbid()
     }
 
     private fun setupUser2() {
@@ -269,13 +269,13 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupUser2()
         setupPuzzle()
-        app.client.delete("/puzzle/0") { withToken(1) }.status.isBadRequest()
+        app.client.delete("/api/puzzle/0") { withToken(1) }.status.isBadRequest()
     }
 
     @Test
     fun `deleteByIdEndpoint returns BAD_REQUEST if authenticated but resource does not exist`() = testSuspend {
         setupUser()
-        app.client.delete("/puzzle/0") { withToken(0) }.status.isBadRequest()
+        app.client.delete("/api/puzzle/0") { withToken(0) }.status.isBadRequest()
     }
 
     private fun countPuzzles(): Long {
@@ -288,7 +288,7 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `deleteByIdEndpoint returns NO_CONTENT if authenticated and resource does not exist`() = testSuspend {
         setupUser()
         setupPuzzle()
-        app.client.delete("/puzzle/0") { withToken(0) }.status.isNoContent()
+        app.client.delete("/api/puzzle/0") { withToken(0) }.status.isNoContent()
     }
 
     @Test
@@ -296,7 +296,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
         val before = countPuzzles()
-        app.client.delete("/puzzle/0") { withToken(0) }.status.isNoContent()
+        app.client.delete("/api/puzzle/0") { withToken(0) }.status.isNoContent()
         val now = countPuzzles()
         assertEquals(before - 1, now)
     }
@@ -305,7 +305,7 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `deleteByIdEndpoint does not affect Puzzle table size when returns BAD_REQUEST`() = testSuspend {
         setupUser()
         val before = countPuzzles()
-        app.client.delete("/puzzle/0") { withToken(0) }.status.isBadRequest()
+        app.client.delete("/api/puzzle/0") { withToken(0) }.status.isBadRequest()
         val now = countPuzzles()
         assertEquals(before, now)
     }
@@ -315,7 +315,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
         val before = countPuzzles()
-        app.client.delete("/puzzle/0").status.isForbid()
+        app.client.delete("/api/puzzle/0").status.isForbid()
         val now = countPuzzles()
         assertEquals(before, now)
     }
@@ -331,7 +331,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
         assertNotNull(getPuzzle(0))
-        app.client.delete("/puzzle/0") { withToken(0) }.status.isNoContent()
+        app.client.delete("/api/puzzle/0") { withToken(0) }.status.isNoContent()
         assertNull(getPuzzle(0))
     }
 
@@ -340,7 +340,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupPuzzle()
         assertNotNull(getPuzzle(0))
-        app.client.delete("/puzzle/0").status.isForbid()
+        app.client.delete("/api/puzzle/0").status.isForbid()
         assertNotNull(getPuzzle(0))
     }
 
@@ -348,14 +348,14 @@ class PuzzleControllerTest : BaseWebTest() {
     fun `deleteAsAdminByIdEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
         setupUser()
         setupPuzzle()
-        app.client.delete("/puzzle/as-admin/0").status.isForbid()
+        app.client.delete("/api/puzzle/as-admin/0").status.isForbid()
     }
 
     @Test
     fun `deleteAsAdminByIdEndpoint returns FORBIDDEN if authenticated just as user`() = testSuspend {
         setupUser()
         setupPuzzle()
-        app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isForbid()
+        app.client.delete("/api/puzzle/as-admin/0") { withToken(0) }.status.isForbid()
     }
 
     @Test
@@ -363,7 +363,7 @@ class PuzzleControllerTest : BaseWebTest() {
         testSuspend {
             setupUser()
             setupAdmin()
-            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isBadRequest()
+            app.client.delete("/api/puzzle/as-admin/0") { withToken(0) }.status.isBadRequest()
         }
 
     @Test
@@ -372,7 +372,7 @@ class PuzzleControllerTest : BaseWebTest() {
             setupUser()
             setupPuzzle()
             setupAdmin()
-            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
+            app.client.delete("/api/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
         }
 
     @Test
@@ -384,7 +384,7 @@ class PuzzleControllerTest : BaseWebTest() {
 
             assertNotNull(getPuzzle(0))
 
-            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
+            app.client.delete("/api/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
 
             assertNull(getPuzzle(0))
         }
@@ -398,7 +398,7 @@ class PuzzleControllerTest : BaseWebTest() {
 
             val before = countPuzzles()
 
-            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
+            app.client.delete("/api/puzzle/as-admin/0") { withToken(0) }.status.isNoContent()
 
             assertEquals(before - 1, countPuzzles())
         }
@@ -411,7 +411,7 @@ class PuzzleControllerTest : BaseWebTest() {
 
         val before = countPuzzles()
 
-        app.client.delete("/puzzle/as-admin/0").status.isForbid()
+        app.client.delete("/api/puzzle/as-admin/0").status.isForbid()
 
         assertEquals(before, countPuzzles())
     }
@@ -424,7 +424,7 @@ class PuzzleControllerTest : BaseWebTest() {
 
             val before = countPuzzles()
 
-            app.client.delete("/puzzle/as-admin/0") { withToken(0) }.status.isForbid()
+            app.client.delete("/api/puzzle/as-admin/0") { withToken(0) }.status.isForbid()
 
             assertEquals(before, countPuzzles())
         }
@@ -436,7 +436,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupAdmin()
 
         val bef = countPuzzles()
-        app.client.delete("/puzzle/as-admin/-500") { withToken(0) }.status.isBadRequest()
+        app.client.delete("/api/puzzle/as-admin/-500") { withToken(0) }.status.isBadRequest()
         assertEquals(bef, countPuzzles())
     }
 
@@ -458,7 +458,7 @@ class PuzzleControllerTest : BaseWebTest() {
 
     @Test
     fun `getAllByTheme returns FORBIDDEN if no auth`() = testSuspend {
-        app.client.get("/puzzle/by-theme/mate").status.isForbid()
+        app.client.get("/api/puzzle/by-theme/mate").status.isForbid()
     }
 
     @Test
@@ -467,7 +467,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupMateTheme()
         setupPuzzle()
         setupMatePuzzles()
-        app.client.get("/puzzle/by-theme/mate") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/by-theme/mate") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -476,7 +476,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupMateTheme()
         setupPuzzle()
         setupMatePuzzles()
-        val r = app.client.get("/puzzle/by-theme/mate") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-theme/mate") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 1)
     }
@@ -506,7 +506,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupMateTheme()
         setupRandomMatePuzzle(500)
-        val r = app.client.get("/puzzle/by-theme/mate") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-theme/mate") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 50)
     }
@@ -516,7 +516,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupMateTheme()
         setupRandomMatePuzzle(500, 0)
-        val r = app.client.get("/puzzle/by-theme/mate?skip=100") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-theme/mate?skip=100") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$[0].id", 100)
         r.jsonPath("$[49].id", 149)
@@ -527,7 +527,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupMateTheme()
         setupRandomMatePuzzle(500, 0)
-        val r = app.client.get("/puzzle/by-theme/mate") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-theme/mate") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$[0].id", 0)
         r.jsonPath("$[49].id", 49)
@@ -575,25 +575,25 @@ class PuzzleControllerTest : BaseWebTest() {
         setupRandomPuzzlesWithTwoThemes(37, 0)
         setupUser()
 
-        app.client.get("/puzzle/by-theme/mate") { withToken(0) }.jsonPath("$.length()", 37)
+        app.client.get("/api/puzzle/by-theme/mate") { withToken(0) }.jsonPath("$.length()", 37)
     }
 
     @Test
     fun `getAllByOpeningId returns FORBIDDEN if no auth`() = testSuspend {
-        app.client.get("/puzzle/by-opening/id/0").status.isForbid()
+        app.client.get("/api/puzzle/by-opening/id/0").status.isForbid()
     }
 
     @Test
     fun `getAllByOpeningId returns OK if auth`() = testSuspend {
         setupUser()
-        app.client.get("/puzzle/by-opening/id/0") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/by-opening/id/0") { withToken(0) }.status.isOk()
     }
 
     @Test
     fun `getAllByOpeningId returns OK if authenticated as admin`() = testSuspend {
         setupUser()
         setupAdmin()
-        app.client.get("/puzzle/by-opening/id/0") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/by-opening/id/0") { withToken(0) }.status.isOk()
     }
 
     private fun setupOpening() = transaction {
@@ -626,7 +626,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupOpening()
         setupRandomPuzzleWithOpening(25)
 
-        val r = app.client.get("/puzzle/by-opening/id/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-opening/id/0") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 25)
     }
@@ -637,7 +637,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupOpening()
         setupRandomPuzzleWithOpening(100)
 
-        val r = app.client.get("/puzzle/by-opening/id/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-opening/id/0") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 50)
     }
@@ -648,7 +648,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupOpening()
         setupRandomPuzzleWithOpening(100)
 
-        val r = app.client.get("/puzzle/by-opening/id/-1") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-opening/id/-1") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$.length()", 0)
     }
@@ -659,7 +659,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupOpening()
         setupRandomPuzzleWithOpening(100)
 
-        val r = app.client.get("/puzzle/by-opening/id/0") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-opening/id/0") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$[0].id", 0)
         r.jsonPath("$[1].id", 1)
@@ -674,7 +674,7 @@ class PuzzleControllerTest : BaseWebTest() {
 
         val skip = 50
 
-        val r = app.client.get("/puzzle/by-opening/id/0?skip=$skip") { withToken(0) }
+        val r = app.client.get("/api/puzzle/by-opening/id/0?skip=$skip") { withToken(0) }
         r.status.isOk()
         r.jsonPath("$[0].id", 0 + skip)
         r.jsonPath("$[1].id", 1 + skip)
@@ -683,20 +683,20 @@ class PuzzleControllerTest : BaseWebTest() {
 
     @Test
     fun `getAllOpeningByEco returns FORBIDDEN if no auth`() = testSuspend {
-        app.client.get("/puzzle/by-opening/eco/A00").status.isForbid()
+        app.client.get("/api/puzzle/by-opening/eco/A00").status.isForbid()
     }
 
     @Test
     fun `getAllOpeningByEco returns OK if authenticated`() = testSuspend {
         setupUser()
-        app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/by-opening/eco/A00") { withToken(0) }.status.isOk()
     }
 
     @Test
     fun `getAllOpeningByEco returns OK if authenticated as admin`() = testSuspend {
         setupUser()
         setupAdmin()
-        app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }.status.isOk()
+        app.client.get("/api/puzzle/by-opening/eco/A00") { withToken(0) }.status.isOk()
     }
 
     @Test
@@ -705,7 +705,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupAdmin()
         setupOpening()
         setupRandomPuzzleWithOpening(25, 0, 0)
-        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        val resp = app.client.get("/api/puzzle/by-opening/eco/A00") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$.length()", 25)
     }
@@ -725,7 +725,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupOpening()
         setupSecondOpening()
         setupRandomPuzzleWithOpening(50, 0, 1)
-        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        val resp = app.client.get("/api/puzzle/by-opening/eco/A00") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$.length()", 0)
     }
@@ -735,7 +735,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupOpening()
         setupRandomPuzzleWithOpening(250, 0, 0)
-        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        val resp = app.client.get("/api/puzzle/by-opening/eco/A00") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$.length()", 50)
     }
@@ -745,7 +745,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupUser()
         setupOpening()
         setupRandomPuzzleWithOpening(250, 0, 0)
-        val resp = app.client.get("/puzzle/by-opening/eco/A00") { withToken(0) }
+        val resp = app.client.get("/api/puzzle/by-opening/eco/A00") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$[0].id", 0)
         resp.jsonPath("$[49].id", 49)
@@ -757,7 +757,7 @@ class PuzzleControllerTest : BaseWebTest() {
         setupOpening()
         setupRandomPuzzleWithOpening(250, 0, 0)
         val skip = 50
-        val resp = app.client.get("/puzzle/by-opening/eco/A00?skip=$skip") { withToken(0) }
+        val resp = app.client.get("/api/puzzle/by-opening/eco/A00?skip=$skip") { withToken(0) }
         resp.status.isOk()
         resp.jsonPath("$[0].id", 0+skip)
         resp.jsonPath("$[49].id", 49+skip)

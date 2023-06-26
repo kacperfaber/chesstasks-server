@@ -1,4 +1,4 @@
-package com.chesstasks.controllers.user
+package com.chesstasks.controllers.api.user
 
 import com.chesstasks.data.dto.UserDto
 

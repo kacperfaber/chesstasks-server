@@ -1,4 +1,4 @@
-package com.chesstasks.controllers.authentication
+package com.chesstasks.controllers.api.authentication
 
 import com.chesstasks.security.auth.TokenPrincipal
 import com.chesstasks.security.auth.user
