@@ -28,6 +28,10 @@ fun HttpStatusCode.isNoContent() {
     assertEquals(HttpStatusCode.NoContent, this)
 }
 
+fun HttpStatusCode.isUnsupportedMediaType() {
+    assertEquals(HttpStatusCode.UnsupportedMediaType, this)
+}
+
 fun <T> String.jsonPath(path: String): T? {
     val config = Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS)
     val parsed = JsonPath.parse(this, config)
