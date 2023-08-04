@@ -2,6 +2,7 @@ package com.chesstasks.services.puzzle.themes
 
 import com.chesstasks.data.dao.PuzzleThemeDao
 import com.chesstasks.data.dao.ThemeDao
+import com.chesstasks.data.dto.ThemeDto
 import org.koin.core.annotation.Single
 
 @Single
@@ -25,4 +26,8 @@ class PuzzleThemeService(private val themeDao: ThemeDao, private val puzzleTheme
     }
 
     suspend fun deleteAllThemesByPuzzleId(puzzleId: Int): Boolean = puzzleThemeDao.deleteAllByPuzzleId(puzzleId) > 0
+
+    suspend fun getThemes(): List<ThemeDto> {
+        return themeDao.getThemes()
+    }
 }

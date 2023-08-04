@@ -1,6 +1,7 @@
 package com.chesstasks.data.dto
 
 import com.chesstasks.data.BaseTable
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 
 object PuzzleThemes : Table("puzzle_themes") {
@@ -11,4 +12,12 @@ object PuzzleThemes : Table("puzzle_themes") {
 
 object Themes : BaseTable("themes"){
     val name = varchar("name", 32).uniqueIndex()
+}
+
+class ThemeDto(val id: Int, val name: String) {
+    companion object {
+        fun from(row: ResultRow): ThemeDto {
+            return ThemeDto(row[Themes.id], row[Themes.name])
+        }
+    }
 }
