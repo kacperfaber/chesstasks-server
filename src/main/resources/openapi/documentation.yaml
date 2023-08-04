@@ -387,6 +387,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Puzzle"
+
+  /api/theme/all:
+    get:
+      operationId: /theme/all
+      tags:
+        - theme
+      description: Get all existing themes.
+      responses:
+        "403":
+          description: Forbidden - You're not authenticated
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Theme"
 components:
   schemas:
     AuthPayload:
@@ -508,3 +526,12 @@ components:
           nullable: true
         createdAt:
           type: integer
+    Theme:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Theme's ID
+        name:
+          type: string
+          description: Theme's NAME
