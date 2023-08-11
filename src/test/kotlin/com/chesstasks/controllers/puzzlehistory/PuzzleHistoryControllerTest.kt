@@ -1,5 +1,8 @@
 package com.chesstasks.controllers.puzzlehistory
 
+import com.chesstasks.data.dao.UserPreferences
+import com.chesstasks.data.dao.UserPuzzleHistoryVisibility
+import com.chesstasks.data.dao.UserStatisticsVisibility
 import com.chesstasks.data.dto.PuzzleDatabase
 import com.chesstasks.data.dto.PuzzleHistoryItems
 import com.chesstasks.data.dto.Puzzles
@@ -23,6 +26,13 @@ class PuzzleHistoryControllerTest : BaseWebTest() {
             it[emailAddress] = "kacperf1234@gmail.com"
             it[passwordHash] = "HelloWorld123"
         }
+
+        UserPreferences.insert {
+            it[id] = 0
+            it[userId] = 0
+            it[statisticsVisibility] = UserStatisticsVisibility.EVERYONE
+            it[historyVisibility] = UserPuzzleHistoryVisibility.EVERYONE
+        }
     }
 
     private fun setupRandomHistoryItems( to: Int) = transaction {
@@ -38,6 +48,8 @@ class PuzzleHistoryControllerTest : BaseWebTest() {
             PuzzleHistoryItems.insert {
                 it[id] = iter
                 it[puzzleId] = iter
+                it[success] = true
+                it[moves] = "e2e4"
                 it[userId] = 0
             }
         }
@@ -56,6 +68,8 @@ class PuzzleHistoryControllerTest : BaseWebTest() {
             it[id] = 0
             it[puzzleId] = 0
             it[userId] = 0
+            it[moves] = "e2e4"
+            it[success] = false
         }
     }
 
