@@ -14,8 +14,10 @@ class UserService(private val userDao: UserDao) {
 
     companion object {
         const val DEFAULT_NEW_USERS_LIMIT = 50
+        const val DEFAULT_SEARCH_LIMIT = 50
     }
 
     suspend fun tryCreateUser(username: String, emailAddress: String, passwordHash: String): UserDto? = userDao.insertValues(username, emailAddress, passwordHash)
     suspend fun isValuesUnique(username: String, emailAddress: String): Boolean = userDao.isValuesUnique(username, emailAddress)
+    suspend fun searchUserByUsername(query: String, limit: Int = DEFAULT_SEARCH_LIMIT, skip: Long = 0L): List<SimpleUserDto> = userDao.searchUserByUsername(query, limit, skip)
 }

@@ -13,6 +13,7 @@ interface UserDao {
     suspend fun getNewUsers(limit: Int, skip: Long): List<SimpleUserDto>
     suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto?
     suspend fun isValuesUnique(username: String, emailAddress: String): Boolean
+    suspend fun searchUserByUsername(query: String, limit: Int, skip: Long): List<SimpleUserDto>
 }
 
 @Single
@@ -37,13 +38,14 @@ class UserDaoImpl : UserDao {
             .singleOrNull()
     }
 
-    override suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto? = dbQuery {
-        Users.insert {
-            it[Users.username] = username
-            it[Users.emailAddress] = emailAddress
-            it[Users.passwordHash] = passwordHash
-        }.resultedValues?.map(UserDto::tryFrom)?.firstOrNull()
-    }
+    override suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto? =
+        dbQuery {
+            Users.insert {
+                it[Users.username] = username
+                it[Users.emailAddress] = emailAddress
+                it[Users.passwordHash] = passwordHash
+            }.resultedValues?.map(UserDto::tryFrom)?.firstOrNull()
+        }
 
     override suspend fun isValuesUnique(username: String, emailAddress: String): Boolean = dbQuery {
         Users.select { (Users.emailAddress like emailAddress) or (Users.username like username) }.count() == 0L
@@ -56,5 +58,12 @@ class UserDaoImpl : UserDao {
             .limit(limit, skip)
             .orderBy(Users.createdAt, SortOrder.DESC)
             .map(SimpleUserDto::from)
+    }
+
+    override suspend fun searchUserByUsername(query: String, limit: Int, skip: Long): List<SimpleUserDto> = dbQuery {
+        Users
+            .select { Users.username like "%${query}%" }
+            .limit(limit, skip)
+            .map { row -> SimpleUserDto.from(row) }
     }
 }
