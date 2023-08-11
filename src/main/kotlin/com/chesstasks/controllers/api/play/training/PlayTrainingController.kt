@@ -46,8 +46,6 @@ fun Route.playTrainingController() {
             call.ofNullable(puzzles)
         }
 
-        // TODO: Added 'moves' query parameter. Modify tests (DONE) and documentation.yaml
-
         post("/play/training/{puzzleId}/submit") {
             val userId = call.requirePrincipalId()
             val userRanking = trainingRankingService.getByUserId(userId).ranking
