@@ -9,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.test.dispatcher.*
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import testutils.*
@@ -613,5 +614,63 @@ class FriendControllerTest : BaseWebTest() {
         for (i in (60 .. 110)) {
             assertNotNull(r.jsonPath("$[?(@.id == $i)].id"))
         }
+    }
+
+    @Test
+    fun `acceptFriendRequestEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        app.client.post("/api/friend/request/by-sender-id/1/accept").status.isForbid()
+    }
+
+    @Test
+    fun `acceptFriendRequestEndpoint returns BAD_REQUEST if authentication but request does not exist`() = testSuspend {
+        setupUsers()
+        app.client.post("/api/friend/request/by-sender-id/1/accept"){withToken(0)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `acceptFriendRequestEndpoint returns OK if authentication and request exists`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}.status.isOk()
+    }
+
+    @Test
+    fun `acceptFriendRequestEndpoint returns OK and expected body if authentication and request exists`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        val r = app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}
+        assertNotNull(r.jsonPath<Int>("$.id"))
+        assertTrue {
+            val uid = r.jsonPath<Int>("$.userId")
+            uid == 1 || uid == 0
+        }
+    }
+
+    @Test
+    fun `acceptFriendRequestEndpoint returns OK and makes Friendship between users if authentication and request exists`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+
+        val rowBefore = transaction { Friends.select { ((Friends.userId eq 0) or (Friends.userId eq 1)) and ((Friends.secondUserId eq 0) or (Friends.secondUserId eq 1)) }.map { it[Friends.id] }.firstOrNull()  }
+        assertNull(rowBefore)
+
+        app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}
+
+        val row = transaction { Friends.select { ((Friends.userId eq 0) or (Friends.userId eq 1)) and ((Friends.secondUserId eq 0) or (Friends.secondUserId eq 1)) }.map { it[Friends.id] }.firstOrNull()  }
+        assertNotNull(row)
+    }
+
+    @Test
+    fun `acceptFriendRequestEndpoint returns OK and deletes FriendRequest if authentication and request exists`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+
+        val rowBefore = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
+        assertNotNull(rowBefore)
+
+        app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}
+
+        val row = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
+        assertNull(row)
     }
 }

@@ -462,7 +462,7 @@ paths:
         - puzzleHistory
       parameters:
         - name: userId
-          in: "query"
+          in: "path"
           required: true
       responses:
         '403':
@@ -475,6 +475,46 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/PuzzleHistoryItems"
+  /api/friend/request/by-sender-id/{senderId}/accept:
+    post:
+      description: Accept Friend Request by sender id.
+      operationId: /friend/request/by-sender-id/{senderId}/accept
+      tags:
+        - friends
+      parameters:
+        - name: senderId
+          in: "path"
+          required: true
+      responses:
+        '200':
+          description: Ok - Request accepted and the Friendship is created.
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/Friend"
+        '403':
+          description: Forbidden - You're not authenticated.
+        '400':
+          description: Bad Request - Couldn't accept this friend request.
+
+  /api/friend/request/by-sender-id/{senderId}/reject:
+    post:
+      description: Reject Friend Request by sender id.
+      operationId: /friend/request/by-sender-id/{senderId}/reject
+      tags:
+        - friends
+      parameters:
+        - name: senderId
+          in: "path"
+          required: true
+      responses:
+        '204':
+          description: Ok [No Content] - Request is rejected.
+        '403':
+          description: Forbidden - You're not authenticated.
+        '400':
+          description: Bad Request - Couldn't reject this friend request.
+
 components:
   schemas:
     PuzzleHistoryItems:
