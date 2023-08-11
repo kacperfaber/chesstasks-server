@@ -37,7 +37,6 @@ open class BaseTest {
     fun setup() {
         app = TestApplication {
             application {
-                Profiles.profileFallback = Profile.TEST
                 module()
             }
         }

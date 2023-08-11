@@ -7,7 +7,7 @@ plugins {
 }
 
 group "com.chesstasks"
-version "0.0.1"
+version "1.0.0-beta.1"
 mainClassName = "com.chesstasks.ApplicationKt"
 
 tasks.compileJava {
@@ -27,8 +27,17 @@ sourceSets.main {
     java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
+task runDev(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.chesstasks.ApplicationKt'
+
+    systemProperty("com.chesstasks.profile", "DEV")
+
+}
+
 test {
     useJUnitPlatform()
+    systemProperty("com.chesstasks.profile", "TEST")
 }
 
 dependencies {

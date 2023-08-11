@@ -25,7 +25,7 @@ object Profiles {
     }
 
     private fun getProfileFromEnv(): Profile {
-        return when (System.getProperty("profile")) {
+        return when (System.getProperty("com.chesstasks.profile").lowercase()) {
             "test" -> Profile.TEST
             "dev" -> Profile.DEV
             "prod" -> Profile.PROD
