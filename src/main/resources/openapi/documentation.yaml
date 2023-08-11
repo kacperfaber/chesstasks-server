@@ -515,8 +515,51 @@ paths:
         '400':
           description: Bad Request - Couldn't reject this friend request.
 
+  /api/user/preferences/history-visibility/:
+    get:
+      description: Get History Visibility value [from User Preferences]
+      tags:
+        - userPreferences
+      operationId: /user/preferences/history-visibility/
+      responses:
+        '400':
+          description: Bad Request - Something went wrong...
+        '403':
+          description: Forbidden - You're not authenticated.
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/UserPuzzleHistoryVisibility"
+
+  /api/user/preferences/history-visibility/{value}:
+    post:
+      description: Set History Visibility value [from User Preferences]
+      tags:
+        - userPreferences
+      operationId: /user/preferences/history-visibility/{value}
+      parameters:
+        - name: value
+          required: true
+          schema:
+            $ref: "#/components/schemas/UserPuzzleHistoryVisibility"
+          description: Value to set
+          in: "path"
+      responses:
+        '400':
+          description: Bad Request - Something went wrong...
+        '403':
+          description: Forbidden - You're not authenticated.
+        '204':
+          description: OK [No Content] - value set
+
 components:
   schemas:
+    UserPuzzleHistoryVisibility:
+      type: string
+      required: true
+      enum: [ME, ONLY_FRIENDS, EVERYONE]
     PuzzleHistoryItems:
       type: array
       items:

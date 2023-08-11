@@ -25,4 +25,8 @@ class UserPreferencesService(private val friendService: FriendService, private v
         // TODO: Actually unused. I need to use it when user register.
         userPreferencesDao.insertValues(userId, UserPuzzleHistoryVisibility.ONLY_FRIENDS)
     }
+
+    suspend fun setHistoryVisibility(userId: Int, value: UserPuzzleHistoryVisibility): Boolean {
+        return userPreferencesDao.setHistoryVisibility(userId, value)
+    }
 }

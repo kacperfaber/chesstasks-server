@@ -6,6 +6,7 @@ import com.chesstasks.controllers.api.play.training.playTrainingController
 import com.chesstasks.controllers.api.puzzle.puzzleController
 import com.chesstasks.controllers.api.puzzlehistory.puzzleHistoryController
 import com.chesstasks.controllers.api.theme.themeController
+import com.chesstasks.controllers.api.user.preferences.userPreferencesController
 import com.chesstasks.controllers.api.user.userController
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -21,6 +22,7 @@ fun Application.configureApiControllers() {
             friendController()
             playTrainingController()
             puzzleHistoryController()
+            userPreferencesController()
         }
     }
 }
