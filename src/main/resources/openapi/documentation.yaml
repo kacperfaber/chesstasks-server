@@ -434,8 +434,65 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Theme"
+
+
+  /api/puzzle-history/mine:
+    get:
+      description: Get puzzle history of current authenticated user.
+      operationId: /puzzle-history/mine
+      tags:
+        - puzzleHistory
+      responses:
+        '403':
+          description: Forbidden - You're not authenticated.
+        '400':
+          description: Something wrong...
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/PuzzleHistoryItems"
+
+  /api/puzzle-history/user/{userId}:
+    get:
+      description: Get PuzzleHistory of another user
+      operationId: /puzzle-history/user/{userId}
+      tags:
+        - puzzleHistory
+      parameters:
+        - name: userId
+          in: "query"
+          required: true
+      responses:
+        '403':
+          description: Forbidden - You're not authenticated.
+        '400':
+          description: Bad Request - Probably you have no access to puzzle history of another user.
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/PuzzleHistoryItems"
 components:
   schemas:
+    PuzzleHistoryItems:
+      type: array
+      items:
+        $ref: "#/components/schemas/PuzzleHistoryItem"
+    PuzzleHistoryItem:
+      type: object
+      properties:
+        moves:
+          type: "string"
+          description: Moves made by user.
+        success:
+          type: "boolean"
+        userId:
+          type: "integer"
+        puzzleId:
+          type: "integer"
     AuthPayload:
       type: "object"
       properties:

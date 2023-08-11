@@ -15,7 +15,6 @@ import org.koin.ktor.ext.get
 fun Route.puzzleHistoryController() {
     val puzzleHistoryService by inject<PuzzleHistoryService>(PuzzleHistoryService::class.java)
 
-    // TODO: Add this to documentation.yaml
 
     user {
         get("/puzzle-history/mine") {
@@ -30,6 +29,7 @@ fun Route.puzzleHistoryController() {
             call.ofNullable(puzzleHistory)
         }
 
+        // TODO: Add this to documentation.yaml
         put("/puzzle-history/mine") {
             val (puzzleId, moves, success) = call.receive<PutPuzzleHistoryPayload>()
             call.ofNullable(puzzleHistoryService.submitPuzzleHistory(call.requirePrincipalId(), puzzleId, moves, success))
