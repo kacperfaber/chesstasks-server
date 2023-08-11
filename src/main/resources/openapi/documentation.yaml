@@ -388,6 +388,35 @@ paths:
                 items:
                   $ref: "#/components/schemas/Puzzle"
 
+  /api/user/search/by-username:
+    get:
+      operationId: /user/search/by-username
+      tags:
+        - user
+      parameters:
+        - name: "query"
+          in: "query"
+          required: true
+          schema:
+            type: string
+        - name: "skip"
+          in: "query"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SimpleUser"
+        "403":
+          description: Forbidden - You're not authenticated.
+
+
   /api/theme/all:
     get:
       operationId: /theme/all
@@ -419,6 +448,15 @@ components:
       properties:
         message:
           type: "string"
+    SimpleUser:
+      type: "object"
+      properties:
+        username:
+          type: string
+        id:
+          type: integer
+        createdAt:
+          type: integer
     User:
       type: "object"
       properties:

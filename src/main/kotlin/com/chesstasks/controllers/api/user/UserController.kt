@@ -25,9 +25,7 @@ fun Route.userController() {
             call.ofNullable(PublicUserResponse.fromNullableUser(userService.getById(id)))
         }
 
-        // TODO: user/search/by-username: It's not tested and not documented.
-
-        get("user/search/by-username/") {
+        get("user/search/by-username") {
             val query = call.parameters["query"] ?: throw MissingQueryParameter("query")
             call.ofNullable(userService.searchUserByUsername(query, skip = call.getSkip()))
         }
