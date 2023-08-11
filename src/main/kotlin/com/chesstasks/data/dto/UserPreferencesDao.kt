@@ -3,6 +3,7 @@ package com.chesstasks.data.dto
 import com.chesstasks.data.DatabaseFactory.dbQuery
 import com.chesstasks.data.dao.UserPreferences
 import com.chesstasks.data.dao.UserPuzzleHistoryVisibility
+import com.chesstasks.data.dao.UserStatisticsVisibility
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
@@ -20,11 +21,12 @@ class UserPreferencesDao {
         }
     }
 
-    suspend fun insertValues(userId: Int, historyVisibility: UserPuzzleHistoryVisibility): Int {
+    suspend fun insertValues(userId: Int, historyVisibility: UserPuzzleHistoryVisibility, statisticsVisibility: UserStatisticsVisibility): Int {
         return dbQuery {
             UserPreferences.insert {
-                it[UserPreferences.userId] = 0
+                it[UserPreferences.userId] = userId
                 it[UserPreferences.historyVisibility] = historyVisibility
+                it[UserPreferences.statisticsVisibility] = statisticsVisibility
             } get UserPreferences.id
         }
     }
