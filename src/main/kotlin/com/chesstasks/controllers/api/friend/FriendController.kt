@@ -48,7 +48,6 @@ fun Route.friendController() {
             call.ofNullable(friendService.acceptRequestBySenderId(senderId, call.requirePrincipalId()))
         }
 
-        // TODO: 'accept' is tested, but 'reject' is not tested.
         post("/friend/request/by-sender-id/{senderId}/reject") {
             val senderId = call.parameters["senderId"]?.toIntOrNull() ?: throw MissingQueryParameter("senderId")
             call.ofBoolean(friendService.rejectRequestBySenderId(senderId, call.requirePrincipalId()))

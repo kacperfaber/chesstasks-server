@@ -673,4 +673,36 @@ class FriendControllerTest : BaseWebTest() {
         val row = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
         assertNull(row)
     }
+
+    @Test
+    fun `rejectFriendRequestEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        app.client.post("/api/friend/request/by-sender-id/1/reject").status.isForbid()
+    }
+
+    @Test
+    fun `rejectFriendRequestEndpoint returns BAD_REQUEST if authentication but request does not exist`() = testSuspend {
+        setupUsers()
+        app.client.post("/api/friend/request/by-sender-id/1/reject"){withToken(0)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `rejectFriendRequestEndpoint returns NO_CONTENT if authentication and request exists`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        app.client.post("/api/friend/request/by-sender-id/0/reject"){withToken(1)}.status.isNoContent()
+    }
+
+    @Test
+    fun `rejectFriendRequestEndpoint returns NO_CONTENT and deletes FriendRequest if authentication and request exists`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+
+        val rowBefore = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
+        assertNotNull(rowBefore)
+
+        app.client.post("/api/friend/request/by-sender-id/0/reject"){withToken(1)}
+
+        val row = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
+        assertNull(row)
+    }
 }
