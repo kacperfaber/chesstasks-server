@@ -8,6 +8,7 @@ import com.chesstasks.exceptions.BadRequestException
 import com.chesstasks.exceptions.MissingQueryParameter
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.puzzle.PuzzleService
+import com.chesstasks.services.puzzle.history.PuzzleHistoryService
 import com.chesstasks.services.training.ranking.TrainingRankingService
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -27,13 +28,14 @@ class GetPuzzlePayload(
     }
 }
 
-data class SubmitPuzzlePayload(val success: Boolean)
+data class SubmitPuzzlePayload(val success: Boolean, val moves: String)
 
 class SubmitPuzzleResponse(val rankingDifference: Int, val ranking: Int)
 
 fun Route.playTrainingController() {
     val puzzleService by inject<PuzzleService>(PuzzleService::class.java)
     val trainingRankingService by inject<TrainingRankingService>(TrainingRankingService::class.java)
+    val puzzleHistoryService by inject<PuzzleHistoryService>(PuzzleHistoryService::class.java)
 
     user {
         get("/play/training/puzzles") {
@@ -44,13 +46,16 @@ fun Route.playTrainingController() {
             call.ofNullable(puzzles)
         }
 
+        // TODO: Added 'moves' query parameter. Modify tests (DONE) and documentation.yaml
+
         post("/play/training/{puzzleId}/submit") {
             val userId = call.requirePrincipalId()
             val userRanking = trainingRankingService.getByUserId(userId).ranking
             val puzzleId = call.parameters["puzzleId"]?.toIntOrNull() ?: throw MissingQueryParameter("puzzleId")
             val puzzle = puzzleService.getById(puzzleId) ?: throw BadRequestException()
-            val (success) = call.receive<SubmitPuzzlePayload>()
+            val (success,moves) = call.receive<SubmitPuzzlePayload>()
             val newRanking = trainingRankingService.updateRanking(userId, userRanking, puzzle.ranking, success)
+            puzzleHistoryService.submitPuzzleHistory(userId, puzzleId, moves, success)
             call.ofNullable(SubmitPuzzleResponse(userRanking - newRanking, newRanking))
         }
     }

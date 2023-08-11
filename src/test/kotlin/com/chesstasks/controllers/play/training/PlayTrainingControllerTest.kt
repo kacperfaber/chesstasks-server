@@ -4,11 +4,14 @@ import com.chesstasks.data.dto.*
 import io.ktor.client.request.*
 import io.ktor.test.dispatcher.*
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import testutils.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 
 class PlayTrainingControllerTest : BaseWebTest() {
     private fun setupUser() = transaction {
@@ -148,8 +151,13 @@ class PlayTrainingControllerTest : BaseWebTest() {
         app.client.post("/api/play/training/0/submit").status.isForbid()
     }
 
-    private fun HttpRequestBuilder.submitPayload(success: Boolean = true) {
-        jsonBody("success" to success)
+    private fun HttpRequestBuilder.submitPayload(success: Boolean? = true, moves: String? = "e2e4") {
+        val pairs = listOfNotNull(
+            if (success != null) "success" to success else null,
+            if (moves != null) "moves" to moves else null
+        ).toTypedArray()
+
+        jsonBody(*pairs)
     }
 
     private fun setupRandomPuzzlesWithId(iter: Int) = transaction {
@@ -175,5 +183,49 @@ class PlayTrainingControllerTest : BaseWebTest() {
     fun `submitPuzzleEndpoint returns BAD_REQUEST if authenticated as user but resource does not exist and body`() = testSuspend {
         setupUser()
         app.client.post("/api/play/training/0/submit"){withToken(0); submitPayload()}.status.isBadRequest()
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns BAD_REQUEST if authenticated as user but missing 'success' query parameter`() = testSuspend {
+        setupUser()
+        app.client.post("/api/play/training/0/submit"){withToken(0); submitPayload(success = null)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns BAD_REQUEST if authenticated as user but missing 'moves' query parameter`() = testSuspend {
+        setupUser()
+        app.client.post("/api/play/training/0/submit"){withToken(0); submitPayload(moves = null)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns OK and created PuzzleHistoryItems row`() = testSuspend {
+        setupUser()
+        setupRandomPuzzlesWithId(100)
+
+        val puzzleHistoryItemBefore = transaction { PuzzleHistoryItems.select { PuzzleHistoryItems.puzzleId eq 0 }.map { PuzzleHistoryDto.from(it) } }.firstOrNull()
+        assertNull(puzzleHistoryItemBefore)
+
+        app.client.post("/api/play/training/0/submit"){withToken(0); submitPayload()}.status.isOk()
+
+        val puzzleHistoryItem = transaction { PuzzleHistoryItems.select { PuzzleHistoryItems.puzzleId eq 0 }.map { PuzzleHistoryDto.from(it) } }.firstOrNull()
+        assertNotNull(puzzleHistoryItem)
+    }
+
+    @Test
+    fun `submitPuzzleEndpoint returns OK and created PuzzleHistoryItems row with expected data`() = testSuspend {
+        setupUser()
+        setupRandomPuzzlesWithId(100)
+
+        val moves = "d2d4 e7e5"
+        val success = false
+
+        val puzzleHistoryItemBefore = transaction { PuzzleHistoryItems.select { PuzzleHistoryItems.puzzleId eq 0 }.map { PuzzleHistoryDto.from(it) } }.firstOrNull()
+        assertNull(puzzleHistoryItemBefore)
+
+        app.client.post("/api/play/training/0/submit"){withToken(0); submitPayload(success, moves)}.status.isOk()
+
+        val puzzleHistoryItem = transaction { PuzzleHistoryItems.select { PuzzleHistoryItems.puzzleId eq 0 }.map { PuzzleHistoryDto.from(it) } }.firstOrNull()
+        assertEquals(moves, puzzleHistoryItem?.moves)
+        assertEquals(success, puzzleHistoryItem?.success)
     }
 }
