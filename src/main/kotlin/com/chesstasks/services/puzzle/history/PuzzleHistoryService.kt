@@ -22,4 +22,10 @@ class PuzzleHistoryService(private val puzzleHistoryDao: PuzzleHistoryDao, priva
         return puzzleHistoryDao.insert(userId, puzzleId, moves, success)
     }
 
+    suspend fun getTotalSolved(userId: Int): Long {
+        return puzzleHistoryDao.getTotalSolved(userId)
+    }
+
+    suspend fun getTotalFails(userId: Int): Long = puzzleHistoryDao.getTotalFails(userId)
+
 }

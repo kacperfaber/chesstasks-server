@@ -22,6 +22,16 @@ class UserPreferencesService(private val friendService: FriendService, private v
         ))
     }
 
+    suspend fun checkAccessToSeeStatistics(userId: Int, authenticatedUserId: Int): Boolean {
+        val statsV =
+            userPreferencesDao.getStatisticsVisibility(userId) ?: throw Exception("No UserPreferences for user.id=$userId")
+        return (userId == authenticatedUserId
+                || statsV == UserStatisticsVisibility.EVERYONE
+                || statsV == UserStatisticsVisibility.ONLY_FRIENDS && friendService.areTheyFriends(
+            userId, authenticatedUserId
+        ))
+    }
+
     // TODO: Actually unused. I need to use it when user register.
     suspend fun setupDefault(userId: Int) {
         userPreferencesDao.insertValues(userId, UserPuzzleHistoryVisibility.ONLY_FRIENDS, UserStatisticsVisibility.ONLY_FRIENDS)

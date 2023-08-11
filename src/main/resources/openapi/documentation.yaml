@@ -468,7 +468,7 @@ paths:
         '403':
           description: Forbidden - You're not authenticated.
         '400':
-          description: Bad Request - Probably you have no access to puzzle history of another user.
+          description: Bad Request - Probably you have no access to puzzle history of this user.
         '200':
           description: OK
           content:
@@ -592,9 +592,37 @@ paths:
           description: Forbidden - You're not authenticated.
         '204':
           description: OK [No Content] - value set
+  /api/statistics/simple/user/{userId}:
+    get:
+      description: Get simple statistics for user
+      operationId: /statistics/simple/user/{userId}
+      parameters:
+        - name: userId
+          in: "path"
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/SimpleUserStatistics"
+        '403':
+          description: Forbidden - You're not authenticated
+        '400':
+          description: Bad Request - Probably you have no access to see statistics of this user.
 
 components:
   schemas:
+    SimpleUserStatistics:
+      type: object
+      properties:
+        totalSolved:
+          type: integer
+        totalFails:
+          type: integer
     UserStatisticsVisibility:
       type: string
       required: true
