@@ -54,4 +54,8 @@ class FriendService(private val friendRequestDao: FriendRequestDao, private val 
     suspend fun deleteFriend(id: Int, authorizedUserId: Int): Boolean {
         return friendDao.deleteFriendByIdAndUserId(id, authorizedUserId)
     }
+
+    suspend fun areTheyFriends(userId: Int, secondUserId: Int): Boolean {
+        return friendDao.areTheyFriends(userId, secondUserId)
+    }
 }

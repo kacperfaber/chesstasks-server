@@ -5,7 +5,8 @@ import com.chesstasks.data.dto.Users
 
 enum class UserPuzzleHistoryVisibility(val i: Int) {
     ME(0),
-    EVERYONE(1)
+    EVERYONE(1),
+    ONLY_FRIENDS(2)
 }
 
 object UserPreferences : BaseTable("user_prefs") {
