@@ -4,6 +4,7 @@ import com.chesstasks.controllers.ofBoolean
 import com.chesstasks.controllers.ofNullable
 import com.chesstasks.controllers.requirePrincipalId
 import com.chesstasks.data.dao.UserPuzzleHistoryVisibility
+import com.chesstasks.data.dao.UserStatisticsVisibility
 import com.chesstasks.exceptions.MissingQueryParameter
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.user.preferences.UserPreferencesService
@@ -23,6 +24,16 @@ fun Route.userPreferencesController() {
         post("user/preferences/history-visibility/{value}") {
             val value = UserPuzzleHistoryVisibility.valueOf(call.parameters["value"]?.uppercase() ?: throw MissingQueryParameter("value"))
             call.ofBoolean(userPreferencesService.setHistoryVisibility(call.requirePrincipalId(), value))
+        }
+
+        get("user/preferences/statistics-visibility") {
+            call.ofNullable(userPreferencesService.getStatisticsVisibility(call.requirePrincipalId()))
+        }
+
+        post("user/preferences/statistics-visibility/{value}") {
+            val valueRaw = call.parameters["value"] ?: throw MissingQueryParameter("value")
+            val value = UserStatisticsVisibility.valueOf(valueRaw)
+            call.ofBoolean(userPreferencesService.setStatisticsVisibility(call.requirePrincipalId(), value))
         }
     }
 }

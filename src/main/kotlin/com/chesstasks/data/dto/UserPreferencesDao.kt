@@ -21,7 +21,11 @@ class UserPreferencesDao {
         }
     }
 
-    suspend fun insertValues(userId: Int, historyVisibility: UserPuzzleHistoryVisibility, statisticsVisibility: UserStatisticsVisibility): Int {
+    suspend fun insertValues(
+        userId: Int,
+        historyVisibility: UserPuzzleHistoryVisibility,
+        statisticsVisibility: UserStatisticsVisibility
+    ): Int {
         return dbQuery {
             UserPreferences.insert {
                 it[UserPreferences.userId] = userId
@@ -32,8 +36,23 @@ class UserPreferencesDao {
     }
 
     suspend fun setHistoryVisibility(userId: Int, value: UserPuzzleHistoryVisibility) = dbQuery {
-        UserPreferences.update(where = {UserPreferences.userId eq userId}) {
+        UserPreferences.update(where = { UserPreferences.userId eq userId }) {
             it[historyVisibility] = value
         } > 0
+    }
+
+    suspend fun getStatisticsVisibility(userId: Int) = dbQuery {
+        UserPreferences
+            .select { UserPreferences.userId eq userId }
+            .map { it[UserPreferences.statisticsVisibility] }
+            .firstOrNull()
+    }
+
+    suspend fun setStatisticsVisibility(userId: Int, value: UserStatisticsVisibility) = dbQuery {
+        UserPreferences
+            .update(
+                where = {UserPreferences.userId eq userId},
+                body = {it[statisticsVisibility] = value}
+            ) > 0
     }
 }

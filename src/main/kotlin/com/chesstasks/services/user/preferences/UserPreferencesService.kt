@@ -1,6 +1,7 @@
 package com.chesstasks.services.user.preferences
 
 import com.chesstasks.data.dao.UserPuzzleHistoryVisibility
+import com.chesstasks.data.dao.UserStatisticsVisibility
 import com.chesstasks.data.dto.UserPreferencesDao
 import com.chesstasks.services.friend.FriendService
 import org.koin.core.annotation.Single
@@ -21,12 +22,16 @@ class UserPreferencesService(private val friendService: FriendService, private v
         ))
     }
 
+    // TODO: Actually unused. I need to use it when user register.
     suspend fun setupDefault(userId: Int) {
-        // TODO: Actually unused. I need to use it when user register.
-        userPreferencesDao.insertValues(userId, UserPuzzleHistoryVisibility.ONLY_FRIENDS)
+        userPreferencesDao.insertValues(userId, UserPuzzleHistoryVisibility.ONLY_FRIENDS, UserStatisticsVisibility.ONLY_FRIENDS)
     }
 
     suspend fun setHistoryVisibility(userId: Int, value: UserPuzzleHistoryVisibility): Boolean {
         return userPreferencesDao.setHistoryVisibility(userId, value)
     }
+
+    suspend fun getStatisticsVisibility(userId: Int) = userPreferencesDao.getStatisticsVisibility(userId)
+
+    suspend fun setStatisticsVisibility(userId: Int, value: UserStatisticsVisibility) = userPreferencesDao.setStatisticsVisibility(userId, value)
 }

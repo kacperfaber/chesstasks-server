@@ -554,8 +554,51 @@ paths:
         '204':
           description: OK [No Content] - value set
 
+  /api/user/preferences/statistics-visibility/:
+    get:
+      description: Get Statistics Visibility value [from User Preferences]
+      tags:
+        - userPreferences
+      operationId: /user/preferences/statistics-visibility/
+      responses:
+        '400':
+          description: Bad Request - Something went wrong...
+        '403':
+          description: Forbidden - You're not authenticated.
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/UserStatisticsVisibility"
+
+  /api/user/preferences/statistics-visibility/{value}:
+    post:
+      description: Set Statistics Visibility value [from User Preferences]
+      tags:
+        - userPreferences
+      operationId: /user/preferences/statistics-visibility/{value}
+      parameters:
+        - name: value
+          required: true
+          schema:
+            $ref: "#/components/schemas/UserStatisticsVisibility"
+          description: Value to set
+          in: "path"
+      responses:
+        '400':
+          description: Bad Request - Something went wrong...
+        '403':
+          description: Forbidden - You're not authenticated.
+        '204':
+          description: OK [No Content] - value set
+
 components:
   schemas:
+    UserStatisticsVisibility:
+      type: string
+      required: true
+      enum: [ME, ONLY_FRIENDS, EVERYONE]
     UserPuzzleHistoryVisibility:
       type: string
       required: true
