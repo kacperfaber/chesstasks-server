@@ -1,6 +1,7 @@
 package com.chesstasks
 
 import com.chesstasks.controllers.configureControllers
+import com.chesstasks.cors.configureCors
 import com.chesstasks.data.configureDb
 import com.chesstasks.di.configureDi
 import com.chesstasks.exceptions.handlers.configureExceptionHandlers
@@ -28,6 +29,7 @@ fun Application.module() {
     configureAuthentication()
     configureRequestValidation()
     configFreeMarker()
+    configureCors()
     configureControllers()
     configWebSocket()
 }
