@@ -5,6 +5,7 @@ import com.chesstasks.data.dto.SimpleUserDto
 import com.chesstasks.data.dto.UserDto
 import com.chesstasks.data.dto.Users
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
 
 interface UserDao {
@@ -14,6 +15,7 @@ interface UserDao {
     suspend fun insertValues(username: String, emailAddress: String, passwordHash: String): UserDto?
     suspend fun isValuesUnique(username: String, emailAddress: String): Boolean
     suspend fun searchUserByUsername(query: String, limit: Int, skip: Long): List<SimpleUserDto>
+    fun getNameById(id: Int): String?
 }
 
 @Single
@@ -65,5 +67,14 @@ class UserDaoImpl : UserDao {
             .select { Users.username like "%${query}%" }
             .limit(limit, skip)
             .map { row -> SimpleUserDto.from(row) }
+    }
+
+    override fun getNameById(id: Int): String? = transaction {
+        Users
+            .slice(Users.id, Users.username)
+            .select { Users.id eq id }
+            .limit(1, 0)
+            .map { it[Users.username] }
+            .firstOrNull()
     }
 }

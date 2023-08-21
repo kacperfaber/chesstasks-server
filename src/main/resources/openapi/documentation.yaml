@@ -614,6 +614,74 @@ paths:
         '400':
           description: Bad Request - Probably you have no access to see statistics of this user.
 
+  /api/friend/all/include-user:
+    get:
+      description: Get friend list including user names
+      tags:
+        - friends
+      parameters:
+        - name: skip
+          in: 'query'
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/FriendIncludeUserNames"
+        '403':
+          description: Forbidden - no valid authentication.
+
+
+  /api/friend/requests/sent/include-user:
+    get:
+      description: Get sent friend requests including user names
+      tags:
+        - friends
+      parameters:
+        - name: skip
+          in: 'query'
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/FriendRequestIncludeUserNames"
+        '403':
+          description: Forbidden - no valid authentication.
+
+  /api/friend/requests/received/include-user:
+    get:
+      description: Get received friend requests including user names
+      tags:
+        - friends
+      parameters:
+        - name: skip
+          in: 'query'
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/FriendRequestIncludeUserNames"
+        '403':
+          description: Forbidden - no valid authentication.
+
+
 components:
   schemas:
     SimpleUserStatistics:
@@ -741,6 +809,50 @@ components:
         targetId:
           type: integer
           description: Id of user who received the request.
+
+    FriendIncludeUserNames:
+      type: "object"
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+          description: "First user id"
+        userName:
+          type: string
+          description: Username [Users.username] of user referenced by 'userId' key.
+        secondUserName:
+          type: string
+          description: Username [Users.username] of user referenced by 'secondUserId'.
+        secondUserId:
+          type: integer
+          description: "Second user id"
+        createdAt:
+          type: integer
+          description: Request accepted at
+
+    FriendRequestIncludeUserNames:
+      type: "object"
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: integer
+          description: Sent at
+        senderId:
+          type: integer
+          description: Id of user who sent the request.
+        targetId:
+          type: integer
+          description: Id of user who received the request.
+        senderUserName:
+          type: string
+          description: Username [Users.username] of user who sent the request.
+        targetUserName:
+          type: string
+          description: Username [Users.username] of user who received the request/
+
+
     SubmitPuzzleResponse:
       type: object
       properties:

@@ -52,5 +52,17 @@ fun Route.friendController() {
             val senderId = call.parameters["senderId"]?.toIntOrNull() ?: throw MissingQueryParameter("senderId")
             call.ofBoolean(friendService.rejectRequestBySenderId(senderId, call.requirePrincipalId()))
         }
+
+        get("/friend/all/include-user") {
+            call.ofNullable(friendService.getFriendsIncludeUser(call.requirePrincipalId(), call.getSkip()))
+        }
+
+        get("/friend/requests/received/include-user") {
+            call.ofNullable(friendService.getReceivedRequestsIncludeUser(call.requirePrincipalId(), call.getSkip()))
+        }
+
+        get("/friend/requests/sent/include-user") {
+            call.ofNullable(friendService.getSentRequestsIncludeUser(call.requirePrincipalId(), call.getSkip()))
+        }
     }
 }

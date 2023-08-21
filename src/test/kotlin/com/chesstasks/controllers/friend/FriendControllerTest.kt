@@ -5,11 +5,11 @@ import com.chesstasks.data.dto.FriendRequests
 import com.chesstasks.data.dto.Friends
 import com.chesstasks.data.dto.Users
 import com.chesstasks.randomString
+import com.chesstasks.services.friend.FriendIncludeUserNames
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.test.dispatcher.*
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import testutils.*
@@ -54,6 +54,16 @@ class FriendControllerTest : BaseWebTest() {
                 it[id] = 1
                 it[userId] = 2
                 it[secondUserId] = 0
+            }
+        }
+    }
+
+    private fun setupSimpleFriend() {
+        transaction {
+            Friends.insert {
+                it[id] = 0
+                it[userId] = 0
+                it[secondUserId] = 1
             }
         }
     }
@@ -516,7 +526,10 @@ class FriendControllerTest : BaseWebTest() {
     fun `putFriendRequestEndpoint returns UNSUPPORTED_MEDIA_TYPE when no body`() = testSuspend {
         setupUsers()
 
-        assertEquals(HttpStatusCode.UnsupportedMediaType, app.client.put("/api/friend/requests") { withToken(0) }.status)
+        assertEquals(
+            HttpStatusCode.UnsupportedMediaType,
+            app.client.put("/api/friend/requests") { withToken(0) }.status
+        )
     }
 
     @Test
@@ -544,17 +557,17 @@ class FriendControllerTest : BaseWebTest() {
     fun `getSentRequestsEndpoint returns OK if authenticated as admin`() = testSuspend {
         setupUsers()
         setupAdmin()
-        app.client.get("/api/friend/requests/sent"){withToken(0)}.status.isOk()
+        app.client.get("/api/friend/requests/sent") { withToken(0) }.status.isOk()
     }
 
     @Test
     fun `getSentRequestsEndpoint returns OK if authenticated as user`() = testSuspend {
         setupUsers()
-        app.client.get("/api/friend/requests/sent"){withToken(0)}.status.isOk()
+        app.client.get("/api/friend/requests/sent") { withToken(0) }.status.isOk()
     }
 
     private fun setupRandomRequests(iter: Int, offset: Int, senderUserId: Int) = transaction {
-        repeat(iter) {iteration ->
+        repeat(iter) { iteration ->
             val id = iteration + offset
 
             Users.insert {
@@ -599,7 +612,7 @@ class FriendControllerTest : BaseWebTest() {
 
         val r = app.client.get("/api/friend/requests/sent") { withToken(0) }
         r.status.isOk()
-        for (i in (10 .. 60)) {
+        for (i in (10..60)) {
             assertNotNull(r.jsonPath("$[?(@.id == $i)].id"))
         }
     }
@@ -611,7 +624,7 @@ class FriendControllerTest : BaseWebTest() {
 
         val r = app.client.get("/api/friend/requests/sent?skip=50") { withToken(0) }
         r.status.isOk()
-        for (i in (60 .. 110)) {
+        for (i in (60..110)) {
             assertNotNull(r.jsonPath("$[?(@.id == $i)].id"))
         }
     }
@@ -624,55 +637,70 @@ class FriendControllerTest : BaseWebTest() {
     @Test
     fun `acceptFriendRequestEndpoint returns BAD_REQUEST if authentication but request does not exist`() = testSuspend {
         setupUsers()
-        app.client.post("/api/friend/request/by-sender-id/1/accept"){withToken(0)}.status.isBadRequest()
+        app.client.post("/api/friend/request/by-sender-id/1/accept") { withToken(0) }.status.isBadRequest()
     }
 
     @Test
     fun `acceptFriendRequestEndpoint returns OK if authentication and request exists`() = testSuspend {
         setupUsers()
         setupFriendRequests()
-        app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}.status.isOk()
+        app.client.post("/api/friend/request/by-sender-id/0/accept") { withToken(1) }.status.isOk()
     }
 
     @Test
-    fun `acceptFriendRequestEndpoint returns OK and expected body if authentication and request exists`() = testSuspend {
-        setupUsers()
-        setupFriendRequests()
-        val r = app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}
-        assertNotNull(r.jsonPath<Int>("$.id"))
-        assertTrue {
-            val uid = r.jsonPath<Int>("$.userId")
-            uid == 1 || uid == 0
+    fun `acceptFriendRequestEndpoint returns OK and expected body if authentication and request exists`() =
+        testSuspend {
+            setupUsers()
+            setupFriendRequests()
+            val r = app.client.post("/api/friend/request/by-sender-id/0/accept") { withToken(1) }
+            assertNotNull(r.jsonPath<Int>("$.id"))
+            assertTrue {
+                val uid = r.jsonPath<Int>("$.userId")
+                uid == 1 || uid == 0
+            }
         }
-    }
 
     @Test
-    fun `acceptFriendRequestEndpoint returns OK and makes Friendship between users if authentication and request exists`() = testSuspend {
-        setupUsers()
-        setupFriendRequests()
+    fun `acceptFriendRequestEndpoint returns OK and makes Friendship between users if authentication and request exists`() =
+        testSuspend {
+            setupUsers()
+            setupFriendRequests()
 
-        val rowBefore = transaction { Friends.select { ((Friends.userId eq 0) or (Friends.userId eq 1)) and ((Friends.secondUserId eq 0) or (Friends.secondUserId eq 1)) }.map { it[Friends.id] }.firstOrNull()  }
-        assertNull(rowBefore)
+            val rowBefore = transaction {
+                Friends.select { ((Friends.userId eq 0) or (Friends.userId eq 1)) and ((Friends.secondUserId eq 0) or (Friends.secondUserId eq 1)) }
+                    .map { it[Friends.id] }.firstOrNull()
+            }
+            assertNull(rowBefore)
 
-        app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}
+            app.client.post("/api/friend/request/by-sender-id/0/accept") { withToken(1) }
 
-        val row = transaction { Friends.select { ((Friends.userId eq 0) or (Friends.userId eq 1)) and ((Friends.secondUserId eq 0) or (Friends.secondUserId eq 1)) }.map { it[Friends.id] }.firstOrNull()  }
-        assertNotNull(row)
-    }
+            val row = transaction {
+                Friends.select { ((Friends.userId eq 0) or (Friends.userId eq 1)) and ((Friends.secondUserId eq 0) or (Friends.secondUserId eq 1)) }
+                    .map { it[Friends.id] }.firstOrNull()
+            }
+            assertNotNull(row)
+        }
 
     @Test
-    fun `acceptFriendRequestEndpoint returns OK and deletes FriendRequest if authentication and request exists`() = testSuspend {
-        setupUsers()
-        setupFriendRequests()
+    fun `acceptFriendRequestEndpoint returns OK and deletes FriendRequest if authentication and request exists`() =
+        testSuspend {
+            setupUsers()
+            setupFriendRequests()
 
-        val rowBefore = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
-        assertNotNull(rowBefore)
+            val rowBefore = transaction {
+                FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1) }
+                    .map { it[FriendRequests.id] }.firstOrNull()
+            }
+            assertNotNull(rowBefore)
 
-        app.client.post("/api/friend/request/by-sender-id/0/accept"){withToken(1)}
+            app.client.post("/api/friend/request/by-sender-id/0/accept") { withToken(1) }
 
-        val row = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
-        assertNull(row)
-    }
+            val row = transaction {
+                FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1) }
+                    .map { it[FriendRequests.id] }.firstOrNull()
+            }
+            assertNull(row)
+        }
 
     @Test
     fun `rejectFriendRequestEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
@@ -682,27 +710,118 @@ class FriendControllerTest : BaseWebTest() {
     @Test
     fun `rejectFriendRequestEndpoint returns BAD_REQUEST if authentication but request does not exist`() = testSuspend {
         setupUsers()
-        app.client.post("/api/friend/request/by-sender-id/1/reject"){withToken(0)}.status.isBadRequest()
+        app.client.post("/api/friend/request/by-sender-id/1/reject") { withToken(0) }.status.isBadRequest()
     }
 
     @Test
     fun `rejectFriendRequestEndpoint returns NO_CONTENT if authentication and request exists`() = testSuspend {
         setupUsers()
         setupFriendRequests()
-        app.client.post("/api/friend/request/by-sender-id/0/reject"){withToken(1)}.status.isNoContent()
+        app.client.post("/api/friend/request/by-sender-id/0/reject") { withToken(1) }.status.isNoContent()
     }
 
     @Test
-    fun `rejectFriendRequestEndpoint returns NO_CONTENT and deletes FriendRequest if authentication and request exists`() = testSuspend {
+    fun `rejectFriendRequestEndpoint returns NO_CONTENT and deletes FriendRequest if authentication and request exists`() =
+        testSuspend {
+            setupUsers()
+            setupFriendRequests()
+
+            val rowBefore = transaction {
+                FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1) }
+                    .map { it[FriendRequests.id] }.firstOrNull()
+            }
+            assertNotNull(rowBefore)
+
+            app.client.post("/api/friend/request/by-sender-id/0/reject") { withToken(1) }
+
+            val row = transaction {
+                FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1) }
+                    .map { it[FriendRequests.id] }.firstOrNull()
+            }
+            assertNull(row)
+        }
+
+    @Test
+    fun `getFriendsIncludeUser returns FORBIDDEN if no authentication`() = testSuspend {
         setupUsers()
         setupFriendRequests()
 
-        val rowBefore = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
-        assertNotNull(rowBefore)
+        app.client.get("/api/friend/all/include-user").status.isForbid()
+    }
 
-        app.client.post("/api/friend/request/by-sender-id/0/reject"){withToken(1)}
+    @Test
+    fun `getFriendsIncludeUser returns OK if authenticated`() = testSuspend {
+        setupUsers()
+        setupFriend()
+        app.client.get("/api/friend/all/include-user") { withToken(0) }.status.isOk()
+    }
 
-        val row = transaction { FriendRequests.select { (FriendRequests.senderId eq 0) and (FriendRequests.targetId eq 1)}.map { it[FriendRequests.id] }.firstOrNull() }
-        assertNull(row)
+    @Test
+    fun `getFriendsIncludeUser returns OK if authenticated and expected data size`() = testSuspend {
+        setupUsers()
+        setupFriend()
+        val r = app.client.get("/api/friend/all/include-user") { withToken(0) }
+        r.jsonPath("$.length()", 2)
+    }
+
+    @Test
+    fun `getFriendsIncludeUser returns OK if authenticated and expected data`() = testSuspend {
+        setupUsers()
+        setupSimpleFriend()
+        val r = app.client.get("/api/friend/all/include-user") { withToken(0) }
+        r.jsonPath("$[0].userName", "kacperfaber")
+        r.jsonPath("$[0].secondUserName", "kacperfaber's friend")
+    }
+
+    @Test
+    fun `getSentRequestsIncludeUser returns OK if authenticated`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        app.client.get("/api/friend/requests/sent/include-user"){withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getSentRequestsIncludeUser returns OK if authenticated and expected data size`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        app.client.get("/api/friend/requests/sent/include-user"){withToken(0)}.jsonPath("$.length()", 1)
+    }
+
+    @Test
+    fun `getSentRequestsIncludeUser returns OK if authenticated and expected data`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        val r = app.client.get("/api/friend/requests/sent/include-user") { withToken(0) }
+        r.jsonPath("$[0].id", 0)
+        r.jsonPath("$[0].senderId", 0)
+        r.jsonPath("$[0].targetId", 1)
+        r.jsonPath("$[0].senderUserName", "kacperfaber")
+        r.jsonPath("$[0].targetUserName", "kacperfaber's friend")
+    }
+
+    @Test
+    fun `getReceivedRequestsIncludeUser returns OK if authenticated`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        app.client.get("/api/friend/requests/received/include-user"){withToken(1)}.status.isOk()
+    }
+
+    @Test
+    fun `getReceivedRequestsIncludeUser returns OK if authenticated and expected data size`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        app.client.get("/api/friend/requests/received/include-user"){withToken(1)}.jsonPath("$.length()", 1)
+    }
+
+    @Test
+    fun `getReceivedRequestsIncludeUser returns OK if authenticated and expected data`() = testSuspend {
+        setupUsers()
+        setupFriendRequests()
+        val r = app.client.get("/api/friend/requests/received/include-user") { withToken(1) }
+        r.jsonPath("$[0].id", 0)
+        r.jsonPath("$[0].senderId", 0)
+        r.jsonPath("$[0].targetId", 1)
+        r.jsonPath("$[0].senderUserName", "kacperfaber")
+        r.jsonPath("$[0].targetUserName", "kacperfaber's friend")
     }
 }
