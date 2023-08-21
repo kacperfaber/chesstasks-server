@@ -11,8 +11,8 @@ version "1.0.0-beta.1"
 mainClassName = "com.chesstasks.ApplicationKt"
 
 tasks.compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 17
+    targetCompatibility = 17
 }
 
 def isDevelopment = project.ext.has("development")
