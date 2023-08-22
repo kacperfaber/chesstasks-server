@@ -2,6 +2,7 @@ package com.chesstasks.data
 
 import com.chesstasks.Profiles
 import com.chesstasks.data.dto.Friends
+import com.chesstasks.data.dto.FriendRequests
 import com.chesstasks.data.dto.Users
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.insert
@@ -35,5 +36,11 @@ fun Application.trySetupTestDb() = transaction {
             it[userId] = 0
             it[secondUserId] = 1
         }
+		
+		FriendRequests.insert {
+			it[id] = 0
+			it[senderId] = 0
+			it[targetId] = 2
+		}
     }
 }
