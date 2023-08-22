@@ -682,6 +682,28 @@ paths:
           description: Forbidden - no valid authentication.
 
 
+  /api/user/by-id/{id}:
+    get:
+      tags:
+        - user
+      description: Get user profile by user ID
+      parameters:
+        - name: id
+          schema:
+            type: integer
+          in: path
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/PublicUser"
+        '403':
+          description: Forbidden - No valid authentication
+        '400':
+          description: Bad Request - Probably user you're looking for does not exist
+
 components:
   schemas:
     SimpleUserStatistics:
@@ -809,6 +831,15 @@ components:
         targetId:
           type: integer
           description: Id of user who received the request.
+    PublicUser:
+      type: "object"
+      properties:
+        id:
+          type: integer
+          description: User ID
+        username:
+          type: string
+          description: Username
 
     FriendIncludeUserNames:
       type: "object"
