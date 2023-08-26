@@ -454,6 +454,56 @@ paths:
               schema:
                 $ref: "#/components/schemas/PuzzleHistoryItems"
 
+  /api/register:
+    post:
+      description: Register new user [as this user]
+      operationId: /register
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                emailAddress:
+                  type: string
+                  description: Email Address
+                username:
+                  type: string
+                  description: Username
+                password:
+                  type: string
+      tags:
+        - register
+      responses:
+        '204':
+          description: No Content - check your email for verification code.
+        '400':
+          description: Bad Request - something wrong...
+
+  /api/register/confirm:
+    post:
+      description: Confirms new user with verification code.
+      operationId: /register/confirm
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                emailAddress:
+                  type: string
+                  description: Email Address
+                code:
+                  type: string
+                  description: Verification code sent to email address
+      tags:
+        - register
+      responses:
+        '204':
+          description: No Content - registered, you can login now.
+        '400':
+          description: Bad Request - something wrong...
+
   /api/puzzle-history/user/{userId}:
     get:
       description: Get PuzzleHistory of another user
