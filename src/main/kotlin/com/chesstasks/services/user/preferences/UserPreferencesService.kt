@@ -8,6 +8,12 @@ import org.koin.core.annotation.Single
 
 @Single
 class UserPreferencesService(private val friendService: FriendService, private val userPreferencesDao: UserPreferencesDao) {
+
+    object Defaults {
+        val historyVisibility = UserPuzzleHistoryVisibility.ME
+        val statisticsVisibility = UserStatisticsVisibility.ME
+    }
+
     suspend fun getHistoryVisibility(userId: Int): UserPuzzleHistoryVisibility? {
         return userPreferencesDao.getHistoryVisibility(userId)
     }
@@ -34,7 +40,7 @@ class UserPreferencesService(private val friendService: FriendService, private v
 
     // TODO: Actually unused. I need to use it when user register.
     suspend fun setupDefault(userId: Int) {
-        userPreferencesDao.insertValues(userId, UserPuzzleHistoryVisibility.ONLY_FRIENDS, UserStatisticsVisibility.ONLY_FRIENDS)
+        userPreferencesDao.insertValues(userId, Defaults.historyVisibility, Defaults.statisticsVisibility)
     }
 
     suspend fun setHistoryVisibility(userId: Int, value: UserPuzzleHistoryVisibility): Boolean {
