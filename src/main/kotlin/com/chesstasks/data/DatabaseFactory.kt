@@ -1,5 +1,7 @@
 package com.chesstasks.data
 
+import com.chesstasks.Profiles
+import com.chesstasks.Properties
 import com.chesstasks.data.dao.UserPreferences
 import com.chesstasks.data.dto.*
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,24 @@ object DatabaseFactory {
     ).toTypedArray()
 
     fun init() {
+        if (Profiles.isProd()) initProd() else initDev()
+    }
+
+    private val jdbc by Properties.value<String>("$.database.jdbc")
+    private val username by Properties.value<String>("$.database.username")
+    private val password by Properties.value<String>("$.database.password")
+
+    private fun initProd() {
+        val db = Database.connect(jdbc, "com.mysql.cj.jdbc.Driver", user = this.username, password = this.password)
+
+        transaction(db) {
+            SchemaUtils.create(*tables)
+
+            commit()
+        }
+    }
+
+    private fun initDev() {
         // TODO: No 'production' database.
         val jdbc = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE"
         val driverClassName = "org.h2.Driver"

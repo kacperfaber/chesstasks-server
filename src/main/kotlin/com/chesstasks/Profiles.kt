@@ -7,29 +7,31 @@ enum class Profile(val value: String) {
 }
 
 object Profiles {
-    var profileFallback: Profile? = null
+    var profileFallback: Profile = Profile.DEV
 
     val profile: Profile
-        get() = profileFallback ?: getProfileFromEnv()
+        get() {
+            return try { getProf() } catch (e: Exception) { profileFallback }
+        }
 
     fun isDev(): Boolean {
-        return profile == Profile.DEV
+        return getProf() == Profile.DEV
     }
 
     fun isTest(): Boolean {
-        return profile == Profile.TEST
+        return getProf() == Profile.TEST
     }
 
     fun isProd(): Boolean {
-        return profile == Profile.PROD
+        return getProf() == Profile.PROD
     }
 
-    private fun getProfileFromEnv(): Profile {
+    private fun getProf(): Profile {
         return when (System.getProperty("com.chesstasks.profile").lowercase()) {
             "test" -> Profile.TEST
             "dev" -> Profile.DEV
             "prod" -> Profile.PROD
-            else -> throw Error("Unrecognized profile")
+            else -> profileFallback
         }
     }
 }

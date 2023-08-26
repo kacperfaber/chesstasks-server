@@ -5,7 +5,7 @@ import com.chesstasks.data.BaseTable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
 
-object Users : BaseTable("`user`") {
+object Users : BaseTable("users") {
     val passwordHash = varchar("password_hash", 32)
     val username = varchar("username", 32).uniqueIndex()
     val emailAddress = varchar("email_address", 32).uniqueIndex()
