@@ -68,8 +68,16 @@ fun Application.trySetupTestDb() = transaction {
 
         Puzzles.insert {
             it[id] = 0
-            it[fen] = "k3r3/8/8/8/2Q5/7R/8/K7 w - - 0 1"
+            it[fen] = "k6r/8/8/8/2Q5/8/8/K7 b - - 0 1"
             it[moves] = "h8e8 c4c6 a8b8 c6e8"
+            it[ranking] = 1400
+            it[database] = PuzzleDatabase.LICHESS
+        }
+
+        Puzzles.insert {
+            it[id] = 1
+            it[fen] = "k7/1q6/1b6/8/6B1/8/4K3/8 b - - 0 1"
+            it[moves] = "b6a5 g4f3 b7f3 e2f3"
             it[ranking] = 1400
             it[database] = PuzzleDatabase.LICHESS
         }
