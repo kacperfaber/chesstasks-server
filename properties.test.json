@@ -1,0 +1,7 @@
+{
+  "security": {
+    "password-hasher": {
+      "secret": "HelloWorld123"
+    }
+  }
+}
