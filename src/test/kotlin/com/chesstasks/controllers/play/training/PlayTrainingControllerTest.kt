@@ -1,6 +1,10 @@
 package com.chesstasks.controllers.play.training
 
+import com.chesstasks.data.dao.UserPreferences
+import com.chesstasks.data.dao.UserPuzzleHistoryVisibility
+import com.chesstasks.data.dao.UserStatisticsVisibility
 import com.chesstasks.data.dto.*
+import com.chesstasks.data.expressions.Random
 import io.ktor.client.request.*
 import io.ktor.test.dispatcher.*
 import org.jetbrains.exposed.sql.insert
@@ -227,5 +231,62 @@ class PlayTrainingControllerTest : BaseWebTest() {
         val puzzleHistoryItem = transaction { PuzzleHistoryItems.select { PuzzleHistoryItems.puzzleId eq 0 }.map { PuzzleHistoryDto.from(it) } }.firstOrNull()
         assertEquals(moves, puzzleHistoryItem?.moves)
         assertEquals(success, puzzleHistoryItem?.success)
+    }
+
+    private fun setupUserWithRanking(rank: Int = 2000, userPrefs: UserStatisticsVisibility = UserStatisticsVisibility.EVERYONE) = transaction {
+        Users.insert {
+            it[id] = 100
+            it[username] = "rankeduser"
+            it[emailAddress] = "ranked@gmail.com"
+            it[passwordHash] = "test"
+        }
+
+        TrainingRankings.insert {
+            it[userId] = 100
+            it[ranking] = rank
+        }
+
+        UserPreferences.insert {
+            it[userId] = 100
+            it[id] = 50
+            it[statisticsVisibility] = userPrefs
+            it[historyVisibility] = UserPuzzleHistoryVisibility.ME
+        }
+    }
+
+    @Test
+    fun `getUserRankingEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        app.client.get("/api/play/training/ranking/100").status.isForbid()
+    }
+
+    @Test
+    fun `getUserRankingEndpoint returns BAD_REQUEST if authenticated but stats are not visible for authenticated user - scenario 1`() = testSuspend {
+        setupUser()
+        setupUserWithRanking(userPrefs = UserStatisticsVisibility.ME)
+        app.client.get("/api/play/training/ranking/100") {withToken(0)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `getUserRankingEndpoint returns BAD_REQUEST if authenticated but stats are not visible for authenticated user - scenario 2`() = testSuspend {
+        setupUser()
+        setupUserWithRanking(userPrefs = UserStatisticsVisibility.ONLY_FRIENDS)
+        app.client.get("/api/play/training/ranking/100") {withToken(0)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `getUserRankingEndpoint returns OK if authenticated and user allows to see his stats for EVERYONE`() = testSuspend {
+        setupUser()
+        setupUserWithRanking()
+        app.client.get("/api/play/training/ranking/100") {withToken(0)}.status.isOk()
+    }
+
+    @Test
+    fun `getUserRankingEndpoint returns OK and expected body`() = testSuspend {
+        val i = kotlin.random.Random.nextInt(0, 10000)
+        setupUser()
+        setupUserWithRanking(rank = i)
+        val res = app.client.get("/api/play/training/ranking/100") { withToken(0) }
+        res.jsonPath("$.ranking", i)
+        res.jsonPath("$.userId", 100)
     }
 }

@@ -2,16 +2,25 @@ package com.chesstasks.services.training.ranking
 
 import com.chesstasks.data.dao.TrainingRankingDao
 import com.chesstasks.data.dto.TrainingRankingDto
+import com.chesstasks.services.user.preferences.UserPreferencesService
 import org.koin.core.annotation.Single
 
 @Single
-class TrainingRankingService(private val trainingRankingDao: TrainingRankingDao, private val rankingCalculator: RankingCalculator) {
+class TrainingRankingService(private val userPreferencesService: UserPreferencesService, private val trainingRankingDao: TrainingRankingDao, private val rankingCalculator: RankingCalculator) {
     companion object {
         // TODO: Use properties.json or admin database.
         const val DEFAULT_RANKING = 1500
     }
 
+    suspend fun getByUserId(currentUserId: Int, userId: Int): TrainingRankingDto? {
+        if (userPreferencesService.checkAccessToSeeStatistics(userId, currentUserId)) {
+            return trainingRankingDao.getByUserId(userId) ?: trainingRankingDao.insertValues(userId, DEFAULT_RANKING)!!
+        }
+        return null
+    }
+
     suspend fun getByUserId(userId: Int): TrainingRankingDto {
+
         return trainingRankingDao.getByUserId(userId) ?: trainingRankingDao.insertValues(userId, DEFAULT_RANKING)!!
     }
 

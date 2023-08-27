@@ -56,5 +56,11 @@ fun Route.playTrainingController() {
             puzzleHistoryService.submitPuzzleHistory(userId, puzzleId, moves, success)
             call.ofNullable(SubmitPuzzleResponse(userRanking - newRanking, newRanking))
         }
+
+        get("/play/training/ranking/{userId}") {
+            val currUserId = call.requirePrincipalId()
+            val userRanking = trainingRankingService.getByUserId(currUserId, call.parameters["userId"]?.toIntOrNull() ?: throw MissingQueryParameter("userId"))
+            call.ofNullable(userRanking)
+        }
     }
 }

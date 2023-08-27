@@ -205,6 +205,25 @@ paths:
                   $ref: "#/components/schemas/Puzzle"
         "403":
           description: Forbidden - You're not authenticated
+  /api/play/training/ranking/{userId}:
+    post:
+      operationId: /play/training/ranking/{userId}
+      tags:
+        - play
+      description: Get user ranking, if it's user allows using statistics visibility.
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainingRanking"
+        "400":
+          description: Bad request - you're not allowed to see ranking of this user, or user does not exist.
+        "403":
+          description: Forbidden - You're not authenticated
   /api/puzzle/{id}:
     delete:
       operationId: /puzzle/{id} DEL
@@ -979,3 +998,12 @@ components:
         name:
           type: string
           description: Theme's NAME
+    TrainingRanking:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: User ID
+        ranking:
+          type: integer
+          description: User ranking
