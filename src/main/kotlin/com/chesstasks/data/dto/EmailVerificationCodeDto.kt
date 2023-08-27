@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.exposed.sql.ResultRow
 
 object EmailVerificationCodes : BaseTable("email_verification_codes") {
-    val code = varchar("code", 6).uniqueIndex().clientDefault {
+    val code = varchar("code", 6).clientDefault {
         randomString(6)
     }
 
