@@ -38,7 +38,7 @@ fun Route.playTrainingController() {
     val puzzleHistoryService by inject<PuzzleHistoryService>(PuzzleHistoryService::class.java)
 
     user {
-        get("/play/training/puzzles") {
+        post("/play/training/puzzles") {
             val userId = call.requirePrincipalId()
             val userRanking = trainingRankingService.getByUserId(userId).ranking
             val searchCriteria = call.receive<GetPuzzlePayload>().toPuzzleSearchCriteria(userRanking)

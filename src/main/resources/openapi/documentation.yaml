@@ -183,7 +183,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SubmitPuzzleResponse"
   /api/play/training/puzzles:
-    get:
+    post:
       operationId: /play/training/puzzles
       tags:
         - play

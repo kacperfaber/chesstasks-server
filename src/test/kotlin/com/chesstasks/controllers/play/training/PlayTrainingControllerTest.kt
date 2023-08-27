@@ -49,13 +49,13 @@ class PlayTrainingControllerTest : BaseWebTest() {
 
     @Test
     fun `puzzlesEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
-        app.client.get("/api/play/training/puzzles").status.isForbid()
+        app.client.post("/api/play/training/puzzles").status.isForbid()
     }
 
     @Test
     fun `puzzlesEndpoint returns 415 if authenticated as user and NO BODY`() = testSuspend {
         setupUser()
-        app.client.get("/api/play/training/puzzles") { withToken(0) }.status.isUnsupportedMediaType()
+        app.client.post("/api/play/training/puzzles") { withToken(0) }.status.isUnsupportedMediaType()
     }
 
     private fun HttpRequestBuilder.getPuzzlePayload(
@@ -69,21 +69,21 @@ class PlayTrainingControllerTest : BaseWebTest() {
     @Test
     fun `puzzlesEndpoint returns OK if authenticated as user and BODY`() = testSuspend {
         setupUser()
-        app.client.get("/api/play/training/puzzles") { withToken(0); getPuzzlePayload() }.status.isOk()
+        app.client.post("/api/play/training/puzzles") { withToken(0); getPuzzlePayload() }.status.isOk()
     }
 
     @Test
     fun `puzzlesEndpoint returns OK if authenticated as admin and BODY`() = testSuspend {
         setupUser()
         setupAdmin()
-        app.client.get("/api/play/training/puzzles") { withToken(0); getPuzzlePayload() }.status.isOk()
+        app.client.post("/api/play/training/puzzles") { withToken(0); getPuzzlePayload() }.status.isOk()
     }
 
     @Test
     fun `puzzlesEndpoint returns OK and expected 50 items length`() = testSuspend {
         setupUser()
         setupRandomPuzzles(500)
-        val resp = app.client.get("/api/play/training/puzzles") { withToken(0); getPuzzlePayload() }
+        val resp = app.client.post("/api/play/training/puzzles") { withToken(0); getPuzzlePayload() }
         resp.status.isOk()
         resp.jsonPath("$.length()", 50)
     }
@@ -96,9 +96,9 @@ class PlayTrainingControllerTest : BaseWebTest() {
         val secret = "ABC"
         createToken(0, secret)
 
-        val r1 = app.client.get("/api/play/training/puzzles") { useToken(0, secret); getPuzzlePayload() }
+        val r1 = app.client.post("/api/play/training/puzzles") { useToken(0, secret); getPuzzlePayload() }
         r1.status.isOk()
-        val r2 = app.client.get("/api/play/training/puzzles") { useToken(0, secret); getPuzzlePayload() }
+        val r2 = app.client.post("/api/play/training/puzzles") { useToken(0, secret); getPuzzlePayload() }
         r2.status.isOk()
 
         val r1FirstId = r1.jsonPath<Int>("$[0].id")
@@ -114,7 +114,7 @@ class PlayTrainingControllerTest : BaseWebTest() {
         setupRandomPuzzles(30, PuzzleDatabase.USER, 1500)
 
         val r =
-            app.client.get("/api/play/training/puzzles") { withToken(0); getPuzzlePayload(database = PuzzleDatabase.LICHESS) }
+            app.client.post("/api/play/training/puzzles") { withToken(0); getPuzzlePayload(database = PuzzleDatabase.LICHESS) }
         r.status.isOk()
         val idsList = r.jsonPath<List<Int>>("$[?(@.database == 'LICHESS')].id")
         assertEquals(25, idsList?.count())
@@ -127,7 +127,7 @@ class PlayTrainingControllerTest : BaseWebTest() {
         setupRandomPuzzles(30, PuzzleDatabase.USER, 1500)
 
         val r =
-            app.client.get("/api/play/training/puzzles") { withToken(0); getPuzzlePayload(database = PuzzleDatabase.USER) }
+            app.client.post("/api/play/training/puzzles") { withToken(0); getPuzzlePayload(database = PuzzleDatabase.USER) }
         r.status.isOk()
         val idsList = r.jsonPath<List<Int>>("$[?(@.database == 'USER')].id")
         assertEquals(30, idsList?.count())
@@ -140,7 +140,7 @@ class PlayTrainingControllerTest : BaseWebTest() {
         setupRandomPuzzles(30, PuzzleDatabase.USER, 1500)
 
         val r =
-            app.client.get("/api/play/training/puzzles") { withToken(0); getPuzzlePayload(database = PuzzleDatabase.USER) }
+            app.client.post("/api/play/training/puzzles") { withToken(0); getPuzzlePayload(database = PuzzleDatabase.USER) }
         r.status.isOk()
         val idsList = r.jsonPath<List<Int>>("$[?(@.database == 'USER')].id")
         assertEquals(30, idsList?.count())
