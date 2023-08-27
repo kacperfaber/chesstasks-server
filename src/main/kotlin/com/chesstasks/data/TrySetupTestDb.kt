@@ -72,6 +72,7 @@ fun Application.trySetupTestDb() = transaction {
             it[moves] = "h8e8 c4c6 a8b8 c6e8"
             it[ranking] = 1400
             it[database] = PuzzleDatabase.LICHESS
+            // themes = mateIn1, long
         }
 
         Puzzles.insert {
@@ -80,6 +81,7 @@ fun Application.trySetupTestDb() = transaction {
             it[moves] = "b6a5 g4f3 b7f3 e2f3"
             it[ranking] = 1400
             it[database] = PuzzleDatabase.LICHESS
+            // themes = mateIn2
         }
 
         PuzzleHistoryItems.insert {
@@ -96,6 +98,36 @@ fun Application.trySetupTestDb() = transaction {
             it[userId] = 0
             it[moves] = "h8e8 c4c6 a8b8 c6e8"
             it[success] = true
+        }
+
+        Themes.insert {
+            it[id] = 0
+            it[name] = "mateIn1"
+        }
+
+        Themes.insert {
+            it[id] = 1
+            it[name] = "fast"
+        }
+
+        Themes.insert {
+            it[id] = 2
+            it[name] = "mateIn2"
+        }
+
+        PuzzleThemes.insert {
+            it[puzzleId] = 0
+            it[themeId] = 0 // mateIn1
+        }
+
+        PuzzleThemes.insert {
+            it[puzzleId] = 0
+            it[themeId] = 1 // fast
+        }
+
+        PuzzleThemes.insert {
+            it[puzzleId] = 1
+            it[themeId] = 2 // mateIN2
         }
     }
 }
