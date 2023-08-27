@@ -44,6 +44,15 @@ class RegisterControllerTest : BaseWebTest() {
     }
 
     @Test
+    fun `registerEndpoint returns BAD_REQUEST if email is invalid`() = testSuspend {
+        val badEmails = "@gmail.com @test@com test@com test.com.com test.pl $$$.com $$$@gmail.com".split(" ")
+
+        for (badEmail in badEmails) {
+            app.client.post("/api/register") {registerBody(emailAddress = "@gmail.com")}.status.isBadRequest()
+        }
+    }
+
+    @Test
     fun `registerEndpoint returns OK if data is OK`() = testSuspend {
         app.client.post("/api/register"){registerBody()}.status.isNoContent()
     }
