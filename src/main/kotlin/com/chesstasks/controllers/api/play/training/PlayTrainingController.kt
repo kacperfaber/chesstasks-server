@@ -54,7 +54,7 @@ fun Route.playTrainingController() {
             val (success,moves) = call.receive<SubmitPuzzlePayload>()
             val newRanking = trainingRankingService.updateRanking(userId, userRanking, puzzle.ranking, success)
             puzzleHistoryService.submitPuzzleHistory(userId, puzzleId, moves, success)
-            call.ofNullable(SubmitPuzzleResponse(userRanking - newRanking, newRanking))
+            call.ofNullable(SubmitPuzzleResponse(newRanking - userRanking, newRanking))
         }
 
         get("/play/training/ranking/{userId}") {
