@@ -39,4 +39,12 @@ class PuzzleHistoryDao {
             .select { (PuzzleHistoryItems.userId eq userId) and (PuzzleHistoryItems.success eq false)}
             .count()
     }
+
+    suspend fun getByUserIdAndPuzzleId(userId: Int, puzzleId: Int): PuzzleHistoryDto? = dbQuery {
+        PuzzleHistoryItems
+            .select { (PuzzleHistoryItems.userId eq userId) and (PuzzleHistoryItems.puzzleId eq puzzleId) }
+            .limit(1)
+            .map(PuzzleHistoryDto::from)
+            .singleOrNull()
+    }
 }

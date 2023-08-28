@@ -69,4 +69,6 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
     suspend fun searchPuzzles(criteria: PuzzleDao.SearchPuzzlesCriteria, limit: Int = DEFAULT_LIMIT): List<PuzzleDto> {
         return puzzleDao.searchPuzzles(criteria, limit)
     }
+
+    suspend fun getPuzzleRanking(puzzleId: Int): Int? = puzzleDao.getPuzzleRanking(puzzleId)
 }

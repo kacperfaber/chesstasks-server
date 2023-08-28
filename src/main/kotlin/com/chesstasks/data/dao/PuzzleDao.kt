@@ -151,4 +151,12 @@ class PuzzleDao {
             .limit(limit)
             .map(PuzzleDto::from)
     }
+
+    suspend fun getPuzzleRanking(puzzleId: Int): Int? = dbQuery {
+        Puzzles
+            .slice(Puzzles.id, Puzzles.ranking)
+            .select { Puzzles.id eq puzzleId }
+            .map { it[Puzzles.ranking] }
+            .singleOrNull()
+    }
 }

@@ -28,4 +28,7 @@ class PuzzleHistoryService(private val puzzleHistoryDao: PuzzleHistoryDao, priva
 
     suspend fun getTotalFails(userId: Int): Long = puzzleHistoryDao.getTotalFails(userId)
 
+    suspend fun getByUserIdAndPuzzleId(userId: Int, puzzleId: Int): PuzzleHistoryDto? {
+        return puzzleHistoryDao.getByUserIdAndPuzzleId(userId, puzzleId)
+    }
 }

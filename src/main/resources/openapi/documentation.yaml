@@ -158,7 +158,7 @@ paths:
       operationId: /play/training/{puzzleId}/submit
       tags:
         - play
-      description: "Submit puzzle"
+      description: Submit puzzle if user didn't submit this puzzle before. If user has submitted, will be returned $.applied=false and PuzzleHistory and ranking will not be affected in database.
       parameters:
       - name: "puzzleId"
         in: "path"
@@ -976,12 +976,17 @@ components:
     SubmitPuzzleResponse:
       type: object
       properties:
+        applied:
+          type: boolean
+          description: Indicates that solution is submitted. Server will not accept second answer [if user already submitted this puzzle]
         ranking:
           type: integer
-          description: New ranking
+          nullable: true
+          description: New ranking, can be null if applied is false.
         rankingDifference:
           type: integer
-          description: Value your ranking has been changed.
+          nullable: true
+          description: Difference between old ranking and new ranking. Positive number when new ranking is greater than old. Nullable when applied is false.
     Puzzle:
       type: object
       properties:
