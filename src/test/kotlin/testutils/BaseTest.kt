@@ -1,15 +1,10 @@
 package testutils
 
-import com.chesstasks.Profile
-import com.chesstasks.Profiles
 import com.chesstasks.data.DatabaseFactory
 import com.chesstasks.data.dto.Tokens
 import com.chesstasks.module
 import com.chesstasks.services.token.Token
 import com.google.gson.Gson
-import com.jayway.jsonpath.Configuration
-import com.jayway.jsonpath.JsonPath
-import com.jayway.jsonpath.Option
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -20,7 +15,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.koin.core.context.GlobalContext.get
 import java.util.*
-import kotlin.test.assertEquals
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
