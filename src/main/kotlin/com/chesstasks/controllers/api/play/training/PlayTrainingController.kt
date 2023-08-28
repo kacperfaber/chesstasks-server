@@ -62,5 +62,10 @@ fun Route.playTrainingController() {
             val userRanking = trainingRankingService.getByUserId(currUserId, call.parameters["userId"]?.toIntOrNull() ?: throw MissingQueryParameter("userId"))
             call.ofNullable(userRanking)
         }
+
+        post("/play/training/puzzles/search") {
+            val searchCriteria = call.receive<GetPuzzleSearchPayload>().toSearchPuzzleCriteria()
+            call.ofNullable(puzzleService.searchPuzzles(searchCriteria))
+        }
     }
 }

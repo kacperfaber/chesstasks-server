@@ -772,7 +772,27 @@ paths:
           description: Forbidden - No valid authentication
         '400':
           description: Bad Request - Probably user you're looking for does not exist
-
+  /api/play/training/puzzles/search:
+    post:
+      tags:
+        - play
+      description: Search puzzles to play using advanced search criteria
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/GetPuzzleSearchPayload"
+      responses:
+        '200':
+          description: Success - Puzzle matching to given criteria returned.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Puzzle"
+        '403':
+          description: Forbidden - You're not authenticated.
 components:
   schemas:
     SimpleUserStatistics:
@@ -1007,3 +1027,19 @@ components:
         ranking:
           type: integer
           description: User ranking
+    GetPuzzleSearchPayload:
+      type: object
+      properties:
+        ranking:
+          type: object
+          properties:
+            from:
+              type: integer
+            to:
+              type: integer
+        themeIds:
+          type: array
+          description: All themes must be find.
+          items:
+            description: Theme ID
+            type: integer

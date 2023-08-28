@@ -1,10 +1,7 @@
 package com.chesstasks.services.puzzle
 
 import com.chesstasks.data.dao.PuzzleDao
-import com.chesstasks.data.dto.PuzzleDatabase
-import com.chesstasks.data.dto.PuzzleDto
-import com.chesstasks.data.dto.PuzzleThemes
-import com.chesstasks.data.dto.Puzzles
+import com.chesstasks.data.dto.*
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
@@ -67,5 +64,9 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
 
     suspend fun getRandomListBySearchCriteria(searchCriteria: SearchCriteria, limit: Int = DEFAULT_LIMIT, skip: Long): List<PuzzleDto> {
         return puzzleDao.getRandomList(searchCriteria.getWheres(), limit, skip)
+    }
+
+    suspend fun searchPuzzles(criteria: PuzzleDao.SearchPuzzlesCriteria, limit: Int = DEFAULT_LIMIT): List<PuzzleDto> {
+        return puzzleDao.searchPuzzles(criteria, limit)
     }
 }

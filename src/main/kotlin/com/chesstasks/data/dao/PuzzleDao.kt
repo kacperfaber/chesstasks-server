@@ -8,7 +8,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inSubQuery
 import org.koin.core.annotation.Single
-import java.lang.RuntimeException
 
 @Single
 class PuzzleDao {
@@ -120,6 +119,36 @@ class PuzzleDao {
             .select {where.reduce {acc, op -> acc.and(op)}}
             .limit(limit, skip)
             .orderBy(Random)
+            .map(PuzzleDto::from)
+    }
+
+    data class SearchPuzzlesCriteria(
+        val themeIds: List<Int>,
+        val rankingFrom: Int,
+        val rankingTo: Int
+    )
+
+    suspend fun searchPuzzles(c: SearchPuzzlesCriteria, limit: Int): List<PuzzleDto> = dbQuery {
+        val (themeIds, rankingFrom, rankingTo) = c
+
+        val themeIdsQuery = ((Puzzles.id inSubQuery PuzzleThemes
+            .slice(PuzzleThemes.puzzleId)
+            .select { PuzzleThemes.themeId inList themeIds }
+            .groupBy(PuzzleThemes.puzzleId)
+            .having { PuzzleThemes.puzzleId.count() eq themeIds.size.toLong() }))
+
+        if (c.themeIds.isEmpty()) {
+            return@dbQuery Puzzles
+                .select { (Puzzles.ranking greaterEq rankingFrom) and (Puzzles.ranking lessEq rankingTo) }
+                .orderBy(Random)
+                .limit(limit)
+                .map(PuzzleDto::from)
+        }
+
+        Puzzles
+            .select { themeIdsQuery and (Puzzles.ranking greaterEq rankingFrom) and (Puzzles.ranking lessEq rankingTo) }
+            .orderBy(Random)
+            .limit(limit)
             .map(PuzzleDto::from)
     }
 }

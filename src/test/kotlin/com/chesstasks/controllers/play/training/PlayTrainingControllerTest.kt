@@ -289,4 +289,205 @@ class PlayTrainingControllerTest : BaseWebTest() {
         res.jsonPath("$.ranking", i)
         res.jsonPath("$.userId", 100)
     }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns FORBIDDEN if no authentication`() = testSuspend {
+        app.client.post("/api/play/training/puzzles/search").status.isForbid()
+    }
+
+    private fun HttpRequestBuilder.searchPuzzlesBody(themeIds: List<Int> = listOf(0), from: Int = 500, to: Int = 1000) {
+        jsonBody(
+            "ranking" to mapOf(
+                "from" to from,
+                "to" to to
+            ),
+
+            "themeIds" to themeIds
+        )
+    }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns OK if authenticated and BODY given`() = testSuspend {
+        setupUser()
+        app.client.post("/api/play/training/puzzles/search"){withToken(0); searchPuzzlesBody()}.status.isOk()
+    }
+
+    private fun setupDefaultThemes() {
+        transaction {
+            Themes.insert {
+                it[id] = 0
+                it[name] = "0"
+            }
+
+            Themes.insert {
+                it[id] = 1
+                it[name] = "1"
+            }
+
+            Themes.insert {
+                it[id] = 2
+                it[name] = "2"
+            }
+        }
+    }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns OK and expected items - scenario 1 -- 0 if one theme, but not both`() = testSuspend {
+        setupUser()
+        setupDefaultThemes()
+
+        transaction {
+            Puzzles.insert {
+                it[id] = 0
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 1
+            }
+        }
+
+        app.client.post("/api/play/training/puzzles/search") {withToken(0); searchPuzzlesBody(listOf(0, 1), 0, 2000)}.jsonPath("$.length()", 0)
+    }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns OK and expected items - scenario 1 -- 1 if both theme present`() = testSuspend {
+        setupUser()
+        setupDefaultThemes()
+
+        transaction {
+            Puzzles.insert {
+                it[id] = 0
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 0
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 1
+            }
+        }
+
+        app.client.post("/api/play/training/puzzles/search") {withToken(0); searchPuzzlesBody(listOf(0, 1), 0, 2000)}.jsonPath("$.length()", 1)
+    }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns OK and expected items - scenario 3 -- 0 if both theme present, but ranking range is bad`() = testSuspend {
+        setupUser()
+        setupDefaultThemes()
+
+        transaction {
+            Puzzles.insert {
+                it[id] = 0
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 0
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 1
+            }
+        }
+
+        app.client.post("/api/play/training/puzzles/search") {withToken(0); searchPuzzlesBody(listOf(0, 1), 1501, 2000)}.jsonPath("$.length()", 0)
+    }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns OK and expected items - scenario 4 -- 2 if expected theme present`() = testSuspend {
+        setupUser()
+        setupDefaultThemes()
+
+        transaction {
+            Puzzles.insert {
+                it[id] = 0
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            Puzzles.insert {
+                it[id] = 1
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 0
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 1
+                it[themeId] = 0
+            }
+        }
+
+        app.client.post("/api/play/training/puzzles/search") {withToken(0); searchPuzzlesBody(listOf(0), 1499, 2000)}.jsonPath("$.length()", 2)
+    }
+
+    @Test
+    fun `searchPuzzlesEndpoint returns OK and expected items - scenario 5 -- 2 if no theme specified`() = testSuspend {
+        setupUser()
+        setupDefaultThemes()
+
+        transaction {
+            Puzzles.insert {
+                it[id] = 0
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            Puzzles.insert {
+                it[id] = 1
+                it[fen] = ""
+                it[moves] = ""
+                it[ownerId] = 0
+                it[database] = PuzzleDatabase.LICHESS
+                it[ranking] = 1500
+                it[openingId] = null
+            }
+
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 0
+            }
+        }
+
+        app.client.post("/api/play/training/puzzles/search") {withToken(0); searchPuzzlesBody(listOf(), 1499, 2000)}.jsonPath("$.length()", 2)
+    }
 }
