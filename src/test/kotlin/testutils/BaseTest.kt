@@ -60,6 +60,10 @@ open class BaseWebTest : BaseTest() {
         setBody(Gson().toJson(mapOf(*pairs)))
     }
 
+    protected fun HttpRequestBuilder.withApiKey(apiKey: String) {
+        header("Authorization", apiKey);
+    }
+
     protected fun createToken(userId: Int, secret: String) = transaction {
         Tokens.insert {
             it[id] = 0

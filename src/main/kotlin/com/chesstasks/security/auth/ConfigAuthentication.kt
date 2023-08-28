@@ -12,11 +12,13 @@ fun Application.configureAuthentication() {
     val tokenAuthenticationProvider: TokenAuthenticationProvider = get()
     val adminTokenAuthenticationProvider: AdminTokenAuthenticationProvider = get()
     val userWebSocketTokenAuthenticationProvider: UserWebSocketTokenAuthenticationProvider = get()
+    val apiKeyAuthenticationProvider: ApiKeyAuthenticationProvider = get()
 
     install(Authentication) {
         this.register(tokenAuthenticationProvider)
         this.register(adminTokenAuthenticationProvider)
         this.register(userWebSocketTokenAuthenticationProvider)
+        register(apiKeyAuthenticationProvider)
         configSessionSecurity()
     }
 

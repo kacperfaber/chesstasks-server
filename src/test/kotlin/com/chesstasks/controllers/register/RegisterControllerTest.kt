@@ -1,6 +1,5 @@
 package com.chesstasks.controllers.register
 
-import com.chesstasks.controllers.api.register.RegisterPayload
 import com.chesstasks.data.dto.EmailVerificationCodeDto
 import com.chesstasks.data.dto.EmailVerificationCodes
 import com.chesstasks.data.dto.UserDto
@@ -12,13 +11,12 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
-import testutils.BaseWebTest
-import testutils.isBadRequest
-import testutils.isNoContent
-import testutils.isOk
+import testutils.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+
+
+// TODO: RegisterControllerTest depends of 'properties.test.json'.
 
 class RegisterControllerTest : BaseWebTest() {
 
@@ -38,9 +36,19 @@ class RegisterControllerTest : BaseWebTest() {
     }
 
     @Test
+    fun `registerEndpoint returns FORBIDDEN if no api key given`() = testSuspend {
+        app.client.post("/api/register") {registerBody();}.status.isForbid()
+    }
+
+    @Test
+    fun `registerEndpoint returns FORBIDDEN if bad api key is given`() = testSuspend {
+        app.client.post("/api/register"){registerBody(); withApiKey("jebac-disa")}.status.isForbid()
+    }
+
+    @Test
     fun `registerEndpoint returns BAD_REQUEST if email is taken`() = testSuspend {
         setupUser()
-        app.client.post("/api/register") {registerBody()}.status.isBadRequest()
+        app.client.post("/api/register") {registerBody(); withApiKey("secured-api-key")}.status.isBadRequest()
     }
 
     @Test
@@ -48,13 +56,13 @@ class RegisterControllerTest : BaseWebTest() {
         val badEmails = "@gmail.com @test@com test@com test.com.com test.pl $$$.com $$$@gmail.com".split(" ")
 
         for (badEmail in badEmails) {
-            app.client.post("/api/register") {registerBody(emailAddress = "@gmail.com")}.status.isBadRequest()
+            app.client.post("/api/register") {registerBody(emailAddress = "@gmail.com"); withApiKey("secured-api-key")}.status.isBadRequest()
         }
     }
 
     @Test
     fun `registerEndpoint returns OK if data is OK`() = testSuspend {
-        app.client.post("/api/register"){registerBody()}.status.isNoContent()
+        app.client.post("/api/register"){registerBody(); withApiKey("secured-api-key")}.status.isNoContent()
     }
 
     private fun userReg(id: Int): EmailVerificationCodeDto? {
@@ -84,7 +92,7 @@ class RegisterControllerTest : BaseWebTest() {
     @Test
     fun `registerEndpoint makes UserRegistration row in database`() = testSuspend {
         val before = countUserReg()
-        app.client.post("/api/register"){registerBody()}.status.isNoContent()
+        app.client.post("/api/register"){registerBody(); withApiKey("secured-api-key")}.status.isNoContent()
         assertEquals(before + 1, countUserReg())
     }
 
@@ -94,7 +102,7 @@ class RegisterControllerTest : BaseWebTest() {
         val email = "kacperf1234@gmail.com"
         val pass = "HelloWorld123"
 
-        app.client.post("/api/register"){registerBody(username, email, pass)}.status.isNoContent()
+        app.client.post("/api/register"){ withApiKey("secured-api-key"); registerBody(username, email, pass)}.status.isNoContent()
 
         val reg = firstUserReg()
         assertEquals(email, reg?.emailAddress)
@@ -108,8 +116,18 @@ class RegisterControllerTest : BaseWebTest() {
     }
 
     @Test
+    fun `confirmEndpoint returns FORBIDDEN if no api key given`() = testSuspend {
+        app.client.post("/api/register/confirm") {confirmBody();}.status.isForbid()
+    }
+
+    @Test
+    fun `confirmEndpoint returns FORBIDDEN if bad api key is given`() = testSuspend {
+        app.client.post("/api/register/confirm") {confirmBody(); withApiKey("jebac-disa-kurwe")}.status.isForbid()
+    }
+
+    @Test
     fun `confirmEndpoint returns BAD_REQUEST if expected`() = testSuspend {
-        app.client.post("/api/register/confirm"){confirmBody()}.status.isBadRequest()
+        app.client.post("/api/register/confirm"){confirmBody(); withApiKey("secured-api-key")}.status.isBadRequest()
     }
 
     private fun setupReg() = transaction {
@@ -125,7 +143,7 @@ class RegisterControllerTest : BaseWebTest() {
     @Test
     fun `confirmEndpoint returns OK if expected`() = testSuspend {
         setupReg()
-        app.client.post("/api/register/confirm"){confirmBody()}.status.isNoContent()
+        app.client.post("/api/register/confirm"){confirmBody(); withApiKey("secured-api-key")}.status.isNoContent()
     }
 
     private fun countUsers(): Long = transaction {
@@ -136,7 +154,7 @@ class RegisterControllerTest : BaseWebTest() {
     fun `confirmEndpoint returns OK and makes user record`() = testSuspend {
         setupReg()
         val bef = countUsers()
-        app.client.post("/api/register/confirm"){confirmBody()}.status.isNoContent()
+        app.client.post("/api/register/confirm"){confirmBody(); withApiKey("secured-api-key")}.status.isNoContent()
 
         assertEquals(bef + 1, countUsers())
     }
@@ -148,7 +166,7 @@ class RegisterControllerTest : BaseWebTest() {
     @Test
     fun `confirmEndpoint returns OK and makes user record with expected data`() = testSuspend {
         setupReg()
-        app.client.post("/api/register/confirm"){confirmBody()}.status.isNoContent()
+        app.client.post("/api/register/confirm"){confirmBody(); withApiKey("secured-api-key")}.status.isNoContent()
         val u = getFirstUser()
         assertEquals("kacperf1234@gmail.com", u?.emailAddress)
         assertEquals("HelloWorld123", u?.passwordHash)
@@ -159,7 +177,7 @@ class RegisterControllerTest : BaseWebTest() {
     fun `confirmEndpoint returns OK and deletes EmailVerificationRecord`() = testSuspend {
         setupReg()
         val bef = countUserReg()
-        app.client.post("/api/register/confirm"){confirmBody()}.status.isNoContent()
+        app.client.post("/api/register/confirm"){confirmBody(); withApiKey("secured-api-key")}.status.isNoContent()
         assertEquals(bef - 1, countUserReg())
     }
 }
