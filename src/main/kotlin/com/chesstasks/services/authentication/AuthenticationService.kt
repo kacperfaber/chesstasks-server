@@ -23,9 +23,11 @@ class AuthenticationService(
 ) {
     suspend fun tryAuthenticate(login: String, password: String): AuthResult? {
         val user = userService.getByLogin(login) ?: return null
-        if (!passwordHasher.comparePasswords(password, user.passwordHash)) return null
+        if (userService.isAccountBlocked(user.id)) return null
         val token = tokenService.createToken(user.id) ?: return null
+        if (!passwordHasher.comparePasswords(password, user.passwordHash)) return null
         val tokenString = tokenService.writeToken(token)
+        userService.resetLoginCounter(user.id)
         return AuthResult(user.id, user.username, user.emailAddress, tokenString)
     }
 

@@ -25,7 +25,8 @@ object DatabaseFactory {
         Openings,
         PuzzleHistoryItems,
         EmailVerificationCodes,
-        TrainingRankings
+        TrainingRankings,
+        LoginCounters
     ).toTypedArray()
 
     fun init() {
