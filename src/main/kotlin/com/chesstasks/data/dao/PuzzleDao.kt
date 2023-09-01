@@ -159,4 +159,19 @@ class PuzzleDao {
             .map { it[Puzzles.ranking] }
             .singleOrNull()
     }
+
+    suspend fun insertPuzzleAsAdmin(fen: String, moves: String, ranking: Int, database: PuzzleDatabase): PuzzleDto? = dbQuery {
+        Puzzles.insert {
+            it[Puzzles.fen] = fen
+            it[Puzzles.moves] = moves
+            it[Puzzles.ranking] = ranking
+            it[Puzzles.database] = database
+        }.resultedValues?.map(PuzzleDto::from)?.singleOrNull()
+    }
+
+    suspend fun updateRanking(puzzleId: Int, newRanking: Int): Boolean = dbQuery {
+        Puzzles.update(where = {Puzzles.id eq puzzleId}) {
+            it[ranking] = newRanking
+        } > 0
+    }
 }

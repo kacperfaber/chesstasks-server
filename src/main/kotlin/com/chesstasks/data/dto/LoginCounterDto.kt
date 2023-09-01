@@ -2,10 +2,11 @@ package com.chesstasks.data.dto
 
 import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.ResultRow
 
 object LoginCounters : BaseTable("login_counters"){
-    val userId = integer("user_id").references(Users.id)
+    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
     val counter = integer("counter")
 }
 

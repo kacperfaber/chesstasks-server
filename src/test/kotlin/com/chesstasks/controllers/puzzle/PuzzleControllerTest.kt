@@ -4,15 +4,15 @@ import com.chesstasks.data.dto.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.test.dispatcher.*
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import testutils.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import java.util.UUID
+import kotlin.test.*
 
 class PuzzleControllerTest : BaseWebTest() {
     private fun setupUser() {
@@ -759,7 +759,333 @@ class PuzzleControllerTest : BaseWebTest() {
         val skip = 50
         val resp = app.client.get("/api/puzzle/by-opening/eco/A00?skip=$skip") { withToken(0) }
         resp.status.isOk()
-        resp.jsonPath("$[0].id", 0+skip)
-        resp.jsonPath("$[49].id", 49+skip)
+        resp.jsonPath("$[0].id", 0 + skip)
+        resp.jsonPath("$[49].id", 49 + skip)
+    }
+
+    private fun HttpRequestBuilder.putPuzzle(
+        fen: String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        moves: String = "e2e4 e7e5",
+        ranking: Int = 1500,
+        database: PuzzleDatabase = PuzzleDatabase.LICHESS
+    ) {
+        jsonBody("fen" to fen, "moves" to moves, "ranking" to ranking, "database" to database)
+    }
+
+    @Test
+    fun `putPuzzleAsAdminEndpoint returns FORBID if no authentication`() = testSuspend {
+        app.client.put("/api/puzzle/as-admin") { putPuzzle() }.status.isForbid()
+    }
+
+    @Test
+    fun `putPuzzleAsAdminEndpoint returns FORBIDDEN if authenticated as user not as admin`() = testSuspend {
+        setupUser()
+        app.client.put("/api/puzzle/as-admin") { putPuzzle(); withToken(0) }.status.isForbid()
+    }
+
+    @Test
+    fun `putPuzzleAsAdminEndpoint returns OK if authenticated as admin`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        app.client.put("/api/puzzle/as-admin") { putPuzzle(); withToken(0) }.status.isOk()
+    }
+
+    @Test
+    fun `putPuzzleAsAdminEndpoint returns BAD_REQUEST if chess position is invalid`() = testSuspend {
+        setupUser()
+        setupAdmin()
+
+        app.client.put("/api/puzzle/as-admin") {
+            putPuzzle(fen = "rnbqkb1r/ppp1pppp/5n2/8/2PP4/5N2/PP3PPP/RNBQKB1R b KQkq - 2 5", moves = "e2e4");
+            withToken(0)
+        }.status.isBadRequest()
+    }
+
+    @Test
+    fun `putPuzzleAsAdminEndpoint returns OK and makes record in database with expected data`() = testSuspend {
+        setupUser()
+        setupAdmin()
+
+        val fen = "r1bq1knr/ppp3pp/2np4/8/4P3/2Q2N2/P4PPP/RNB2RK1 w - - 1 12"
+        val moves = "f1e1 d6d5"
+        val ranking = 777
+        val database = PuzzleDatabase.LICHESS
+        val r = app.client.put("/api/puzzle/as-admin") { putPuzzle(fen, moves, ranking, database); withToken(0) }
+        r.status.isOk()
+        val id = r.jsonPath<Int>("$.id")!!
+        val p = getPuzzle(id)
+        assertEquals(fen, p?.fen)
+        assertEquals(moves, p?.moves)
+        assertEquals(database, p?.database)
+        assertEquals(ranking, p?.ranking)
+    }
+
+    @Test
+    fun `putPuzzleAsAdminEndpoint returns OK and expected data`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        val fen = "rnbqkb1r/ppp1pppp/5n2/8/2PP4/5N2/PP3PPP/RNBQKB1R b KQkq - 2 5"
+        val moves = "e7e5 d4d5"
+        val ranking = 505
+        val database = PuzzleDatabase.USER
+        val r = app.client.put("/api/puzzle/as-admin") { putPuzzle(fen, moves, ranking, database); withToken(0) }
+        r.status.isOk()
+        r.jsonPath("$.fen", fen)
+        r.jsonPath("$.moves", moves)
+        r.jsonPath("$.ranking", ranking)
+        r.jsonPath("$.database", database.name)
+    }
+
+    @Test
+    fun `putThemeNamesAsAdminEndpoint returns FORBID if user is not admin`() = testSuspend {
+        setupUser()
+        app.client.put("/api/puzzle/theme/by-names/as-admin/0") {withToken(0) }.status.isForbid()
+    }
+
+    private fun HttpRequestBuilder.themeNames(vararg names: String = arrayOf("mateIn1")) {
+        jsonBody("themeNames" to names)
+    }
+
+    private fun setupThemes() = transaction {
+        Themes.insert {
+            it[id] = 0
+            it[name] = "mate"
+        }
+    }
+
+    @Test
+    fun `putThemeNamesAsAdminEndpoint returns BAD_REQUEST if is admin but puzzle does not exist`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupThemes()
+        app.client.put("/api/puzzle/theme/by-names/as-admin/0") {withToken(0); themeNames("mate") }.status.isBadRequest()
+    }
+
+    @Test
+    fun `putThemeNamesAsAdminEndpoint returns BAD_REQUEST if is admin and puzzle exists but theme does not exist`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        app.client.put("/api/puzzle/theme/by-names/as-admin/0") {withToken(0); themeNames("mate") }.status.isBadRequest()
+    }
+
+    @Test
+    fun `putThemeNamesAsAdminEndpoint returns NO_CONTENT if admin, puzzle and theme name exists`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupThemes()
+        app.client.put("/api/puzzle/theme/by-names/as-admin/0") {withToken(0); themeNames("mate") }.status.isNoContent()
+    }
+
+    private fun isPuzzleThemeExist(puzzleId: Int, themeId: Int): Boolean = transaction{
+        PuzzleThemes.select {
+            (PuzzleThemes.puzzleId eq puzzleId) and (PuzzleThemes.themeId eq themeId)
+        }.count() > 0
+    }
+
+    @Test
+    fun `putThemeNamesAsAdminEndpoint returns NO_CONTENT and makes PuzzleTheme record in database`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupThemes()
+        assertFalse { isPuzzleThemeExist(0, 0) }
+        app.client.put("/api/puzzle/theme/by-names/as-admin/0") {withToken(0); themeNames("mate") }.status.isNoContent()
+        assertTrue { isPuzzleThemeExist(0, 0) }
+    }
+
+    @Test
+    fun `putThemeNamesAsAdminEndpoint returns BAD_REQUEST if theme already assigned`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupThemes()
+
+        transaction {
+            PuzzleThemes.insert {
+                it[puzzleId] = 0
+                it[themeId] = 0
+            }
+        }
+
+        app.client.put("/api/puzzle/theme/by-names/as-admin/0") {withToken(0); themeNames("mate") }.status.isBadRequest()
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns FORBIDDEN if user is not an admin`() = testSuspend {
+        setupUser()
+        app.client.delete("/api/puzzle/theme/by-ids/as-admin/0"){withToken(0)}.status.isForbid()
+    }
+
+    private fun HttpRequestBuilder.themeIds(vararg ids: Int = intArrayOf(0)) {
+        jsonBody("themeIds" to ids)
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK and body equals to 0 if puzzle does not exist`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        val r = app.client.delete("/api/puzzle/theme/by-ids/as-admin/0") { withToken(0); themeIds() }
+        r.status.isOk()
+        r.jsonPath("$", 0)
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK if admin and puzzle does exist`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupThemes()
+        app.client.delete("/api/puzzle/theme/by-ids/as-admin/0"){withToken(0); themeIds()}.status.isOk()
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK and body equals to 0 if puzzle exists but theme is not exists`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        val r = app.client.delete("/api/puzzle/theme/by-ids/as-admin/0") { withToken(0); themeIds(5) }
+        r.status.isOk()
+        r.jsonPath("$", 0)
+    }
+
+    private fun assignTheme(puzzleId: Int = 0, themeId: Int = 0) {
+        transaction {
+            PuzzleThemes.insert {
+                it[PuzzleThemes.puzzleId] = puzzleId
+                it[PuzzleThemes.themeId] = themeId
+            }
+        }
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK and expected body if puzzle and theme exists`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupThemes()
+        assignTheme()
+
+        val r = app.client.delete("/api/puzzle/theme/by-ids/as-admin/0") { withToken(0); themeIds(0) }
+        r.status.isOk()
+        r.jsonPath("$", 1)
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK and deletes PuzzleTheme from database`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupThemes()
+        assignTheme()
+
+        assertTrue { isPuzzleThemeExist(0, 0) }
+
+        val r = app.client.delete("/api/puzzle/theme/by-ids/as-admin/0") { withToken(0); themeIds(0) }
+        r.status.isOk()
+
+        assertFalse { isPuzzleThemeExist(0, 0) }
+    }
+
+    private fun setupRandomThemesForPuzzle(puzzleId: Int = 0, rng: IntRange = 0..10) = transaction {
+        rng.forEach {index ->
+            Themes.insert {
+                it[id] = index
+                it[name] = UUID.randomUUID().toString().take(32)
+            }
+
+            PuzzleThemes.insert {
+                it[PuzzleThemes.puzzleId] = puzzleId
+                it[themeId] = index
+            }
+        }
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK and deletes many puzzleThemes from database`() = testSuspend {
+        val range = 0..20
+
+        val ids = range.map { it }.toTypedArray().toIntArray()
+
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupRandomThemesForPuzzle(puzzleId = 0, rng = range)
+
+        range.forEach {i ->
+            assertTrue { isPuzzleThemeExist(0, i) }
+        }
+
+        val r = app.client.delete("/api/puzzle/theme/by-ids/as-admin/0") { withToken(0); themeIds(*ids) }
+        r.status.isOk()
+
+        range.forEach {i ->
+            assertFalse { isPuzzleThemeExist(0, i) }
+        }
+    }
+
+    private fun isThemeById(id: Int): Boolean = transaction {
+        Themes.select { Themes.id eq id }.count() > 0
+    }
+
+    @Test
+    fun `deleteThemeIdsAsAdminEndpoint returns OK and deletes PuzzleTheme but not Themes`() = testSuspend {
+        val range = 0..20
+
+        val ids = range.map { it }.toTypedArray().toIntArray()
+
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        setupRandomThemesForPuzzle(puzzleId = 0, rng = range)
+
+        range.forEach {i ->
+            assertTrue { isPuzzleThemeExist(0, i) }
+            assertTrue { isThemeById(i) }
+        }
+
+        val r = app.client.delete("/api/puzzle/theme/by-ids/as-admin/0") { withToken(0); themeIds(*ids) }
+        r.status.isOk()
+
+        range.forEach {i ->
+            assertFalse { isPuzzleThemeExist(0, i) }
+            assertTrue { isThemeById(i) }
+        }
+    }
+
+    @Test
+    fun `updateRankingAsAdminEndpoint returns FORBID if no authentication`() = testSuspend {
+        app.client.post("/api/puzzle/ranking/as-admin/0/3000").status.isForbid()
+    }
+
+    @Test
+    fun `updateRankingAsAdminEndpoint returns FORBID if user, not admin`() = testSuspend {
+        setupUser()
+        app.client.post("/api/puzzle/ranking/as-admin/0/3000"){withToken(0)}.status.isForbid()
+    }
+
+    @Test
+    fun `updateRankingAsAdminEndpoint returns BAD_REQUEST if admin, but puzzle does not exist`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        app.client.post("/api/puzzle/ranking/as-admin/0/3000"){withToken(0)}.status.isBadRequest()
+    }
+
+    @Test
+    fun `updateRankingAsAdminEndpoint returns NO_CONTENT if admin and puzzle does exist`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        app.client.post("/api/puzzle/ranking/as-admin/0/3000"){withToken(0)}.status.isNoContent()
+    }
+
+    @Test
+    fun `updateRankingAsAdminEndpoint returns NO_CONTENT and changes Puzzle ranking`() = testSuspend {
+        setupUser()
+        setupAdmin()
+        setupPuzzle()
+        app.client.post("/api/puzzle/ranking/as-admin/0/3000"){withToken(0)}.status.isNoContent()
+        assertEquals(3000, getPuzzle(0)?.ranking)
     }
 }

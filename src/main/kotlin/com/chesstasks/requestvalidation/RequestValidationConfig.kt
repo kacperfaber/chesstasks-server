@@ -1,5 +1,6 @@
 package com.chesstasks.requestvalidation
 
+import com.chesstasks.controllers.api.register.RegisterAsAdminPayload
 import com.chesstasks.controllers.api.register.RegisterPayload
 import com.chesstasks.requestvalidation.base.InsertPuzzlePayload
 import com.chesstasks.services.chess.ChessService
@@ -25,10 +26,30 @@ fun Application.configureRequestValidation() {
             }
 
             if (p.username.length < 2) {
-                return@validate ValidationResult.Invalid("Bad email address")
+                return@validate ValidationResult.Invalid("username to short")
             }
 
-            // TODO: add rules for passwords.
+            if (p.password.length < 2) {
+                return@validate ValidationResult.Invalid("Password is too short")
+            }
+
+            // TODO: add better rules for passwords.
+
+            ValidationResult.Valid
+        }
+
+        validate<RegisterAsAdminPayload> {
+            if (!it.emailAddress.validateEmailAddress()) {
+                return@validate ValidationResult.Invalid("Invalid email address")
+            }
+
+            if (it.username.length < 2) {
+                return@validate ValidationResult.Invalid("Username too short")
+            }
+
+            if (it.password.length < 2) {
+                return@validate ValidationResult.Invalid("Password is too short")
+            }
 
             ValidationResult.Valid
         }

@@ -3,6 +3,7 @@ package com.chesstasks.data.dto
 import com.chesstasks.data.BaseDto
 import com.chesstasks.data.BaseTable
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 
@@ -15,13 +16,13 @@ enum class PuzzleDatabase(val value: Int) {
 
 object Puzzles : BaseTable("puzzles") {
     /** NULL, when it's imported from Lichess or by administrator. */
-    val ownerId = integer("owner_id").references(Users.id).nullable()
+    val ownerId = integer("owner_id").references(Users.id, onDelete = ReferenceOption.CASCADE).nullable()
 
     val fen = varchar("fen", 128)
     val moves = varchar("moves", 256)
     val ranking = integer("ranking")
     val database = enumeration<PuzzleDatabase>("database")
-    val openingId = integer("opening_id").references(Openings.id).nullable()
+    val openingId = integer("opening_id").references(Openings.id, onDelete = ReferenceOption.SET_NULL).nullable()
 }
 
 class PuzzleDto(

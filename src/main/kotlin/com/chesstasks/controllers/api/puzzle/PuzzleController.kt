@@ -6,15 +6,19 @@ import com.chesstasks.controllers.ofNullable
 import com.chesstasks.controllers.requirePrincipalId
 import com.chesstasks.data.dto.PuzzleDatabase
 import com.chesstasks.exceptions.MissingQueryParameter
+import com.chesstasks.requestvalidation.base.InsertPuzzlePayload
 import com.chesstasks.security.auth.admin
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.puzzle.PuzzleService
+import com.chesstasks.services.puzzle.themes.PuzzleThemeService
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.java.KoinJavaComponent.inject
 
 fun Route.puzzleController() {
     val puzzleService by inject<PuzzleService>(PuzzleService::class.java)
+    val puzzleThemeService by inject<PuzzleThemeService>(PuzzleThemeService::class.java)
 
     user {
         get("/puzzle/{id}") {
@@ -65,6 +69,47 @@ fun Route.puzzleController() {
         delete("/puzzle/as-admin/{id}") {
             val id = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
             call.ofBoolean(puzzleService.deletePuzzle(id))
+        }
+
+        put("/puzzle/as-admin") {
+            val payload = call.receive<InsertPuzzlePayload>()
+            val r = puzzleService.insertPuzzleAsAdmin(payload.fen, payload.moves, payload.ranking, payload.database)
+            call.ofNullable(r)
+        }
+
+        put("/puzzle/theme/by-names/as-admin/{puzzleId}") {
+            // TODO: Make it better, now I don't have time.
+
+            try {
+                val puzzleId = call.parameters["puzzleId"]?.toIntOrNull() ?: throw MissingQueryParameter("puzzleId")
+                val themeNames = call.receive<ThemeNamesPayload>().themeNames
+                puzzleThemeService.tryAssignThemes(puzzleId, themeNames)
+                call.ofBoolean(true)
+            }
+
+            catch (e: Exception) {
+                call.ofBoolean(false)
+            }
+        }
+
+        delete("/puzzle/theme/by-ids/as-admin/{puzzleId}") {
+            // TODO: Make it better, now I don't have time.
+
+            try {
+                val puzzleId = call.parameters["puzzleId"]?.toIntOrNull() ?: throw MissingQueryParameter("puzzleId")
+                val themeIds = call.receive<ThemeIdsPayload>().themeIds
+                call.ofNullable(puzzleThemeService.deleteByIds(puzzleId, themeIds))
+            }
+
+            catch (e: Exception) {
+                call.ofBoolean(false)
+            }
+        }
+
+        post("/puzzle/ranking/as-admin/{puzzleId}/{newRank}") {
+            val puzzleId = call.parameters["puzzleId"]?.toIntOrNull() ?: throw MissingQueryParameter("puzzleId")
+            val ranking = call.parameters["newRank"]?.toIntOrNull() ?: throw MissingQueryParameter("ranking")
+            call.ofBoolean(puzzleService.updateRanking(puzzleId, ranking))
         }
     }
 }

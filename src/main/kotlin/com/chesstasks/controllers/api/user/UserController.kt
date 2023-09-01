@@ -1,9 +1,11 @@
 package com.chesstasks.controllers.api.user
 
 import com.chesstasks.controllers.getSkip
+import com.chesstasks.controllers.ofBoolean
 import com.chesstasks.controllers.ofNullable
 import com.chesstasks.controllers.requirePrincipalId
 import com.chesstasks.exceptions.MissingQueryParameter
+import com.chesstasks.security.auth.admin
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.user.UserService
 import io.ktor.server.application.*
@@ -28,6 +30,13 @@ fun Route.userController() {
         get("user/search/by-username") {
             val query = call.parameters["query"] ?: throw MissingQueryParameter("query")
             call.ofNullable(userService.searchUserByUsername(query, skip = call.getSkip()))
+        }
+    }
+
+    admin {
+        delete("/user/as-admin/{id}") {
+            val userId = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
+            call.ofBoolean(userService.deleteUser(userId))
         }
     }
 }

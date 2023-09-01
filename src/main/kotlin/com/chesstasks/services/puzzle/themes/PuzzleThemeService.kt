@@ -25,6 +25,10 @@ class PuzzleThemeService(private val themeDao: ThemeDao, private val puzzleTheme
         }
     }
 
+    suspend fun deleteByIds(puzzleId: Int, themeIds: List<Int>): Int {
+        return puzzleThemeDao.deleteByIds(puzzleId, themeIds)
+    }
+
     suspend fun deleteAllThemesByPuzzleId(puzzleId: Int): Boolean = puzzleThemeDao.deleteAllByPuzzleId(puzzleId) > 0
 
     suspend fun getThemes(): List<ThemeDto> {

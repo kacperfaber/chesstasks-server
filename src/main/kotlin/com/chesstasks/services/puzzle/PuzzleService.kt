@@ -71,4 +71,12 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
     }
 
     suspend fun getPuzzleRanking(puzzleId: Int): Int? = puzzleDao.getPuzzleRanking(puzzleId)
+
+    suspend fun insertPuzzleAsAdmin(fen: String, moves: String, ranking: Int, database: PuzzleDatabase): PuzzleDto? {
+        return puzzleDao.insertPuzzleAsAdmin(fen, moves, ranking, database)
+    }
+
+    suspend fun updateRanking(puzzleId: Int, newRanking: Int): Boolean {
+        return puzzleDao.updateRanking(puzzleId, newRanking)
+    }
 }

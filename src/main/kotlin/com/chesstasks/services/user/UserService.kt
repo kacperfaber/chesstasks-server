@@ -31,4 +31,8 @@ class UserService(private val userDao: UserDao, private val loginCounterDao: Log
     suspend fun resetLoginCounter(userId: Int): Boolean {
         return loginCounterDao.resetCounterValue(userId)
     }
+
+    suspend fun deleteUser(userId: Int): Boolean {
+        return userDao.deleteUser(userId)
+    }
 }
