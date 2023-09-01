@@ -1,0 +1,62 @@
+1. DELETE /api/puzzle/as-admin/{id}
+
+Deletes puzzle from database.
+
+204,
+400,
+403
+
+2. PUT /api/puzzle/as-admin
+
+Inserts puzzle as admin
+
+JSON BODY:
++ moves: string
++ fen: string
++ ranking: int
++ database: "LICHESS" | "USER"
+
+200, 400, 403
+
+3. PUT /api/puzzle/theme/by-names/as-admin/{puzzleId}
+
+Assign themes to puzzle {puzzleId}
+
+JSON BODY:
++ themeNames: string[]
+
+204, 400, 403
+
+4. DELETE /api/puzzle/theme/by-ids/as-admin/{puzzleId}
+
+Deletes theme from this puzzle [delete assignment, theme will still be accessible]
+
+JSON BODY:
++ themeIds: int[]
+
+5. POST /api/puzzle/ranking/as-admin/{puzzleId}/{newRank}
+
+Update the puzzle ranking.
+
+204, 400, 403
+
+6. POST /api/register/as-admin
+
+Creates new user as admin, we can skip
+email verification [create user without sending verification email] using skipVerification parameter.
+
+JSON BODY:
++ username: string
++ emailAddress: string
++ password: string
++ skipVerification: boolean
+
+204: 'CodeSent' [Sent verification email to user, if skipVerification=false], 'Ok'
+403,
+400: Maybe data is invalid or already taken by another user
+
+7. DELETE /api/user/as-admin/{id}
+
+Deletes user by ID
+
+204, 400, 403
