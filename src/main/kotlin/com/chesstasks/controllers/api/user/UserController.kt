@@ -9,9 +9,9 @@ import com.chesstasks.security.auth.admin
 import com.chesstasks.security.auth.user
 import com.chesstasks.services.user.UserService
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.java.KoinJavaComponent.inject
-import org.koin.ktor.ext.get
 
 fun Route.userController() {
     val userService by inject<UserService>(UserService::class.java)
@@ -37,6 +37,18 @@ fun Route.userController() {
         delete("/user/as-admin/{id}") {
             val userId = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
             call.ofBoolean(userService.deleteUser(userId))
+        }
+
+        post("/user/as-admin/all/filtered") {
+            val p = call.receive<FilteredUserListPayload>()
+            val skip = call.getSkip()
+            val limit = call.parameters["limit"]?.toIntOrNull() ?: UserService.DEFAULT_USERS_LIST_LIMIT
+            call.ofNullable(userService.getFilteredList(p.usernameLike, p.emailLike, limit = limit, skip = skip))
+        }
+
+        get("/user/as-admin/by-id/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull() ?: throw MissingQueryParameter("id")
+            call.ofNullable(userService.getById(id))
         }
     }
 }

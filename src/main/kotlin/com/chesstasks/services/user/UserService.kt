@@ -17,6 +17,7 @@ class UserService(private val userDao: UserDao, private val loginCounterDao: Log
         const val DEFAULT_NEW_USERS_LIMIT = 50
         const val DEFAULT_SEARCH_LIMIT = 50
         const val BAN_WHEN_LOGIN_COUNTER_GREATER_THAN = 10
+        const val DEFAULT_USERS_LIST_LIMIT = 50
     }
 
     suspend fun tryCreateUser(username: String, emailAddress: String, passwordHash: String): UserDto? = userDao.insertValues(username, emailAddress, passwordHash)
@@ -34,5 +35,9 @@ class UserService(private val userDao: UserDao, private val loginCounterDao: Log
 
     suspend fun deleteUser(userId: Int): Boolean {
         return userDao.deleteUser(userId)
+    }
+
+    suspend fun getFilteredList(usernameLike: String, emailAddressLike: String, limit: Int = DEFAULT_USERS_LIST_LIMIT, skip: Long = 0): List<UserDto> {
+        return userDao.getFilteredList(usernameLike, emailAddressLike, limit, skip)
     }
 }

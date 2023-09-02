@@ -18,6 +18,7 @@ interface UserDao {
     suspend fun searchUserByUsername(query: String, limit: Int, skip: Long): List<SimpleUserDto>
     suspend fun deleteUser(userId: Int): Boolean
     fun getNameById(id: Int): String?
+    suspend fun getFilteredList(usernameLike: String, emailLike: String, limit: Int, skip: Long): List<UserDto>
 }
 
 @Single
@@ -82,5 +83,15 @@ class UserDaoImpl : UserDao {
             .limit(1, 0)
             .map { it[Users.username] }
             .firstOrNull()
+    }
+
+    override suspend fun getFilteredList(usernameLike: String, emailLike: String, limit: Int, skip: Long): List<UserDto> {
+        return dbQuery {
+            Users
+                .select { (Users.username like "%${usernameLike}%") and (Users.emailAddress like "%${emailLike}%") }
+                .orderBy(Users.id)
+                .limit(limit, skip)
+                .map(UserDto::from)
+        }
     }
 }

@@ -60,3 +60,24 @@ JSON BODY:
 Deletes user by ID
 
 204, 400, 403
+
+8. POST /api/user/as-admin/all/filtered?limit=50&skip=0
+
+Get list of users matching criteria
+
+JSON BODY:
++usernameLike: str
++emailLike: str
+
+RETURNS:
+200: List<UserDto>,
+403, 415
+
+9. GET /api/user/as-admin/by-id/{id}
+
+Get user by User ID
+
+RETURNS:
+200: UserDto,
+400: User could not be found
+403

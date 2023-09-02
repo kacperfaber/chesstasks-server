@@ -33,6 +33,14 @@ class UserDto(
                 null
             }
         }
+
+        fun from(row: ResultRow): UserDto = UserDto(
+            row[Users.id],
+            row[Users.createdAt],
+            row[Users.username],
+            row[Users.emailAddress],
+            row[Users.passwordHash]
+        )
     }
 }
 
