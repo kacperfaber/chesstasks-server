@@ -19,6 +19,11 @@ fun Application.trySetupTestDb() = transaction {
             it[emailAddress] = "kacperf1234@gmail.com"
         }
 
+	Admins.insert {
+	    it[id] = 0
+	    it[userId] = 0
+	}
+
         Users.insert {
             it[id] = 1
             it[username] = "Aneta"
