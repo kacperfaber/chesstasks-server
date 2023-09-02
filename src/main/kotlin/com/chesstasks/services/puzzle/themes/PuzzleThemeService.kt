@@ -11,6 +11,10 @@ class PuzzleThemeService(private val themeDao: ThemeDao, private val puzzleTheme
         return themeNames.map { name -> themeDao.getThemeId(name)!! } // TODO: Throw some kinda exception to inform user, that only admins can add themes.
     }
 
+    suspend fun tryInsertTheme(themeName: String): Int? {
+        return try { themeDao.insertTheme(themeName) } catch (e: Exception) { null }
+    }
+
     suspend fun isThemeExists(themeName: String): Boolean {
         return themeDao.getThemeId(themeName) != null
     }

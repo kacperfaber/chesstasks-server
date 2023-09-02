@@ -81,3 +81,12 @@ RETURNS:
 200: UserDto,
 400: User could not be found
 403
+
+10. PUT /api/theme/as-admin/{name}
+
+Insert new theme to database, will return 400 if theme already exist [theme name is unique]
+
+RETURNS:
+200: Int [Theme.id]
+400: Theme already exist
+403
