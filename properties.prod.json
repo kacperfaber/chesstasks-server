@@ -8,6 +8,11 @@
       "secret": "HelloWorld123"
     },
 
+    "cors": {
+      "allowed-origins": "origins white-space separated",
+      "allowed-hosts": "hosts white-space separated"
+    },
+
     "api-key": "secured-api-key"
   },
 
