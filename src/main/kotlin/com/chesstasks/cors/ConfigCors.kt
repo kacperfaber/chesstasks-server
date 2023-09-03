@@ -8,7 +8,6 @@ import io.ktor.server.plugins.cors.*
 import io.ktor.server.plugins.cors.routing.CORS
 
 fun Application.configureCors() {
-    // TODO: Rebuild CORS in production mode.
     install(CORS) {
         if (Profiles.isProd()) setupProd() else setupDev()
     }
@@ -32,8 +31,8 @@ fun CORSConfig.setupDev() {
 }
 
 private fun CORSConfig.setupProd() {
-    val allowedOrigins by Properties.value<Array<String>>("$.security.cors.allowed-origins")
-    val allowedHosts by Properties.value<Array<String>>("$.security.cors.allowed-hosts")
+    val allowedOrigins by Properties.value<String>("$.security.cors.allowed-origins")
+    val allowedHosts by Properties.value<String>("$.security.cors.allowed-hosts")
 
     allowMethod(HttpMethod.Options)
     allowMethod(HttpMethod.Put)
@@ -43,7 +42,11 @@ private fun CORSConfig.setupProd() {
     allowHeader(HttpHeaders.Authorization)
     allowHeader(HttpHeaders.ContentType)
 
-    allowedHosts.forEach { host -> allowHost(host, schemes = listOf("http", "https")) }
+    allowedHosts
+        .split(" ")
+        .forEach { host -> allowHost(host, schemes = listOf("http", "https")) }
 
-    allowOrigins { it in allowedOrigins }
+    val originArray = allowedOrigins.split(" ")
+
+    allowOrigins { it in originArray }
 }
