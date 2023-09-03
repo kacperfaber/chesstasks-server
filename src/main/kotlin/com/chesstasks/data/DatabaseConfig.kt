@@ -6,4 +6,6 @@ fun Application.configureDb() {
     DatabaseFactory.init()
 
     trySetupTestDb()
+
+    tryImportLichessPuzzles();
 }

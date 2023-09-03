@@ -27,6 +27,12 @@ sourceSets.main {
     java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
+tasks.register('runProd', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.chesstasks.ApplicationKt"
+    systemProperty("com.chesstasks.profile", "PROD")
+}
+
 task runDev(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.chesstasks.ApplicationKt'
@@ -65,6 +71,7 @@ dependencies {
     implementation 'io.ktor:ktor-server-sessions-jvm:2.3.0'
     implementation "org.apache.commons:commons-email:1.5"
     implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'com.opencsv:opencsv:5.5'
 
     implementation 'com.jayway.jsonpath:json-path:2.8.0'
     implementation 'io.ktor:ktor-server-cors-jvm:2.3.0'
