@@ -42,6 +42,13 @@ task runDev(type: JavaExec) {
 
 }
 
+task runProd(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.chesstasks.ApplicationKt'
+
+    systemProperty("com.chesstasks.profile", "PROD")
+}
+
 test {
     useJUnitPlatform()
     systemProperty("com.chesstasks.profile", "TEST")
