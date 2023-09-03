@@ -15,6 +15,8 @@ import org.koin.ktor.ext.inject
 
 data class AuthPayload(val login: String, val password: String)
 
+data class AuthResponse(val token: String)
+
 fun Route.authenticationController() {
     val authenticationService by inject<AuthenticationService>()
     val tokenService by inject<TokenService>()
@@ -22,7 +24,7 @@ fun Route.authenticationController() {
     post("/auth") {
         val authPayload = call.receive<AuthPayload>()
         val authResult = authenticationService.tryAuthenticate(authPayload.login, authPayload.password) ?: throw BadRequestException("")
-        call.respond(authResult.token)
+        call.respond(AuthResponse(authResult.token))
     }
 
     user {

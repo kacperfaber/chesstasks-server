@@ -24,8 +24,11 @@ paths:
           content:
             'application/json':
               schema:
-                type: string
-                description: Generated token.
+                type: object
+                properties:
+                  token:
+                    type: string
+                description: Response
         "400":
           description: Bad Request - Bad credentials
   /api/auth/current:
