@@ -1,0 +1,30 @@
+{
+  "security": {
+    "password-hasher": {
+      "secret": "HelloWorld123"
+    },
+
+    "tokens": {
+      "secret": "HelloWorld123"
+    },
+
+    "api-key": "secured-api-key"
+  },
+
+  "database": {
+    "jdbc": "jdbc:mysql://@localhost:3306/chesstasks",
+    "username": "root2",
+    "password": "root2"
+  },
+
+  "email": {
+    "verification": {
+      "hostname": "string",
+      "port": 587,
+      "username": "string",
+      "password": "string",
+      "from": "string must contain @domain",
+      "subject": "Your verification code for ChessTasks.com"
+    }
+  }
+}

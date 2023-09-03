@@ -4,6 +4,10 @@
       "secret": "HelloWorld123"
     },
 
+    "tokens": {
+      "secret": "HelloWorld123"
+    },
+
     "api-key": "secured-api-key"
   }
 }
