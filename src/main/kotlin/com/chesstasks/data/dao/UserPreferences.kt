@@ -2,6 +2,7 @@ package com.chesstasks.data.dao
 
 import com.chesstasks.data.BaseTable
 import com.chesstasks.data.dto.Users
+import org.jetbrains.exposed.sql.ReferenceOption
 
 enum class UserPuzzleHistoryVisibility(val i: Int) {
     ME(0),
@@ -16,7 +17,7 @@ enum class UserStatisticsVisibility(val i: Int) {
 }
 
 object UserPreferences : BaseTable("user_prefs") {
-    val userId = integer("user_id").references(Users.id)
+    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
     val historyVisibility = enumeration<UserPuzzleHistoryVisibility>("history_visibility")
     val statisticsVisibility = enumeration<UserStatisticsVisibility>("statistics_visibility")
 }
