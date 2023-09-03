@@ -32,8 +32,8 @@ fun devModule() = module {
 
 fun prodModule() = module {
     single { ProdPasswordHasher() } binds arrayOf(PasswordHasher::class)
-    single { ProdTokenReader() } binds arrayOf(TokenReader::class)
-    single { ProdTokenWriter() } binds arrayOf(TokenWriter::class)
+    single { ProdTokenReader(get()) } binds arrayOf(TokenReader::class)
+    single { ProdTokenWriter(get()) } binds arrayOf(TokenWriter::class)
     single { ProdVerificationEmailSender() } binds arrayOf(VerificationEmailSender::class)
 }
 
