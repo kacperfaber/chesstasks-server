@@ -3,6 +3,7 @@ package com.chesstasks.services.importpuzzle
 import com.chesstasks.data.DatabaseFactory.dbQuery
 import com.chesstasks.data.dao.ThemeDao
 import com.chesstasks.data.dto.PuzzleDatabase
+import com.chesstasks.data.dto.PuzzleThemes
 import com.chesstasks.data.dto.Puzzles
 import com.chesstasks.services.puzzle.themes.PuzzleThemeService
 import org.jetbrains.exposed.sql.insert
@@ -44,8 +45,8 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
         return result.toInt()
     }
 
-    private suspend fun insertPuzzle(row: PuzzleCsvRow): Int = dbQuery {
-        Puzzles.insert {
+    private fun insertPuzzle(row: PuzzleCsvRow): Int {
+        return Puzzles.insert {
             it[fen] = row.fen
             it[ranking] = row.rating
             it[moves] = row.moves
@@ -54,12 +55,15 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
         } get Puzzles.id
     }
 
-    private suspend fun processRow(row: PuzzleCsvRow, themes: Map<String, Int>) {
+    private suspend fun processRow(row: PuzzleCsvRow, themes: Map<String, Int>) = dbQuery {
         val puzzleId = insertPuzzle(row)
         val themeList = row.themes.split(" ")
         themeList.forEach {  theme ->
             val themeId = themes[theme] ?: throw Exception("In buffer there's no $theme mapped.")
-            puzzleThemeService.assignTheme(puzzleId, themeId)
+            PuzzleThemes.insert {
+                it[PuzzleThemes.puzzleId] = puzzleId
+                it[PuzzleThemes.themeId] = themeId
+            }
         }
     }
 
