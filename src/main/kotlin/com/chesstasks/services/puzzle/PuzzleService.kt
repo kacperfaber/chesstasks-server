@@ -52,7 +52,7 @@ class PuzzleService(private val puzzleDao: PuzzleDao) {
         fun getWheres(): List<Op<Boolean>> {
             return listOfNotNull(
                 if (themeId != null) PuzzleThemes.puzzleId eq themeId else null,
-                (Puzzles.ranking greaterEq (ranking + (rankingOffset ?: 0)) - 100) and (Puzzles.ranking lessEq (ranking + (rankingOffset ?: 0)) + 100),
+                (Puzzles.ranking greaterEq (ranking + (rankingOffset ?: 0)) - 200) and (Puzzles.ranking lessEq (ranking + (rankingOffset ?: 0)) + 200),
                 if (database != null) Puzzles.database eq database else null
             )
         }
