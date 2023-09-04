@@ -1,9 +1,9 @@
 package com.chesstasks
 
 enum class Profile(val value: String) {
-    PROD("prod"),
-    DEV("dev"),
-    TEST("test")
+    PROD(Constants.ProfileProd),
+    DEV(Constants.ProfileDev),
+    TEST(Constants.ProfileProd)
 }
 
 object Profiles {
@@ -27,10 +27,10 @@ object Profiles {
     }
 
     private fun getProf(): Profile {
-        return when (System.getProperty("com.chesstasks.profile").lowercase()) {
-            "test" -> Profile.TEST
-            "dev" -> Profile.DEV
-            "prod" -> Profile.PROD
+        return when (System.getProperty(Constants.ProfileVar).lowercase()) {
+            Constants.ProfileTest -> Profile.TEST
+            Constants.ProfileDev -> Profile.DEV
+            Constants.ProfileProd -> Profile.PROD
             else -> profileFallback
         }
     }
