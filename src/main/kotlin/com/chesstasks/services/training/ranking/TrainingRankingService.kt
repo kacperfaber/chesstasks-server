@@ -39,7 +39,7 @@ class TrainingRankingService(private val puzzleService: PuzzleService, private v
     }
 
     suspend fun tryUpdateRanking(userId: Int, puzzleId: Int, success: Boolean): RankingUpdated? {
-        val currentUserRanking = getByUserId(0).ranking
+        val currentUserRanking = getByUserId(userId).ranking
         val puzzleRanking = puzzleService.getPuzzleRanking(puzzleId) ?: return null
         val newRanking = updateRanking(userId, currentUserRanking, puzzleRanking, success)
         return RankingUpdated(newRanking, rankingDiff = newRanking - currentUserRanking)
