@@ -44,4 +44,8 @@ class TrainingRankingService(private val puzzleService: PuzzleService, private v
         val newRanking = updateRanking(userId, currentUserRanking, puzzleRanking, success)
         return RankingUpdated(newRanking, rankingDiff = newRanking - currentUserRanking)
     }
+
+    suspend fun setupDefault(userId: Int) {
+        trainingRankingDao.insertValues(userId, DEFAULT_RANKING)
+    }
 }

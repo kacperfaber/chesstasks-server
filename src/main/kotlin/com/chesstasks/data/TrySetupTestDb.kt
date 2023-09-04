@@ -7,7 +7,6 @@ import com.chesstasks.data.dao.UserStatisticsVisibility
 import com.chesstasks.data.dto.*
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.trySetupTestDb() = transaction {
@@ -19,10 +18,10 @@ fun Application.trySetupTestDb() = transaction {
             it[emailAddress] = "kacperf1234@gmail.com"
         }
 
-	Admins.insert {
-	    it[id] = 0
-	    it[userId] = 0
-	}
+        Admins.insert {
+            it[id] = 0
+            it[userId] = 0
+        }
 
         Users.insert {
             it[id] = 1
@@ -36,6 +35,21 @@ fun Application.trySetupTestDb() = transaction {
             it[username] = "Kamil"
             it[emailAddress] = "kamil@gmail.com"
             it[passwordHash] = "HelloWorld123"
+        }
+
+        TrainingRankings.insert {
+            it[userId] = 0
+            it[ranking] = 1500
+        }
+
+        TrainingRankings.insert {
+            it[userId] = 1
+            it[ranking] = 1500
+        }
+
+        TrainingRankings.insert {
+            it[userId] = 2
+            it[ranking] = 1500
         }
 
         UserPreferences.insert {
@@ -64,12 +78,12 @@ fun Application.trySetupTestDb() = transaction {
             it[userId] = 0
             it[secondUserId] = 1
         }
-		
-		FriendRequests.insert {
-			it[id] = 0
-			it[senderId] = 0
-			it[targetId] = 2
-		}
+
+        FriendRequests.insert {
+            it[id] = 0
+            it[senderId] = 0
+            it[targetId] = 2
+        }
 
         Puzzles.insert {
             it[id] = 0

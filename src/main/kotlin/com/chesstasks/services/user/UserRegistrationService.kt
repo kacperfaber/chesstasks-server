@@ -3,6 +3,7 @@ package com.chesstasks.services.user
 import com.chesstasks.security.PasswordHasher
 import com.chesstasks.services.email.verification.EmailVerificationCodeService
 import com.chesstasks.services.email.verification.VerificationEmailSender
+import com.chesstasks.services.training.ranking.TrainingRankingService
 import com.chesstasks.services.user.preferences.UserPreferencesService
 import org.koin.core.annotation.Single
 
@@ -12,7 +13,8 @@ class UserRegistrationService(
     private val passwordHasher: PasswordHasher,
     private val emailVerificationCodeService: EmailVerificationCodeService,
     private val verificationEmailSender: VerificationEmailSender,
-    private val userPreferencesService: UserPreferencesService
+    private val userPreferencesService: UserPreferencesService,
+    private val trainingRankingService: TrainingRankingService
 ) {
 
     enum class RegistrationResult(val i: String) {
@@ -52,11 +54,16 @@ class UserRegistrationService(
         val user = userService.tryCreateUser(emailVerificationCode.username, emailVerificationCode.emailAddress, emailVerificationCode.passwordHash) ?: return VerificationResult.Fail
         emailVerificationCodeService.deleteById(emailVerificationCode.id)
         setupUserPrefs(user.id)
+        setupTrainingRanking(user.id)
         return VerificationResult.Ok
     }
 
     private suspend fun setupUserPrefs(userId: Int) {
         userPreferencesService.setupDefault(userId)
+    }
+
+    private suspend fun setupTrainingRanking(userId: Int) {
+        trainingRankingService.setupDefault(userId)
     }
 
     suspend fun tryRegisterAsAdmin(username: String, emailAddress: String, password: String, skipVerification: Boolean): RegistrationResult {
