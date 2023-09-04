@@ -3,7 +3,7 @@ package com.chesstasks
 enum class Profile(val value: String) {
     PROD(Constants.ProfileProd),
     DEV(Constants.ProfileDev),
-    TEST(Constants.ProfileProd)
+    TEST(Constants.ProfileTest)
 }
 
 object Profiles {
