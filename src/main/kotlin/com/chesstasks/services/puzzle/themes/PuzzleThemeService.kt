@@ -29,6 +29,10 @@ class PuzzleThemeService(private val themeDao: ThemeDao, private val puzzleTheme
         }
     }
 
+    suspend fun assignTheme(puzzleId: Int, themeId: Int) {
+        puzzleThemeDao.insertPuzzleTheme(puzzleId, themeId)
+    }
+
     suspend fun deleteByIds(puzzleId: Int, themeIds: List<Int>): Int {
         return puzzleThemeDao.deleteByIds(puzzleId, themeIds)
     }

@@ -19,6 +19,24 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
             .forEach { themeDao.insertTheme(it) }
     }
 
+    private suspend fun ensureTheme(theme: String): Int {
+        return themeDao.getThemeId(theme) ?: themeDao.insertTheme(theme)
+    }
+
+    private suspend fun createThemeBuffer(fileReader: FileReader): Map<String, Int> {
+        val output = mutableMapOf<String, Int>()
+        PuzzleCsvReader.readRows(fileReader) { row ->
+            val themeList = row.themes.split(" ")
+            themeList.forEach { theme ->
+                if (!output.containsKey(theme)) {
+                    val themeId = ensureTheme(theme)
+                    output[theme] = themeId
+                }
+            }
+        }
+        return output
+    }
+
     private fun getPuzzleId(row: PuzzleCsvRow): Int {
         val digest = MessageDigest.getInstance("SHA-256")
         val bytes = digest.digest(row.id.toByteArray())
@@ -36,15 +54,24 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
         } get Puzzles.id
     }
 
-    private suspend fun processRow(row: PuzzleCsvRow) {
+    private suspend fun processRow(row: PuzzleCsvRow, themes: Map<String, Int>) {
         val puzzleId = insertPuzzle(row)
         val themeList = row.themes.split(" ")
-        ensureThemes(themeList)
-        puzzleThemeService.tryAssignThemes(puzzleId, themeList)
+        themeList.forEach {  theme ->
+            val themeId = themes[theme] ?: throw Exception("In buffer there's no $theme mapped.")
+            puzzleThemeService.assignTheme(puzzleId, themeId)
+        }
     }
 
     suspend fun importData() {
         val reader = FileReader(File("lichess.data.csv"))
-        PuzzleCsvReader.readRows(reader, ::processRow)
+
+        val themeBuffer = createThemeBuffer(reader)
+
+        val reader2 = FileReader(File("lichess.data.csv"))
+
+        PuzzleCsvReader.readRows(reader2) {
+            processRow(it, themeBuffer)
+        }
     }
 }
