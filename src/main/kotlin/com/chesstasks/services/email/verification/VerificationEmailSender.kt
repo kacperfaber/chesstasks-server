@@ -19,7 +19,14 @@ class ProdVerificationEmailSender : VerificationEmailSender {
     private val subject by Properties.value<String>("$.email.verification.subject")
 
     override suspend fun sendVerificationEmail(emailAddress: String, code: String) {
-        // TODO: Use template.
+        val msg = """
+            Hi!
+            
+            If you still want to register in <a href="ChessTasks.com">ChessTasks.com</a>, 
+            please use this verification code: <strong>$code</strong>.
+            
+            If it wasn't you, please ignore this email.
+        """.trimIndent()
 
         SimpleEmail().apply {
             hostName = this@ProdVerificationEmailSender.hostName
@@ -27,7 +34,7 @@ class ProdVerificationEmailSender : VerificationEmailSender {
             setAuthenticator(DefaultAuthenticator(username, password))
             setFrom(from)
             subject = this@ProdVerificationEmailSender.subject
-            setMsg("Hi! Your code is $code") // TODO: Use template
+            setMsg(msg)
             addTo(emailAddress)
         }.send()
     }
