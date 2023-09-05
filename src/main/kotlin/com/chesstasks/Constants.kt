@@ -6,4 +6,5 @@ object Constants {
     const val ProfileDev = "dev"
     const val ProfileTest = "test"
     const val ProfileProd = "prod"
+    const val TestingInitDbVar = "com.chesstasks.testing.initdb"
 }

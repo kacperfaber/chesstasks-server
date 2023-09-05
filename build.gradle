@@ -38,8 +38,7 @@ task runDev(type: JavaExec) {
     mainClass = 'com.chesstasks.ApplicationKt'
 
     systemProperty("com.chesstasks.profile", "DEV")
-    systemProperty("testing.initdb", "true")
-
+    systemProperty("com.chesstasks.testing.initdb", "true")
 }
 
 test {

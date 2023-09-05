@@ -1,5 +1,6 @@
 package com.chesstasks.data
 
+import com.chesstasks.Constants
 import com.chesstasks.Profiles
 import com.chesstasks.data.dao.UserPreferences
 import com.chesstasks.data.dao.UserPuzzleHistoryVisibility
@@ -9,13 +10,29 @@ import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 
+private fun setupUserDefaults(vararg userIds: Int) {
+    userIds.forEach { id ->
+        TrainingRankings.insert {
+            it[userId] = id
+            it[ranking] = 1500
+        }
+
+        UserPreferences.insert {
+            it[UserPreferences.id] = id
+            it[userId] = id
+            it[historyVisibility] = UserPuzzleHistoryVisibility.ME
+            it[statisticsVisibility] = UserStatisticsVisibility.ME
+        }
+    }
+}
+
 fun Application.trySetupTestDb() = transaction {
-    if (!Profiles.isProd() && System.getProperty("testing.initdb").toBoolean()) {
+    if (!Profiles.isProd() && System.getProperty(Constants.TestingInitDbVar).toBoolean()) {
         Users.insert {
             it[id] = 0
-            it[username] = "kacperfaber"
+            it[username] = "admin1"
             it[passwordHash] = "HelloWorld123"
-            it[emailAddress] = "kacperf1234@gmail.com"
+            it[emailAddress] = "admin1@gmail.com"
         }
 
         Admins.insert {
@@ -25,53 +42,20 @@ fun Application.trySetupTestDb() = transaction {
 
         Users.insert {
             it[id] = 1
-            it[username] = "Aneta"
-            it[emailAddress] = "anetka@gmail.com"
+            it[username] = "user2"
+            it[emailAddress] = "user2@gmail.com"
             it[passwordHash] = "HelloWorld123"
         }
 
         Users.insert {
             it[id] = 2
-            it[username] = "Kamil"
-            it[emailAddress] = "kamil@gmail.com"
+            it[username] = "user3"
+            it[emailAddress] = "user3@gmail.com"
             it[passwordHash] = "HelloWorld123"
         }
 
-        TrainingRankings.insert {
-            it[userId] = 0
-            it[ranking] = 1500
-        }
-
-        TrainingRankings.insert {
-            it[userId] = 1
-            it[ranking] = 1500
-        }
-
-        TrainingRankings.insert {
-            it[userId] = 2
-            it[ranking] = 1500
-        }
-
-        UserPreferences.insert {
-            it[id] = 0
-            it[userId] = 0
-            it[historyVisibility] = UserPuzzleHistoryVisibility.ME
-            it[statisticsVisibility] = UserStatisticsVisibility.ME
-        }
-
-        UserPreferences.insert {
-            it[id] = 1
-            it[userId] = 1
-            it[historyVisibility] = UserPuzzleHistoryVisibility.ONLY_FRIENDS
-            it[statisticsVisibility] = UserStatisticsVisibility.ONLY_FRIENDS
-        }
-
-        UserPreferences.insert {
-            it[id] = 2
-            it[userId] = 2
-            it[historyVisibility] = UserPuzzleHistoryVisibility.EVERYONE
-            it[statisticsVisibility] = UserStatisticsVisibility.EVERYONE
-        }
+        /* Make sure to setup all users */
+        setupUserDefaults(0, 1, 2)
 
         Friends.insert {
             it[id] = 0
