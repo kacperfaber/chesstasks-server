@@ -1,9 +1,9 @@
 # ChessTasks.com
 
+ChessTasks.com API server written in Ktor/Kotlin
+
 [![build](https://github.com/kacperfaber/chesstasks-server/actions/workflows/build.yml/badge.svg)](https://github.com/kacperfaber/chesstasks-server/actions/workflows/build.yml)
 [![test](https://github.com/kacperfaber/chesstasks-server/actions/workflows/test.yml/badge.svg)](https://github.com/kacperfaber/chesstasks-server/actions/workflows/test.yml)
-
-API server
 
 ## Installation
 
