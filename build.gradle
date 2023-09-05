@@ -41,6 +41,13 @@ task runDev(type: JavaExec) {
     systemProperty("com.chesstasks.testing.initdb", "true")
 }
 
+task runDevNoInitDb(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.chesstasks.ApplicationKt'
+
+    systemProperty("com.chesstasks.profile", "DEV")
+}
+
 test {
     useJUnitPlatform()
     systemProperty("com.chesstasks.profile", "TEST")
