@@ -1,9 +1,17 @@
+import com.github.jk1.license.render.*
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.21'
     id 'io.ktor.plugin' version '2.3.0'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.21'
     id "com.google.devtools.ksp" version "$ksp_version"
     id 'application'
+    id 'com.github.jk1.dependency-license-report' version '2.5'
+}
+
+licenseReport {
+    outputDir = "$projectDir/licenses"
+    renderers = [new XmlReportRenderer("third-party-libs.xml")]
 }
 
 group "com.chesstasks"

@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic SYSTEM "html-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="topic.v2.xsd"  id="third-party-libs" title="Third Party Libraries">
+<chunk include-id="third-party-libs-tables">
+<chapter title="Third-party libraries" id="Third-party_libraries">
+<table>
+<tr><td>Project</td><td>Version</td><td>License</td></tr>
+<tr>
+<td><a href='http://www.qos.ch'>ch.qos.logback:logback-classic</a></td>
+<td>1.2.11</td>
+<td><a href='http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html'>GNU Lesser General Public License</a></td>
+</tr>
+<tr>
+<td><a href='http://www.qos.ch'>ch.qos.logback:logback-core</a></td>
+<td>1.2.11</td>
+<td><a href='http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html'>GNU Lesser General Public License</a></td>
+</tr>
+<tr>
+<td>com.fasterxml.jackson:jackson-bom</td>
+<td>2.14.2</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/FasterXML/jackson'>com.fasterxml.jackson.core:jackson-annotations</a></td>
+<td>2.14.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/FasterXML/jackson-core'>com.fasterxml.jackson.core:jackson-core</a></td>
+<td>2.14.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/FasterXML/jackson'>com.fasterxml.jackson.core:jackson-databind</a></td>
+<td>2.14.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/FasterXML/jackson-module-kotlin'>com.fasterxml.jackson.module:jackson-module-kotlin</a></td>
+<td>2.14.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>com.github.bhlangonijr:chesslib</td>
+<td>1.3.3</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/google/gson/gson'>com.google.code.gson:gson</a></td>
+<td>2.10.1</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://developers.google.com/protocol-buffers/'>com.google.protobuf:protobuf-java</a></td>
+<td>3.21.9</td>
+<td><a href='https://opensource.org/licenses/BSD-3-Clause'>BSD-3-Clause</a></td>
+</tr>
+<tr>
+<td><a href='https://h2database.com'>com.h2database:h2</a></td>
+<td>2.1.214</td>
+<td><a href='https://www.mozilla.org/en-US/MPL/2.0/'>MPL 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/jayway/JsonPath'>com.jayway.jsonpath:json-path</a></td>
+<td>2.8.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://dev.mysql.com/doc/connector-j/en/'>com.mysql:mysql-connector-j</a></td>
+<td>8.0.33</td>
+<td>The GNU General Public License, v2 with Universal FOSS Exception, v1.0</td>
+</tr>
+<tr>
+<td><a href='http://opencsv.sf.net'>com.opencsv:opencsv</a></td>
+<td>5.5</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>Apache 2</a></td>
+</tr>
+<tr>
+<td><a href='http://www.oracle.com'>com.sun.mail:javax.mail</a></td>
+<td>1.5.6</td>
+<td><a href='https://opensource.org/licenses/CDDL-1.0'>COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/lightbend/config'>com.typesafe:config</a></td>
+<td>1.4.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://commons.apache.org/proper/commons-beanutils/'>commons-beanutils:commons-beanutils</a></td>
+<td>1.9.4</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://commons.apache.org/proper/commons-codec/'>commons-codec:commons-codec</a></td>
+<td>1.16.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://commons.apache.org/collections/'>commons-collections:commons-collections</a></td>
+<td>3.2.2</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://commons.apache.org/proper/commons-logging/'>commons-logging:commons-logging</a></td>
+<td>1.2</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.insert-koin:koin-annotations</td>
+<td>1.2.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://insert-koin.io/'>io.insert-koin:koin-annotations-jvm</a></td>
+<td>1.2.0</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.insert-koin:koin-core</td>
+<td>3.4.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://insert-koin.io/'>io.insert-koin:koin-core-jvm</a></td>
+<td>3.4.0</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://insert-koin.io/'>io.insert-koin:koin-ktor</a></td>
+<td>3.4.0</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-bom</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td>io.ktor:ktor-client-core</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-client-core-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-events</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-events-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-http</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td>io.ktor:ktor-http-cio</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-http-cio-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-http-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-io</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-io-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-network</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-network-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-serialization</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-serialization-jackson-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-serialization-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-serialization-kotlinx</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-serialization-kotlinx-json-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-serialization-kotlinx-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-auth</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-auth-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-content-negotiation-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-core</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-core-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-cors</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-cors-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-freemarker</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-freemarker-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-host-common</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-host-common-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-netty-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-request-validation</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-request-validation-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-server-sessions</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-sessions-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-status-pages-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-server-websockets-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-utils</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-utils-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-websocket-serialization</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-websocket-serialization-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>io.ktor:ktor-websockets</td>
+<td>2.3.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/ktorio/ktor'>io.ktor:ktor-websockets-jvm</a></td>
+<td>2.3.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-buffer</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-codec</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-codec-http</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-codec-http2</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-common</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-handler</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-resolver</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-transport</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-transport-classes-epoll</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-transport-classes-kqueue</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-transport-native-epoll</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-transport-native-kqueue</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://netty.io/'>io.netty:netty-transport-native-unix-common</a></td>
+<td>4.1.91.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://java.sun.com/products/javabeans/jaf/index.jsp'>javax.activation:activation</a></td>
+<td>1.1</td>
+<td><a href='https://glassfish.dev.java.net/public/CDDLv1.0.html'>Common Development and Distribution License (CDDL) v1.0</a></td>
+</tr>
+<tr>
+<td>mysql:mysql-connector-java</td>
+<td>8.0.33</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://urielch.github.io/'>net.minidev:accessors-smart</a></td>
+<td>2.4.9</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://urielch.github.io/'>net.minidev:json-smart</a></td>
+<td>2.4.10</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://commons.apache.org/proper/commons-collections/'>org.apache.commons:commons-collections4</a></td>
+<td>4.4</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://commons.apache.org/proper/commons-email/'>org.apache.commons:commons-email</a></td>
+<td>1.5</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://commons.apache.org/proper/commons-lang/'>org.apache.commons:commons-lang3</a></td>
+<td>3.12.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://commons.apache.org/proper/commons-text'>org.apache.commons:commons-text</a></td>
+<td>1.9</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://www.eclipse.org/jetty/documentation/current/alpn-chapter.html'>org.eclipse.jetty.alpn:alpn-api</a></td>
+<td>1.1.3.v20160715</td>
+<td><a href='http://www.eclipse.org/org/documents/epl-v10.php'>Eclipse Public License - Version 1.0</a></td>
+</tr>
+<tr>
+<td><a href='https://freemarker.apache.org/'>org.freemarker:freemarker</a></td>
+<td>2.3.32</td>
+<td>Apache License, Version 2.0; see: http://www.apache.org/licenses/LICENSE-2.0.txt</td>
+</tr>
+<tr>
+<td><a href='http://fusesource.github.io/jansi'>org.fusesource.jansi:jansi</a></td>
+<td>2.4.0</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://www.jetbrains.org'>org.jetbrains:annotations</a></td>
+<td>13.0</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/JetBrains/Exposed'>org.jetbrains.exposed:exposed-core</a></td>
+<td>0.41.1</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/JetBrains/Exposed'>org.jetbrains.exposed:exposed-jdbc</a></td>
+<td>0.41.1</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://kotlinlang.org/'>org.jetbrains.kotlin:kotlin-reflect</a></td>
+<td>1.8.10</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://kotlinlang.org/'>org.jetbrains.kotlin:kotlin-stdlib</a></td>
+<td>1.8.21</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://kotlinlang.org/'>org.jetbrains.kotlin:kotlin-stdlib-common</a></td>
+<td>1.8.21</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://kotlinlang.org/'>org.jetbrains.kotlin:kotlin-stdlib-jdk7</a></td>
+<td>1.8.21</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://kotlinlang.org/'>org.jetbrains.kotlin:kotlin-stdlib-jdk8</a></td>
+<td>1.8.21</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>org.jetbrains.kotlinx:kotlinx-coroutines-bom</td>
+<td>1.6.4</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td>org.jetbrains.kotlinx:kotlinx-coroutines-core</td>
+<td>1.6.4</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/Kotlin/kotlinx.coroutines'>org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm</a></td>
+<td>1.6.4</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/Kotlin/kotlinx.coroutines'>org.jetbrains.kotlinx:kotlinx-coroutines-jdk8</a></td>
+<td>1.6.4</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/Kotlin/kotlinx.coroutines'>org.jetbrains.kotlinx:kotlinx-coroutines-slf4j</a></td>
+<td>1.6.4</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>org.jetbrains.kotlinx:kotlinx-serialization-bom</td>
+<td>1.5.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td>org.jetbrains.kotlinx:kotlinx-serialization-core</td>
+<td>1.5.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/Kotlin/kotlinx.serialization'>org.jetbrains.kotlinx:kotlinx-serialization-core-jvm</a></td>
+<td>1.5.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td>org.jetbrains.kotlinx:kotlinx-serialization-json</td>
+<td>1.5.0</td>
+<td>No license information found</td>
+</tr>
+<tr>
+<td><a href='https://github.com/Kotlin/kotlinx.serialization'>org.jetbrains.kotlinx:kotlinx-serialization-json-jvm</a></td>
+<td>1.5.0</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://asm.ow2.org'>org.ow2.asm:asm</a></td>
+<td>9.3</td>
+<td><a href='http://www.apache.org/licenses/LICENSE-2.0.txt'>The Apache Software License, Version 2.0</a></td>
+</tr>
+<tr>
+<td><a href='http://www.slf4j.org'>org.slf4j:slf4j-api</a></td>
+<td>1.7.36</td>
+<td><a href='http://www.opensource.org/licenses/mit-license.php'>MIT License</a></td>
+</tr>
+</table>
+</chapter>
+</chunk>
+</topic>
