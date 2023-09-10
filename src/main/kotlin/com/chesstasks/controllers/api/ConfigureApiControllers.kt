@@ -6,6 +6,7 @@ import com.chesstasks.controllers.api.play.training.playTrainingController
 import com.chesstasks.controllers.api.puzzle.puzzleController
 import com.chesstasks.controllers.api.puzzlehistory.puzzleHistoryController
 import com.chesstasks.controllers.api.register.registerController
+import com.chesstasks.controllers.api.server.serverController
 import com.chesstasks.controllers.api.statistics.statisticsController
 import com.chesstasks.controllers.api.theme.themeController
 import com.chesstasks.controllers.api.user.preferences.userPreferencesController
@@ -26,6 +27,7 @@ fun Application.configureApiControllers() {
             puzzleHistoryController()
             userPreferencesController()
             statisticsController()
+            serverController()
         }
     }
 }

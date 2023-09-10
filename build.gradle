@@ -21,6 +21,19 @@ tasks.named("jar", Jar) {
     }
 }
 
+task createVersionResource(dependsOn: processResources) {
+    doLast {
+        new File("$buildDir/resources/main/version").withWriter { w ->
+            w.write(project.getVersion().toString())
+            w.close()
+        }
+    }
+}
+
+classes {
+    dependsOn createVersionResource
+}
+
 group "com.chesstasks"
 version "1.0.0-beta.1"
 mainClassName = "com.chesstasks.ApplicationKt"

@@ -4,9 +4,22 @@ info:
   description: "ChessTasks.com - API documentation."
   version: "0.0.1"
 servers:
-- url: "https://chesstasks.com/api"
+- url: "https://chesstasks.com.pl/api"
 paths:
-  /api/auth:
+  /server/version/raw:
+    get:
+      tags:
+        - server
+      description: Get running server version
+      responses:
+        200:
+          description: OK
+          content:
+            'text/plain':
+              schema: 
+                type: string
+                example: 1.0.0-beta.1
+  /auth:
     post:
       operationId: /api/auth
       tags:
@@ -31,7 +44,7 @@ paths:
                 description: Response
         "400":
           description: Bad Request - Bad credentials
-  /api/auth/current:
+  /auth/current:
     get:
       operationId: /api/auth/current
       tags:
@@ -46,7 +59,7 @@ paths:
                 $ref: "#/components/schemas/User"
         "400":
           description: Bad request - no current user
-  /api/auth/revoke:
+  /auth/revoke:
     post:
       operationId: /api/auth/revoke
       tags:
@@ -57,7 +70,7 @@ paths:
           description: OK
         "403":
           description: Forbidden - You're not authenticated.
-  /api/friend/all:
+  /friend/all:
     get:
       operationId: /api/friend/all
       tags:
@@ -74,7 +87,7 @@ paths:
                   $ref: "#/components/schemas/Friend"
         "403":
           description: Forbidden - You're not authenticated
-  /api/friend/by-id/{id}:
+  /friend/by-id/{id}:
     delete:
       operationId: /api/friend/by-id/{id}
       tags:
@@ -94,7 +107,7 @@ paths:
           description: Forbidden - You're not authenticated
         "400":
           description: "Bad Request - Friend not found"
-  /api/friend/requests:
+  /friend/requests:
     put:
       operationId: /api/friend/requests
       tags:
@@ -115,7 +128,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/FriendRequest"
-  /api/friend/requests/received:
+  /friend/requests/received:
     get:
       operationId: /friend/requests/received
       tags:
@@ -135,7 +148,7 @@ paths:
                   $ref: "#/components/schemas/FriendRequest"
         "403":
           description: Forbidden - You're not authenticated
-  /api/friend/requests/sent:
+  /friend/requests/sent:
     get:
       operationId: /friend/requests/sent
       tags:
@@ -156,7 +169,7 @@ paths:
         "403":
           description: Forbidden - You're not authenticated
 
-  /api/play/training/{puzzleId}/submit:
+  /play/training/{puzzleId}/submit:
     post:
       operationId: /play/training/{puzzleId}/submit
       tags:
@@ -185,7 +198,7 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/SubmitPuzzleResponse"
-  /api/play/training/puzzles:
+  /play/training/puzzles:
     post:
       operationId: /play/training/puzzles
       tags:
@@ -208,7 +221,7 @@ paths:
                   $ref: "#/components/schemas/Puzzle"
         "403":
           description: Forbidden - You're not authenticated
-  /api/play/training/ranking/{userId}:
+  /play/training/ranking/{userId}:
     post:
       operationId: /play/training/ranking/{userId}
       tags:
@@ -227,7 +240,7 @@ paths:
           description: Bad request - you're not allowed to see ranking of this user, or user does not exist.
         "403":
           description: Forbidden - You're not authenticated
-  /api/puzzle/{id}:
+  /puzzle/{id}:
     delete:
       operationId: /puzzle/{id} DEL
       tags:
@@ -264,7 +277,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Puzzle"
-  /api/puzzle/all/by-database/lichess:
+  /puzzle/all/by-database/lichess:
     get:
       operationId: /puzzle/all/by-database/lichess
       tags:
@@ -287,7 +300,7 @@ paths:
                   $ref: "#/components/schemas/Puzzle"
         "403":
           description: Forbidden - You're not authenticated.
-  /api/puzzle/all/by-database/user:
+  /puzzle/all/by-database/user:
     get:
       operationId: /puzzle/all/by-database/user
       tags:
@@ -310,7 +323,7 @@ paths:
                   $ref: "#/components/schemas/Puzzle"
         "403":
           description: Forbidden - You're not authenticated.
-  /api/puzzle/by-opening/eco/{openingEco}:
+  /puzzle/by-opening/eco/{openingEco}:
     get:
       operationId: /puzzle/by-opening/eco/{openingEco}
       tags:
@@ -333,7 +346,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Puzzle"
-  /api/puzzle/by-opening/id/{openingId}:
+  /puzzle/by-opening/id/{openingId}:
     get:
       operationId: /puzzle/by-opening/id/{openingId}
       tags:
@@ -358,7 +371,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Puzzle"
-  /api/puzzle/by-theme/{themeName}:
+  /puzzle/by-theme/{themeName}:
     get:
       operationId: /puzzle/by-theme/{themeName}
       tags:
@@ -381,7 +394,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Puzzle"
-  /api/puzzle/by-user/{userId}:
+  /puzzle/by-user/{userId}:
     get:
       operationId: /puzzle/by-user/{userId}
       tags:
@@ -410,7 +423,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Puzzle"
 
-  /api/user/search/by-username:
+  /user/search/by-username:
     get:
       operationId: /user/search/by-username
       tags:
@@ -439,7 +452,7 @@ paths:
           description: Forbidden - You're not authenticated.
 
 
-  /api/theme/all:
+  /theme/all:
     get:
       operationId: /theme/all
       tags:
@@ -458,7 +471,7 @@ paths:
                   $ref: "#/components/schemas/Theme"
 
 
-  /api/puzzle-history/mine:
+  /puzzle-history/mine:
     get:
       description: Get puzzle history of current authenticated user.
       operationId: /puzzle-history/mine
@@ -476,7 +489,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/PuzzleHistoryItems"
 
-  /api/register:
+  /register:
     post:
       description: Register new user [as this user]
       operationId: /register
@@ -502,7 +515,7 @@ paths:
         '400':
           description: Bad Request - something wrong...
 
-  /api/register/confirm:
+  /register/confirm:
     post:
       description: Confirms new user with verification code.
       operationId: /register/confirm
@@ -526,7 +539,7 @@ paths:
         '400':
           description: Bad Request - something wrong...
 
-  /api/puzzle-history/user/{userId}:
+  /puzzle-history/user/{userId}:
     get:
       description: Get PuzzleHistory of another user
       operationId: /puzzle-history/user/{userId}
@@ -547,7 +560,7 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/PuzzleHistoryItems"
-  /api/friend/request/by-sender-id/{senderId}/accept:
+  /friend/request/by-sender-id/{senderId}/accept:
     post:
       description: Accept Friend Request by sender id.
       operationId: /friend/request/by-sender-id/{senderId}/accept
@@ -569,7 +582,7 @@ paths:
         '400':
           description: Bad Request - Couldn't accept this friend request.
 
-  /api/friend/request/by-sender-id/{senderId}/reject:
+  /friend/request/by-sender-id/{senderId}/reject:
     post:
       description: Reject Friend Request by sender id.
       operationId: /friend/request/by-sender-id/{senderId}/reject
@@ -587,7 +600,7 @@ paths:
         '400':
           description: Bad Request - Couldn't reject this friend request.
 
-  /api/user/preferences/history-visibility/:
+  /user/preferences/history-visibility/:
     get:
       description: Get History Visibility value [from User Preferences]
       tags:
@@ -605,7 +618,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserPuzzleHistoryVisibility"
 
-  /api/user/preferences/history-visibility/{value}:
+  /user/preferences/history-visibility/{value}:
     post:
       description: Set History Visibility value [from User Preferences]
       tags:
@@ -626,7 +639,7 @@ paths:
         '204':
           description: OK [No Content] - value set
 
-  /api/user/preferences/statistics-visibility/:
+  /user/preferences/statistics-visibility/:
     get:
       description: Get Statistics Visibility value [from User Preferences]
       tags:
@@ -644,7 +657,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserStatisticsVisibility"
 
-  /api/user/preferences/statistics-visibility/{value}:
+  /user/preferences/statistics-visibility/{value}:
     post:
       description: Set Statistics Visibility value [from User Preferences]
       tags:
@@ -664,7 +677,7 @@ paths:
           description: Forbidden - You're not authenticated.
         '204':
           description: OK [No Content] - value set
-  /api/statistics/simple/user/{userId}:
+  /statistics/simple/user/{userId}:
     get:
       description: Get simple statistics for user
       operationId: /statistics/simple/user/{userId}
@@ -686,7 +699,7 @@ paths:
         '400':
           description: Bad Request - Probably you have no access to see statistics of this user.
 
-  /api/friend/all/include-user:
+  /friend/all/include-user:
     get:
       description: Get friend list including user names
       tags:
@@ -709,7 +722,7 @@ paths:
           description: Forbidden - no valid authentication.
 
 
-  /api/friend/requests/sent/include-user:
+  /friend/requests/sent/include-user:
     get:
       description: Get sent friend requests including user names
       tags:
@@ -731,7 +744,7 @@ paths:
         '403':
           description: Forbidden - no valid authentication.
 
-  /api/friend/requests/received/include-user:
+  /friend/requests/received/include-user:
     get:
       description: Get received friend requests including user names
       tags:
@@ -754,7 +767,7 @@ paths:
           description: Forbidden - no valid authentication.
 
 
-  /api/user/by-id/{id}:
+  /user/by-id/{id}:
     get:
       tags:
         - user
@@ -775,7 +788,7 @@ paths:
           description: Forbidden - No valid authentication
         '400':
           description: Bad Request - Probably user you're looking for does not exist
-  /api/play/training/puzzles/search:
+  /play/training/puzzles/search:
     post:
       tags:
         - play
