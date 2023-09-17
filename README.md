@@ -27,6 +27,11 @@ gradle runDevNoInitDb
 
 ```json5
 {
+  "server": {
+    "host": "",
+    "port": 8080
+  },
+
   "security": {
     "password-hasher": {
       // Password used to encoding/decoding user passwords.

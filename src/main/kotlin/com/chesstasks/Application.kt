@@ -13,11 +13,16 @@ import com.chesstasks.websocket.configWebSocket
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import com.chesstasks.Properties;
+
+private val host by Properties.value<String>("$.server.host")
+private val port by Properties.value<Int>("$.server.port")
+
 
 fun main() {
     Profiles.profileFallback = Profile.DEV
 
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+    embeddedServer(Netty, port = port, host = host, module = Application::module)
         .start(wait = true)
 }
 
