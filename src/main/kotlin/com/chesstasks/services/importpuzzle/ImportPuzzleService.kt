@@ -6,11 +6,12 @@ import com.chesstasks.data.dto.PuzzleDatabase
 import com.chesstasks.data.dto.PuzzleThemes
 import com.chesstasks.data.dto.Puzzles
 import com.chesstasks.services.puzzle.themes.PuzzleThemeService
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.*
 import org.koin.core.annotation.Single
 import java.io.File
 import java.io.FileReader
 import java.security.MessageDigest
+import kotlin.random.Random
 
 @Single
 class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThemeService: PuzzleThemeService) {
@@ -42,21 +43,57 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
         val digest = MessageDigest.getInstance("SHA-256")
         val bytes = digest.digest(row.id.toByteArray())
         val result = bytes.fold(0L) { acc, byte -> (acc shl 8) or (byte.toInt() and 0xff).toLong() }
-        return result.toInt()
+        return result.toInt() + Random.nextInt()
     }
 
-    private fun insertPuzzle(row: PuzzleCsvRow): Int {
-        return Puzzles.insert {
-            it[fen] = row.fen
-            it[ranking] = row.rating
-            it[moves] = row.moves
-            it[database] = PuzzleDatabase.LICHESS
-            it[id] = getPuzzleId(row)
-        } get Puzzles.id
+    private fun insertPuzzle(row: PuzzleCsvRow): Int? {
+        val id = getPuzzleId(row)
+
+        try {
+            return Puzzles.insert {
+                it[fen] = row.fen
+                it[ranking] = row.rating
+                it[moves] = row.moves
+                it[database] = PuzzleDatabase.LICHESS
+                it[this.id] = id
+            } get Puzzles.id
+        }
+
+        catch (e: Exception) {
+            val isTaken = isPuzzleIdTaken(id)
+
+            if (isTaken) {
+                return tryWithAnotherId(row)
+            }
+
+            return null
+        }
     }
 
-    private suspend fun processRow(row: PuzzleCsvRow, themes: Map<String, Int>) = dbQuery {
-        val puzzleId = insertPuzzle(row)
+    private fun tryWithAnotherId(row: PuzzleCsvRow): Int? {
+        val id = getPuzzleId(row)
+
+        try {
+            return Puzzles.insert {
+                it[fen] = row.fen
+                it[ranking] = row.rating
+                it[moves] = row.moves
+                it[database] = PuzzleDatabase.LICHESS
+                it[this.id] = id
+            } get Puzzles.id
+        }
+
+        catch (e: Exception) {
+          return null
+        }
+    }
+
+    private fun isPuzzleIdTaken(id: Int): Boolean {
+        return Puzzles.select { Puzzles.id eq id }.count() > 0
+    }
+
+    private suspend fun processRow(row: PuzzleCsvRow, themes: Map<String, Int>): Boolean = dbQuery {
+        val puzzleId = insertPuzzle(row) ?: return@dbQuery false
         val themeList = row.themes.split(" ")
         themeList.forEach {  theme ->
             val themeId = themes[theme] ?: throw Exception("In buffer there's no $theme mapped.")
@@ -65,6 +102,12 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
                 it[PuzzleThemes.themeId] = themeId
             }
         }
+
+        return@dbQuery true
+    }
+
+    private fun logResult(row: PuzzleCsvRow, result: Boolean) {
+        println("IMPORT-LOG: SUCCESS: true: ${row.id}")
     }
 
     suspend fun importData() {
@@ -75,7 +118,8 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
         val reader2 = FileReader(File("lichess.data.csv"))
 
         PuzzleCsvReader.readRows(reader2) {
-            processRow(it, themeBuffer)
+            val r = processRow(it, themeBuffer)
+            logResult(it, r)
         }
     }
 }
