@@ -12,9 +12,12 @@ import java.io.File
 import java.io.FileReader
 import java.security.MessageDigest
 import kotlin.random.Random
+import org.slf4j.LoggerFactory
 
 @Single
 class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThemeService: PuzzleThemeService) {
+    val logger = LoggerFactory.getLogger(javaClass)
+
     private suspend fun ensureThemes(themes: List<String>) {
         themes
             .filter { !themeDao.isThemeExist(it) }
@@ -106,11 +109,18 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
         return@dbQuery true
     }
 
-    private fun logResult(row: PuzzleCsvRow, result: Boolean) {
-        println("IMPORT-LOG: SUCCESS: true: ${row.id}")
+    private fun logResult(row: PuzzleCsvRow, result: Boolean, counter: Int) {
+        if (!result) {
+            logger.warn("$counter: ${row.id} is skipped.")
+            return
+        }
+
+        logger.info("$counter: ${row.id} is imported.")
     }
 
     suspend fun importData() {
+        var counter = 0
+
         val reader = FileReader(File("lichess.data.csv"))
 
         val themeBuffer = createThemeBuffer(reader)
@@ -119,7 +129,9 @@ class ImportPuzzleService(private val themeDao: ThemeDao, private val puzzleThem
 
         PuzzleCsvReader.readRows(reader2) {
             val r = processRow(it, themeBuffer)
-            logResult(it, r)
+            logResult(it, r, counter)
+
+            counter += 1
         }
     }
 }
