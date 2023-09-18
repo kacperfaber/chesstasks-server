@@ -34,7 +34,8 @@
       "username": "string",
       "password": "string",
       "from": "string must contain @domain",
-      "subject": "Your verification code for ChessTasks.com"
+      "subject": "Your verification code for ChessTasks.com",
+      "ssl-trust": "string"
     }
   }
 }

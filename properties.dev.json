@@ -1,7 +1,22 @@
 {
     "server": {
-      "host": "",
+      "host": "0.0.0.0",
       "port": 8080
     },
-    "api-key": "dev-api-key"
+
+    "email": {
+      "verification": {
+        "hostname": "",
+        "port": 587,
+        "username": "",
+        "password": "",
+        "subject": "",
+        "from": "",
+        "ssl-trust": ""
+      }
+    },
+
+    "security": {
+      "api-key": "dev-api-key"
+    }
 }

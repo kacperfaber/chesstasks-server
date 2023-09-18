@@ -17,13 +17,14 @@ class ProdVerificationEmailSender : VerificationEmailSender {
     private val password by Properties.value<String>("$.email.verification.password")
     private val from by Properties.value<String>("$.email.verification.from")
     private val subject by Properties.value<String>("$.email.verification.subject")
+    private val sslTrust by Properties.value<String>("$.email.verification.ssl-trust")
 
     override suspend fun sendVerificationEmail(emailAddress: String, code: String) {
         val msg = """
             Hi!
             
-            If you still want to register in <a href="ChessTasks.com">ChessTasks.com</a>, 
-            please use this verification code: <strong>$code</strong>.
+            If you still want to register in ChessTasks.com, 
+            please use this verification code: $code.
             
             If it wasn't you, please ignore this email.
         """.trimIndent()
@@ -35,6 +36,9 @@ class ProdVerificationEmailSender : VerificationEmailSender {
             setFrom(from)
             subject = this@ProdVerificationEmailSender.subject
             setMsg(msg)
+            setStartTLSEnabled(true)
+            setTLS(true)
+            getMailSession().getProperties().put("mail.smtp.ssl.trust", sslTrust)
             addTo(emailAddress)
         }.send()
     }

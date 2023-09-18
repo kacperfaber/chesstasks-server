@@ -69,7 +69,8 @@ gradle runDevNoInitDb
       "username": "string",
       "password": "string",
       "from": "string",
-      "subject": "string"
+      "subject": "string",
+      "ssl-trust": "string"
     }
   }
 }
