@@ -12,4 +12,9 @@ fun Route.serverController() {
     get("/server/version/raw") {
         call.respond(serverService.getServerVersion())
     }
+
+    get("/server/version") {
+        val v = serverService.getServerVersion()
+        call.respond(mapOf("version" to v))
+    }
 }
